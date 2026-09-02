@@ -1,9 +1,14 @@
 .venv/
 __pycache__/
 .pytest_cache/
+.pytest-tmp-*/
 *.egg-info/
 data/raw/
 data/standard/*.parquet
 data/derived/*.parquet
 outputs/qa/*.csv
 outputs/qa/*.md
+outputs/batch1_recovery/
+outputs/models/*_stdout.log
+outputs/models/*_stderr.log
+outputs/models/run_failures.log

@@ -1,0 +1,40 @@
+# Frozen on 2026-09-02 before inspecting any Batch 2 estimates.
+primary_outcome: annualized_nco_rate
+# Mortgage NCO reporting begins in 2020 in the committed Batch 1 mapping; it
+# cannot support the pre-specified 2005--2019 OOS windows and remains secondary.
+primary_segments: [CRE, CI]
+primary_cre_exposure: cre_to_tier1
+primary_lags:
+  nco: 1
+  npl: 1
+  bank_features: 1
+  macro: 1
+ar_baseline:
+  entity_effect: bank_segment_fixed_effect
+dynamic_fe_spec:
+  entity_effect: bank_segment_fixed_effect
+  standard_errors: bank_clustered
+  bank_features: [lagged_npl_rate, lagged_allowance_coverage, lagged_loan_growth, lagged_tier1_ratio]
+  segment_macro_variables:
+    CRE: [lagged_cre_price_growth, lagged_gdp_growth, lagged_bbb_spread, lagged_short_rate]
+    CI: [lagged_gdp_growth, lagged_bbb_spread, lagged_unemployment_rate, lagged_short_rate]
+  exclude_merger_recent: true
+cre_interaction_spec:
+  outcome: annualized_nco_rate
+  segment: CRE
+  exposure: cre_to_tier1
+  alternative_exposure: cre_share
+  shock: cre_price_growth
+  pre_shock_reference: 2021-12-31
+  entity_effect: bank_fixed_effect
+  time_effect: quarter_fixed_effect
+oos_windows:
+  - {train_start: '2017-01-01', train_end: '2019-12-31', test_start: '2020-01-01', test_end: '2020-12-31'}
+  - {train_start: '2017-01-01', train_end: '2020-12-31', test_start: '2021-01-01', test_end: '2021-12-31'}
+  - {train_start: '2017-01-01', train_end: '2021-12-31', test_start: '2022-01-01', test_end: '2023-12-31'}
+  - {train_start: '2017-01-01', train_end: '2023-12-31', test_start: '2024-01-01', test_end: '2025-12-31'}
+quantiles: [0.5, 0.75, 0.9]
+bayesian_core_spec: deferred_to_batch_3
+secondary_hypotheses:
+  - CI losses interact with BBB spread.
+  - Mortgage losses interact with unemployment and house-price growth when a sufficiently long loss series is available.

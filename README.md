@@ -15,6 +15,25 @@ python scripts/run_batch1.py --full
 python -m pytest -q
 ```
 
+## Batch 2
+
+Batch 2 consumes the ignored, real `data/derived/credit_panel.parquet` produced
+by Batch 1.  If a checkout contains the committed manifest but not its ignored
+archives, restore the archives without changing the original manifest, then run
+the existing Batch 1 pipeline followed by Batch 2:
+
+```powershell
+python scripts/recover_batch1_inputs.py
+python scripts/run_batch1.py --full
+python scripts/run_batch2.py
+```
+
+The recovery command writes `data/manifests/ffiec_recovery_manifest.csv`, which
+records each fresh source download timestamp and SHA-256.  Batch 2 writes its
+macro availability audit to `metadata/macro_release_calendar.csv`; its explicit
+ALFRED/final-vintage fallback limitation is written to
+`metadata/macro_vintage_limitation.md`.
+
 `--pilot` obtains 2005Q1, 2009Q4, 2020Q2, and 2025Q4.  `--full` obtains the
 complete 2005Q1–2025Q4 sequence, reuses manifest-backed raw snapshots without
 overwriting them, and regenerates the standard layer, panel, QA reports, and

@@ -1,0 +1,3 @@
+# Macro vintage limitation
+
+GDP and unemployment use ALFRED snapshots at each quarter-end forecast origin. The release-calendar `release_date` field for these series is the snapshot availability date, not a separately sourced first-publication date; ALFRED proves the value was visible at that origin but this pipeline does not claim a complete release-calendar feed. CRE price, house price, BBB spread, short rate, and mortgage rate use final FRED vintages lagged one complete quarter because a release-calendar API feed was not available. These fallback variables are labeled in `macro_release_calendar.csv` and must not be described as real-time vintages.

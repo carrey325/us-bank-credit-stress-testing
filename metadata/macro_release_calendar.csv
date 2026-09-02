@@ -1,0 +1,585 @@
+series_id,observation_date,release_date,vintage_date,value,frequency,aggregation_rule,transformation,source
+BAA10YM,2004-12-31,2004-12-31,,2.013333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2005-03-31,2005-03-31,,1.67,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2005-06-30,2005-06-30,,1.8133333333333335,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2005-09-30,2005-09-30,,1.7666666666666666,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2005-12-31,2005-12-31,,1.8466666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2006-03-31,2006-03-31,,1.7366666666666666,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2006-06-30,2006-06-30,,1.6666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2006-09-30,2006-09-30,,1.6966666666666665,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2006-12-31,2006-12-31,,1.6500000000000001,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2007-03-31,2007-03-31,,1.6166666666666665,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2007-06-30,2007-06-30,,1.6466666666666665,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2007-09-30,2007-09-30,,1.8999999999999997,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2007-12-31,2007-12-31,,2.25,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2008-03-31,2008-03-31,,3.0866666666666664,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2008-06-30,2008-06-30,,3.1033333333333335,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2008-09-30,2008-09-30,,3.3433333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2008-12-31,2008-12-31,,5.586666666666666,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2009-03-31,2009-03-31,,5.476666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2009-06-30,2009-06-30,,4.67,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2009-09-30,2009-09-30,,3.143333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2009-12-31,2009-12-31,,2.8666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2010-03-31,2010-03-31,,2.57,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2010-06-30,2010-06-30,,2.686666666666666,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2010-09-30,2010-09-30,,2.9899999999999998,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2010-12-31,2010-12-31,,3.0500000000000003,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2011-03-31,2011-03-31,,2.6300000000000003,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2011-06-30,2011-06-30,,2.64,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2011-09-30,2011-09-30,,3.0366666666666666,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2011-12-31,2011-12-31,,3.206666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2012-03-31,2012-03-31,,3.1633333333333336,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2012-06-30,2012-06-30,,3.27,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2012-09-30,2012-09-30,,3.23,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2012-12-31,2012-12-31,,2.8666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2013-03-31,2013-03-31,,2.86,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2013-06-30,2013-06-30,,2.84,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2013-09-30,2013-09-30,,2.6933333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2013-12-31,2013-12-31,,2.61,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2014-03-31,2014-03-31,,2.3533333333333335,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2014-06-30,2014-06-30,,2.1966666666666668,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2014-09-30,2014-09-30,,2.2433333333333336,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2014-12-31,2014-12-31,,2.46,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2015-03-31,2015-03-31,,2.533333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2015-06-30,2015-06-30,,2.6666666666666665,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2015-09-30,2015-09-30,,3.0233333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2015-12-31,2015-12-31,,3.2300000000000004,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2016-03-31,2016-03-31,,3.3866666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2016-06-30,2016-06-30,,2.9133333333333336,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2016-09-30,2016-09-30,,2.6933333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2016-12-31,2016-12-31,,2.51,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2017-03-31,2017-03-31,,2.216666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2017-06-30,2017-06-30,,2.2333333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2017-09-30,2017-09-30,,2.09,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2017-12-31,2017-12-31,,1.9000000000000001,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2018-03-31,2018-03-31,,1.71,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2018-06-30,2018-06-30,,1.8566666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2018-09-30,2018-09-30,,1.8866666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2018-12-31,2018-12-31,,2.106666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2019-03-31,2019-03-31,,2.316666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2019-06-30,2019-06-30,,2.263333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2019-09-30,2019-09-30,,2.223333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2019-12-31,2019-12-31,,2.1199999999999997,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2020-03-31,2020-03-31,,2.513333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2020-06-30,2020-06-30,,3.22,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2020-09-30,2020-09-30,,2.6633333333333336,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2020-12-31,2020-12-31,,2.436666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2021-03-31,2021-03-31,,2.15,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2021-06-30,2021-06-30,,1.9633333333333332,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2021-09-30,2021-09-30,,1.9133333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2021-12-31,2021-12-31,,1.7766666666666666,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2022-03-31,2022-03-31,,2.006666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2022-06-30,2022-06-30,,2.0866666666666664,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2022-09-30,2022-09-30,,2.2433333333333336,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2022-12-31,2022-12-31,,2.143333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2023-03-31,2023-03-31,,1.9533333333333331,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2023-06-30,2023-06-30,,2.09,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2023-09-30,2023-09-30,,1.8233333333333335,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2023-12-31,2023-12-31,,1.7466666666666668,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2024-03-31,2024-03-31,,1.5733333333333335,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2024-06-30,2024-06-30,,1.4799999999999998,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2024-09-30,2024-09-30,,1.6733333333333331,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2024-12-31,2024-12-31,,1.4533333333333331,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2025-03-31,2025-03-31,,1.5233333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2025-06-30,2025-06-30,,1.8466666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+BAA10YM,2025-09-30,2025-09-30,,1.72,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+COMREPUSQ159N,2005-06-30,2005-06-30,,-24.058507871912347,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2005-09-30,2005-09-30,,-13.420952306786294,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2005-12-31,2005-12-31,,31.744589412528224,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2006-03-31,2006-03-31,,-5.098500694394503,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2006-06-30,2006-06-30,,21.442383801558627,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2006-09-30,2006-09-30,,-12.22524579943366,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2006-12-31,2006-12-31,,-0.8088538175525462,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2007-03-31,2007-03-31,,-2.432871145326776,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2007-06-30,2007-06-30,,-5.930263252055868,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2007-09-30,2007-09-30,,-6.2486815572274645,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2007-12-31,2007-12-31,,-38.38285653701915,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2008-03-31,2008-03-31,,-152.4106066884698,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2008-06-30,2008-06-30,,53.760550053650256,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2008-09-30,2008-09-30,,68.26985713641575,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2008-12-31,2008-12-31,,17.23634552671973,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2009-03-31,2009-03-31,,-13.794917093353776,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2009-06-30,2009-06-30,,165.49043852633903,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2009-09-30,2009-09-30,,1.7209803398033463,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2009-12-31,2009-12-31,,12.175334716427066,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2010-03-31,2010-03-31,,-23.51293995503767,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2010-06-30,2010-06-30,,-99.8443299917352,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2010-09-30,2010-09-30,,-6036.967903990395,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2010-12-31,2010-12-31,,449.5967220764824,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2011-03-31,2011-03-31,,-2.808887494116874,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2011-06-30,2011-06-30,,-86.67387064967848,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2011-09-30,2011-09-30,,-11.58589282027056,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2011-12-31,2011-12-31,,369.0296116969659,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2012-03-31,2012-03-31,,-53.23347825281427,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2012-06-30,2012-06-30,,57.54001393457182,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2012-09-30,2012-09-30,,72.00540559992828,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2012-12-31,2012-12-31,,-54.46238217360683,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2013-03-31,2013-03-31,,22.10064843684907,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2013-06-30,2013-06-30,,132.77829480818397,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2013-09-30,2013-09-30,,41.76913890993301,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2013-12-31,2013-12-31,,-10.604367284284011,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2014-03-31,2014-03-31,,-22.11624829923623,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2014-06-30,2014-06-30,,-7.137063192541748,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2014-09-30,2014-09-30,,-48.62095270211224,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2014-12-31,2014-12-31,,59.27126020525668,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2015-03-31,2015-03-31,,95.83415396655492,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2015-06-30,2015-06-30,,-19.5837936000261,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2015-09-30,2015-09-30,,-13.558570202373465,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2015-12-31,2015-12-31,,-43.567317695224375,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2016-03-31,2016-03-31,,-120.5310581406573,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2016-06-30,2016-06-30,,-130.23446940189143,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2016-09-30,2016-09-30,,1021.7558056332846,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2016-12-31,2016-12-31,,34.82563544615793,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2017-03-31,2017-03-31,,-0.03738801044862461,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2017-06-30,2017-06-30,,77.64425244560425,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2017-09-30,2017-09-30,,-63.56351026948748,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2017-12-31,2017-12-31,,47.50971442305523,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2018-03-31,2018-03-31,,70.41336447573347,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2018-06-30,2018-06-30,,-90.6709000982395,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2018-09-30,2018-09-30,,320.08167307864744,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2018-12-31,2018-12-31,,-94.15167939859572,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2019-03-31,2019-03-31,,1145.1549269969432,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2019-06-30,2019-06-30,,184.43633343463173,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2019-09-30,2019-09-30,,-12.155079190073014,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2019-12-31,2019-12-31,,-9.028472417244693,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2020-03-31,2020-03-31,,-17.501984774019107,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2020-06-30,2020-06-30,,-152.3008399882523,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2020-09-30,2020-09-30,,-49.277067181709214,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2020-12-31,2020-12-31,,-342.82252668063416,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2021-03-31,2021-03-31,,-53.45644757417809,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2021-06-30,2021-06-30,,430.98595000026944,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2021-09-30,2021-09-30,,95.37682655145427,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2021-12-31,2021-12-31,,4.236184709586777,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2022-03-31,2022-03-31,,-23.772748723004266,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2022-06-30,2022-06-30,,-16.596793825724,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2022-09-30,2022-09-30,,-73.1374492275267,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2022-12-31,2022-12-31,,-170.88565635314404,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2023-03-31,2023-03-31,,-119.05951600859126,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2023-06-30,2023-06-30,,432.81372106841314,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2023-09-30,2023-09-30,,-148.12272365623434,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2023-12-31,2023-12-31,,666.3148905533244,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2024-03-31,2024-03-31,,29.37202135996999,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2024-06-30,2024-06-30,,16.248560219166052,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2024-09-30,2024-09-30,,-0.8182259221974353,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2024-12-31,2024-12-31,,-74.19722283246682,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+COMREPUSQ159N,2025-03-31,2025-03-31,,10.207485823309526,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+GDPC1,2004-12-31,2005-03-31,2005-03-31,0.9484895785510927,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2005-03-31,2005-06-30,2005-06-30,0.9268439100261094,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2005-06-30,2005-09-30,2005-09-30,0.8173247388470362,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2005-09-30,2005-12-31,2005-12-31,1.0199112650145947,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2005-12-31,2006-03-31,2006-03-31,0.41062995991894,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2006-03-31,2006-06-30,2006-06-30,1.3806530764648883,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2006-06-30,2006-09-30,2006-09-30,0.6335937223852284,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2006-09-30,2006-12-31,2006-12-31,0.4864727215250886,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2006-12-31,2007-03-31,2007-03-31,0.6073316730021316,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2007-03-31,2007-06-30,2007-06-30,0.17197950143315044,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2007-06-30,2007-09-30,2007-09-30,0.9419413630548767,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2007-09-30,2007-12-31,2007-12-31,1.2048506523380853,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2007-12-31,2008-03-31,2008-03-31,0.14409592671693616,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2008-03-31,2008-06-30,2008-06-30,0.23895783550451632,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2008-06-30,2008-09-30,2008-09-30,0.6989524300188954,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2008-09-30,2008-12-31,2008-12-31,-0.12790558862152412,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2008-12-31,2009-03-31,2009-03-31,-1.6247737440661103,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2009-03-31,2009-06-30,2009-06-30,-1.4025221096848672,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2009-06-30,2009-09-30,2009-09-30,-0.18490723691335642,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2009-09-30,2009-12-31,2009-12-31,0.5541991241328592,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2009-12-31,2010-03-31,2010-03-31,1.3605179989208294,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2010-03-31,2010-06-30,2010-06-30,0.6775923038898846,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2010-06-30,2010-09-30,2010-09-30,0.42697963284319407,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2010-09-30,2010-12-31,2010-12-31,0.6335781248815842,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2010-12-31,2011-03-31,2011-03-31,0.7696652483337729,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2011-03-31,2011-06-30,2011-06-30,0.4753114560523741,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2011-06-30,2011-09-30,2011-09-30,0.33187429599559337,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2011-09-30,2011-12-31,2011-12-31,0.4505794240419636,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2011-12-31,2012-03-31,2012-03-31,0.7305949773470433,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2012-03-31,2012-06-30,2012-06-30,0.4646660212971998,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2012-06-30,2012-09-30,2012-09-30,0.3117040810282523,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2012-09-30,2012-12-31,2012-12-31,0.7676126508469494,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2012-12-31,2013-03-31,2013-03-31,0.09448818897637157,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2013-03-31,2013-06-30,2013-06-30,0.44126040950138723,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2013-06-30,2013-09-30,2013-09-30,0.6147370042159039,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2013-09-30,2013-12-31,2013-12-31,1.0178766175373166,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2013-12-31,2014-03-31,2014-03-31,0.6502812624295196,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2014-03-31,2014-06-30,2014-06-30,-0.7407964973686232,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2014-06-30,2014-09-30,2014-09-30,1.1287480182166076,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2014-09-30,2014-12-31,2014-12-31,1.2192075151151727,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2014-12-31,2015-03-31,2015-03-31,0.5498099422421854,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2015-03-31,2015-06-30,2015-06-30,-0.042958753459709786,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2015-06-30,2015-09-30,2015-09-30,0.9661686437168138,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2015-09-30,2015-12-31,2015-12-31,0.49223686143899936,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2015-12-31,2016-03-31,2016-03-31,0.34482758620688614,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2016-03-31,2016-06-30,2016-06-30,0.2671426663266585,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2016-06-30,2016-09-30,2016-09-30,0.3515885022692844,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2016-09-30,2016-12-31,2016-12-31,0.8677509030277974,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2016-12-31,2017-03-31,2017-03-31,0.5159323249835479,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2017-03-31,2017-06-30,2017-06-30,0.353886506515666,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2017-06-30,2017-09-30,2017-09-30,0.756661460551844,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2017-09-30,2017-12-31,2017-12-31,0.779803518096478,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2017-12-31,2018-03-31,2018-03-31,0.7143076040903029,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2018-03-31,2018-06-30,2018-06-30,0.4937784676675605,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2018-06-30,2018-09-30,2018-09-30,1.0238669440666426,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2018-09-30,2018-12-31,2018-12-31,0.8286544592421619,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2018-12-31,2019-03-31,2019-03-31,0.5372791056274195,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2019-03-31,2019-06-30,2019-06-30,0.7731096234445012,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2019-06-30,2019-09-30,2019-09-30,0.49969670762537444,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2019-09-30,2019-12-31,2019-12-31,0.5217786273266745,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2019-12-31,2020-03-31,2020-03-31,0.5274693229138538,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2020-03-31,2020-06-30,2020-06-30,-1.2725386627905455,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2020-06-30,2020-09-30,2020-09-30,-8.98611676869966,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2020-09-30,2020-12-31,2020-12-31,7.478741091394214,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2020-12-31,2021-03-31,2021-03-31,1.0642044283444063,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2021-03-31,2021-06-30,2021-06-30,1.553380773640023,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2021-06-30,2021-09-30,2021-09-30,1.6407465395443133,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2021-09-30,2021-12-31,2021-12-31,0.570948110599212,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2021-12-31,2022-03-31,2022-03-31,1.6807782659928439,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2022-03-31,2022-06-30,2022-06-30,-0.3956924795102901,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2022-06-30,2022-09-30,2022-09-30,-0.144633972706798,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2022-09-30,2022-12-31,2022-12-31,0.8011552091951923,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2022-12-31,2023-03-31,2023-03-31,0.6373978959407056,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2023-03-31,2023-06-30,2023-06-30,0.4968118157466117,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2023-06-30,2023-09-30,2023-09-30,0.5111220984456155,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2023-09-30,2023-12-31,2023-12-31,1.1938709626620136,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2023-12-31,2024-03-31,2024-03-31,0.8384046164520154,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2024-03-31,2024-06-30,2024-06-30,0.35052738725322996,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2024-06-30,2024-09-30,2024-09-30,0.7389796233074009,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2024-09-30,2024-12-31,2024-12-31,0.7595104802784025,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2024-12-31,2025-03-31,2025-03-31,0.607065022345421,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2025-03-31,2025-06-30,2025-06-30,-0.12586679434578585,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2025-06-30,2025-09-30,2025-09-30,0.9459997171759493,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+GDPC1,2025-09-30,2025-12-31,2025-12-31,1.068450029144774,quarterly,quarter_end,qoq_pct_change,ALFRED vintage graph
+MORTGAGE30US,2004-12-31,2004-12-31,,5.7361538461538455,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2005-03-31,2005-03-31,,5.768461538461538,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2005-06-30,2005-06-30,,5.708461538461538,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2005-09-30,2005-09-30,,5.7638461538461545,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2005-12-31,2005-12-31,,6.226153846153846,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2006-03-31,2006-03-31,,6.2469230769230775,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2006-06-30,2006-06-30,,6.602307692307692,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2006-09-30,2006-09-30,,6.5600000000000005,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2006-12-31,2006-12-31,,6.243846153846154,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2007-03-31,2007-03-31,,6.214615384615384,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2007-06-30,2007-06-30,,6.358461538461539,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2007-09-30,2007-09-30,,6.5515384615384615,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2007-12-31,2007-12-31,,6.224615384615385,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2008-03-31,2008-03-31,,5.872307692307692,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2008-06-30,2008-06-30,,6.086923076923076,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2008-09-30,2008-09-30,,6.322307692307692,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2008-12-31,2008-12-31,,5.841428571428572,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2009-03-31,2009-03-31,,5.06,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2009-06-30,2009-06-30,,5.012307692307692,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2009-09-30,2009-09-30,,5.162307692307692,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2009-12-31,2009-12-31,,4.922142857142857,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2010-03-31,2010-03-31,,4.995833333333334,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2010-06-30,2010-06-30,,4.922307692307692,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2010-09-30,2010-09-30,,4.4471428571428575,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2010-12-31,2010-12-31,,4.436153846153847,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2011-03-31,2011-03-31,,4.846923076923077,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2011-06-30,2011-06-30,,4.650769230769231,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2011-09-30,2011-09-30,,4.291538461538462,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2011-12-31,2011-12-31,,4.002307692307692,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2012-03-31,2012-03-31,,3.9223076923076925,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2012-06-30,2012-06-30,,3.7946153846153843,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2012-09-30,2012-09-30,,3.553846153846154,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2012-12-31,2012-12-31,,3.3592307692307695,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2013-03-31,2013-03-31,,3.496923076923077,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2013-06-30,2013-06-30,,3.6723076923076925,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2013-09-30,2013-09-30,,4.4399999999999995,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2013-12-31,2013-12-31,,4.2930769230769235,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2014-03-31,2014-03-31,,4.364615384615385,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2014-06-30,2014-06-30,,4.227692307692307,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2014-09-30,2014-09-30,,4.135384615384615,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2014-12-31,2014-12-31,,3.9635714285714285,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2015-03-31,2015-03-31,,3.716666666666667,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2015-06-30,2015-06-30,,3.819230769230769,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2015-09-30,2015-09-30,,3.9546153846153844,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2015-12-31,2015-12-31,,3.8978571428571427,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2016-03-31,2016-03-31,,3.7384615384615385,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2016-06-30,2016-06-30,,3.589230769230769,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2016-09-30,2016-09-30,,3.446153846153846,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2016-12-31,2016-12-31,,3.8423076923076924,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2017-03-31,2017-03-31,,4.173076923076923,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2017-06-30,2017-06-30,,3.98,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2017-09-30,2017-09-30,,3.883846153846154,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2017-12-31,2017-12-31,,3.9223076923076925,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2018-03-31,2018-03-31,,4.282307692307692,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2018-06-30,2018-06-30,,4.544615384615384,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2018-09-30,2018-09-30,,4.566923076923077,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2018-12-31,2018-12-31,,4.7846153846153845,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2019-03-31,2019-03-31,,4.373846153846154,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2019-06-30,2019-06-30,,4.010769230769231,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2019-09-30,2019-09-30,,3.6584615384615384,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2019-12-31,2019-12-31,,3.7,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2020-03-31,2020-03-31,,3.5215384615384617,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2020-06-30,2020-06-30,,3.2392307692307694,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2020-09-30,2020-09-30,,2.9523076923076923,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2020-12-31,2020-12-31,,2.7607142857142857,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2021-03-31,2021-03-31,,2.875833333333333,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2021-06-30,2021-06-30,,3.003846153846154,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2021-09-30,2021-09-30,,2.8721428571428573,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2021-12-31,2021-12-31,,3.079230769230769,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2022-03-31,2022-03-31,,3.822307692307692,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2022-06-30,2022-06-30,,5.266153846153846,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2022-09-30,2022-09-30,,5.623076923076923,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2022-12-31,2022-12-31,,6.664615384615384,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2023-03-31,2023-03-31,,6.372307692307692,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2023-06-30,2023-06-30,,6.510769230769231,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2023-09-30,2023-09-30,,7.04,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2023-12-31,2023-12-31,,7.303846153846154,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2024-03-31,2024-03-31,,6.748461538461539,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2024-06-30,2024-06-30,,6.995384615384615,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2024-09-30,2024-09-30,,6.508461538461538,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2024-12-31,2024-12-31,,6.632307692307692,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2025-03-31,2025-03-31,,6.827692307692308,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2025-06-30,2025-06-30,,6.788461538461538,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+MORTGAGE30US,2025-09-30,2025-09-30,,6.5661538461538465,weekly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2004-12-31,2004-12-31,,2.0066666666666664,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2005-03-31,2005-03-31,,2.5366666666666666,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2005-06-30,2005-06-30,,2.8633333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2005-09-30,2005-09-30,,3.36,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2005-12-31,2005-12-31,,3.8266666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2006-03-31,2006-03-31,,4.3933333333333335,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2006-06-30,2006-06-30,,4.703333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2006-09-30,2006-09-30,,4.906666666666666,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2006-12-31,2006-12-31,,4.903333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2007-03-31,2007-03-31,,4.983333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2007-06-30,2007-06-30,,4.736666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2007-09-30,2007-09-30,,4.303333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2007-12-31,2007-12-31,,3.39,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2008-03-31,2008-03-31,,2.0433333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2008-06-30,2008-06-30,,1.6266666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2008-09-30,2008-09-30,,1.4933333333333332,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2008-12-31,2008-12-31,,0.2966666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2009-03-31,2009-03-31,,0.21333333333333335,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2009-06-30,2009-06-30,,0.17333333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2009-09-30,2009-09-30,,0.15666666666666665,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2009-12-31,2009-12-31,,0.05666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2010-03-31,2010-03-31,,0.10666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2010-06-30,2010-06-30,,0.14666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2010-09-30,2010-09-30,,0.15666666666666665,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2010-12-31,2010-12-31,,0.1366666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2011-03-31,2011-03-31,,0.12666666666666668,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2011-06-30,2011-06-30,,0.04666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2011-09-30,2011-09-30,,0.023333333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2011-12-31,2011-12-31,,0.013333333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2012-03-31,2012-03-31,,0.06666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2012-06-30,2012-06-30,,0.08666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2012-09-30,2012-09-30,,0.10333333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2012-12-31,2012-12-31,,0.08666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2013-03-31,2013-03-31,,0.08666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2013-06-30,2013-06-30,,0.049999999999999996,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2013-09-30,2013-09-30,,0.03333333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2013-12-31,2013-12-31,,0.06333333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2014-03-31,2014-03-31,,0.04666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2014-06-30,2014-06-30,,0.03333333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2014-09-30,2014-09-30,,0.02666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2014-12-31,2014-12-31,,0.023333333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2015-03-31,2015-03-31,,0.02666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2015-06-30,2015-06-30,,0.02,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2015-09-30,2015-09-30,,0.04,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2015-12-31,2015-12-31,,0.12333333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2016-03-31,2016-03-31,,0.2866666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2016-06-30,2016-06-30,,0.25666666666666665,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2016-09-30,2016-09-30,,0.29666666666666663,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2016-12-31,2016-12-31,,0.43,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2017-03-31,2017-03-31,,0.59,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2017-06-30,2017-06-30,,0.89,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2017-09-30,2017-09-30,,1.0366666666666668,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2017-12-31,2017-12-31,,1.2066666666666668,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2018-03-31,2018-03-31,,1.5599999999999998,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2018-06-30,2018-06-30,,1.8399999999999999,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2018-09-30,2018-09-30,,2.0399999999999996,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2018-12-31,2018-12-31,,2.316666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2019-03-31,2019-03-31,,2.3866666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2019-06-30,2019-06-30,,2.3000000000000003,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2019-09-30,2019-09-30,,1.9799999999999998,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2019-12-31,2019-12-31,,1.5766666666666669,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2020-03-31,2020-03-31,,1.11,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2020-06-30,2020-06-30,,0.14333333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2020-09-30,2020-09-30,,0.11333333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2020-12-31,2020-12-31,,0.09333333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2021-03-31,2021-03-31,,0.049999999999999996,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2021-06-30,2021-06-30,,0.02666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2021-09-30,2021-09-30,,0.04666666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2021-12-31,2021-12-31,,0.05333333333333334,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2022-03-31,2022-03-31,,0.3066666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2022-06-30,2022-06-30,,1.0766666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2022-09-30,2022-09-30,,2.6633333333333336,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2022-12-31,2022-12-31,,4.04,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2023-03-31,2023-03-31,,4.626666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2023-06-30,2023-06-30,,5.073333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2023-09-30,2023-09-30,,5.29,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2023-12-31,2023-12-31,,5.283333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2024-03-31,2024-03-31,,5.233333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2024-06-30,2024-06-30,,5.243333333333333,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2024-09-30,2024-09-30,,4.989999999999999,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2024-12-31,2024-12-31,,4.3999999999999995,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2025-03-31,2025-03-31,,4.21,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2025-06-30,2025-06-30,,4.23,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+TB3MS,2025-09-30,2025-09-30,,4.096666666666667,monthly,quarterly_mean; lag 1 quarter,level,FRED final vintage fallback
+UNRATE,2005-03-31,2005-03-31,2005-03-31,5.300000000000001,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2005-06-30,2005-06-30,2005-06-30,5.15,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2005-09-30,2005-09-30,2005-09-30,4.95,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2005-12-31,2005-12-31,2005-12-31,5.0,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2006-03-31,2006-03-31,2006-03-31,4.75,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2006-06-30,2006-06-30,2006-06-30,4.65,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2006-09-30,2006-09-30,2006-09-30,4.75,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2006-12-31,2006-12-31,2006-12-31,4.45,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2007-03-31,2007-03-31,2007-03-31,4.55,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2007-06-30,2007-06-30,2007-06-30,4.5,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2007-09-30,2007-09-30,2007-09-30,4.6,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2007-12-31,2007-12-31,2007-12-31,4.7,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2008-03-31,2008-03-31,2008-03-31,4.85,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2008-06-30,2008-06-30,2008-06-30,5.25,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2008-09-30,2008-09-30,2008-09-30,5.9,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2008-12-31,2008-12-31,2008-12-31,6.6,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2009-03-31,2009-03-31,2009-03-31,7.85,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2009-06-30,2009-06-30,2009-06-30,9.15,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2009-09-30,2009-09-30,2009-09-30,9.55,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2009-12-31,2009-12-31,2009-12-31,10.1,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2010-03-31,2010-03-31,2010-03-31,9.7,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2010-06-30,2010-06-30,2010-06-30,9.8,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2010-09-30,2010-09-30,2010-09-30,9.55,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2010-12-31,2010-12-31,2010-12-31,9.7,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2011-03-31,2011-03-31,2011-03-31,8.95,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2011-06-30,2011-06-30,2011-06-30,9.05,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2011-09-30,2011-09-30,2011-09-30,9.1,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2011-12-31,2011-12-31,2011-12-31,8.8,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2012-03-31,2012-03-31,2012-03-31,8.3,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2012-06-30,2012-06-30,2012-06-30,8.149999999999999,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2012-09-30,2012-09-30,2012-09-30,8.2,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2012-12-31,2012-12-31,2012-12-31,7.800000000000001,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2013-03-31,2013-03-31,2013-03-31,7.800000000000001,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2013-06-30,2013-06-30,2013-06-30,7.55,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2013-09-30,2013-09-30,2013-09-30,7.35,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2013-12-31,2013-12-31,2013-12-31,7.15,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2014-03-31,2014-03-31,2014-03-31,6.65,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2014-06-30,2014-06-30,2014-06-30,6.3,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2014-09-30,2014-09-30,2014-09-30,6.15,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2014-12-31,2014-12-31,2014-12-31,5.8,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2015-03-31,2015-03-31,2015-03-31,5.6,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2015-06-30,2015-06-30,2015-06-30,5.45,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2015-09-30,2015-09-30,2015-09-30,5.199999999999999,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2015-12-31,2015-12-31,2015-12-31,5.0,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2016-03-31,2016-03-31,2016-03-31,4.9,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2016-06-30,2016-06-30,2016-06-30,4.85,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2016-09-30,2016-09-30,2016-09-30,4.9,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2016-12-31,2016-12-31,2016-12-31,4.75,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2017-03-31,2017-03-31,2017-03-31,4.75,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2017-06-30,2017-06-30,2017-06-30,4.35,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2017-09-30,2017-09-30,2017-09-30,4.35,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2017-12-31,2017-12-31,2017-12-31,4.1,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2018-03-31,2018-03-31,2018-03-31,4.1,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2018-06-30,2018-06-30,2018-06-30,3.8499999999999996,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2018-09-30,2018-09-30,2018-09-30,3.9,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2018-12-31,2018-12-31,2018-12-31,3.7,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2019-03-31,2019-03-31,2019-03-31,3.9,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2019-06-30,2019-06-30,2019-06-30,3.6,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2019-09-30,2019-09-30,2019-09-30,3.7,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2019-12-31,2019-12-31,2019-12-31,3.55,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2020-03-31,2020-03-31,2020-03-31,3.55,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2020-06-30,2020-06-30,2020-06-30,14.0,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2020-09-30,2020-09-30,2020-09-30,9.3,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2020-12-31,2020-12-31,2020-12-31,6.800000000000001,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2021-03-31,2021-03-31,2021-03-31,6.25,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2021-06-30,2021-06-30,2021-06-30,5.949999999999999,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2021-09-30,2021-09-30,2021-09-30,5.300000000000001,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2021-12-31,2021-12-31,2021-12-31,4.4,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2022-03-31,2022-03-31,2022-03-31,3.9,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2022-06-30,2022-06-30,2022-06-30,3.6,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2022-09-30,2022-09-30,2022-09-30,3.6,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2022-12-31,2022-12-31,2022-12-31,3.7,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2023-03-31,2023-03-31,2023-03-31,3.5,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2023-06-30,2023-06-30,2023-06-30,3.55,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2023-09-30,2023-09-30,2023-09-30,3.65,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2023-12-31,2023-12-31,2023-12-31,3.8,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2024-03-31,2024-03-31,2024-03-31,3.8,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2024-06-30,2024-06-30,2024-06-30,3.95,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2024-09-30,2024-09-30,2024-09-30,4.25,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2024-12-31,2024-12-31,2024-12-31,4.15,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2025-03-31,2025-03-31,2025-03-31,4.05,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2025-06-30,2025-06-30,2025-06-30,4.2,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2025-09-30,2025-09-30,2025-09-30,4.25,monthly,quarterly_mean,level,ALFRED vintage graph
+UNRATE,2025-12-31,2025-12-31,2025-12-31,4.6,monthly,quarterly_mean,level,ALFRED vintage graph
+USSTHPI,2004-12-31,2004-12-31,,2.1472681107175484,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2005-03-31,2005-03-31,,2.2954643098263006,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2005-06-30,2005-06-30,,3.206935861282778,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2005-09-30,2005-09-30,,3.028805627416209,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2005-12-31,2005-12-31,,2.2683030046551034,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2006-03-31,2006-03-31,,1.5807332616072145,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2006-06-30,2006-06-30,,1.0292759763185,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2006-09-30,2006-09-30,,0.8198704335905083,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2006-12-31,2006-12-31,,1.0265024262784639,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2007-03-31,2007-03-31,,0.36948087936448104,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2007-06-30,2007-06-30,,-0.06310641318924004,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2007-09-30,2007-09-30,,-1.1182150656458,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2007-12-31,2007-12-31,,-0.32728433824703584,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2008-03-31,2008-03-31,,-0.7368055740943458,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2008-06-30,2008-06-30,,-2.528037006158723,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2008-09-30,2008-09-30,,-3.1481941340396835,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2008-12-31,2008-12-31,,-0.9230243290980544,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2009-03-31,2009-03-31,,0.736097532923119,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2009-06-30,2009-06-30,,-2.6174573271678825,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2009-09-30,2009-09-30,,-2.608670164434168,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2009-12-31,2009-12-31,,-0.764438559003211,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2010-03-31,2010-03-31,,-1.1918842689473186,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2010-06-30,2010-06-30,,-0.9085328422345107,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2010-09-30,2010-09-30,,0.966422995911298,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2010-12-31,2010-12-31,,-0.7117437722419906,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2011-03-31,2011-03-31,,-2.777777777777779,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2011-06-30,2011-06-30,,-1.7638646114730538,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2011-09-30,2011-09-30,,0.7440957618893407,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2011-12-31,2011-12-31,,0.46242774566473965,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2012-03-31,2012-03-31,,-1.0516557984912245,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2012-06-30,2012-06-30,,-0.4554999192376119,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2012-09-30,2012-09-30,,1.3273187512169882,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2012-12-31,2012-12-31,,0.7878807289497969,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2013-03-31,2013-03-31,,0.49254822205981874,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2013-06-30,2013-06-30,,1.5241588666835337,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2013-09-30,2013-09-30,,1.410951224070267,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2013-12-31,2013-12-31,,0.7924076292269655,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2014-03-31,2014-03-31,,0.8136027059145956,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2014-06-30,2014-06-30,,1.9405150525934056,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2014-09-30,2014-09-30,,1.4350945857795283,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2014-12-31,2014-12-31,,0.8126278865828729,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2015-03-31,2015-03-31,,1.1047320807237249,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2015-06-30,2015-06-30,,1.6146147007370493,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2015-09-30,2015-09-30,,1.4139760668322454,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2015-12-31,2015-12-31,,0.7987087078729971,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2016-03-31,2016-03-31,,0.922142462727793,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2016-06-30,2016-06-30,,1.8629972096076974,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2016-09-30,2016-09-30,,1.7886397206928972,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2016-12-31,2016-12-31,,0.7677897680800072,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2017-03-31,2017-03-31,,0.7017176372015044,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2017-06-30,2017-06-30,,2.233489339573569,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2017-09-30,2017-09-30,,1.5386963045855628,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2017-12-31,2017-12-31,,0.8290752429616299,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2018-03-31,2018-03-31,,1.398584026828975,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2018-06-30,2018-06-30,,1.8349747660346027,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2018-09-30,2018-09-30,,1.222123318978996,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2018-12-31,2018-12-31,,0.3351158645276353,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2019-03-31,2019-03-31,,1.1227970437748702,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2019-06-30,2019-06-30,,1.6772077769969584,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2019-09-30,2019-09-30,,1.2740174169469487,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2019-12-31,2019-12-31,,0.8871903364498834,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2020-03-31,2020-03-31,,1.1612437709982215,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2020-06-30,2020-06-30,,1.0097182596291,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2020-09-30,2020-09-30,,1.7675486020698683,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2020-12-31,2020-12-31,,2.1900342599418865,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2021-03-31,2021-03-31,,2.4231879137667667,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2021-06-30,2021-06-30,,5.552102755334576,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2021-09-30,2021-09-30,,5.560353287536812,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2021-12-31,2021-12-31,,3.408140118624825,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2022-03-31,2022-03-31,,3.637442462600693,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2022-06-30,2022-06-30,,6.431409288849577,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2022-09-30,2022-09-30,,1.5322922439930942,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2022-12-31,2022-12-31,,-1.077288636290663,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2023-03-31,2023-03-31,,0.5745354215694443,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2023-06-30,2023-06-30,,2.9304975068179306,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2023-09-30,2023-09-30,,1.6351806851140571,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2023-12-31,2023-12-31,,0.018510520145609277,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2024-03-31,2024-03-31,,1.417334978408391,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2024-06-30,2024-06-30,,2.3677367356559564,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2024-09-30,2024-09-30,,0.9878780676213728,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2024-12-31,2024-12-31,,0.5383857254232849,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2025-03-31,2025-03-31,,0.724245394823475,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2025-06-30,2025-06-30,,1.4918218529386351,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback
+USSTHPI,2025-09-30,2025-09-30,,0.6225937110878821,quarterly,quarter_end; lag 1 quarter,qoq_pct_change,FRED final vintage fallback

@@ -1,0 +1,62 @@
+# Batch 2 macro inputs.  `fallback_final_lag1` is intentional and is surfaced in
+# metadata/specification outputs: it is never presented as an ALFRED vintage.
+vintage_policy: alfred_gdp_unemployment_final_lag1
+forecast_origin: quarter_end
+cache_dir: data/raw/macro
+series:
+  gdp:
+    series_id: GDPC1
+    frequency: quarterly
+    aggregation_rule: quarter_end
+    transformation: qoq_pct_change
+    output_column: gdp_growth
+    source: ALFRED
+    availability: vintage
+  unemployment:
+    series_id: UNRATE
+    frequency: monthly
+    aggregation_rule: quarterly_mean
+    transformation: level
+    output_column: unemployment_rate
+    source: ALFRED
+    availability: vintage
+  cre_price:
+    series_id: COMREPUSQ159N
+    frequency: quarterly
+    aggregation_rule: quarter_end
+    transformation: qoq_pct_change
+    output_column: cre_price_growth
+    source: FRED
+    availability: fallback_final_lag1
+  house_price:
+    series_id: USSTHPI
+    frequency: quarterly
+    aggregation_rule: quarter_end
+    transformation: qoq_pct_change
+    output_column: house_price_growth
+    source: FRED
+    availability: fallback_final_lag1
+  bbb_spread:
+    series_id: BAA10YM
+    frequency: monthly
+    aggregation_rule: quarterly_mean
+    transformation: level
+    output_column: bbb_spread
+    source: FRED
+    availability: fallback_final_lag1
+  short_rate:
+    series_id: TB3MS
+    frequency: monthly
+    aggregation_rule: quarterly_mean
+    transformation: level
+    output_column: short_rate
+    source: FRED
+    availability: fallback_final_lag1
+  mortgage_rate:
+    series_id: MORTGAGE30US
+    frequency: weekly
+    aggregation_rule: quarterly_mean
+    transformation: level
+    output_column: mortgage_rate
+    source: FRED
+    availability: fallback_final_lag1
