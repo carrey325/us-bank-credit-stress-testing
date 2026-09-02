@@ -1,0 +1,3 @@
+# The selection is data-driven.  This file intentionally contains no bank list
+# and no target-result count beyond the transparent selection policy in project.yaml.
+specialized_credit_card_ratio: 0.50

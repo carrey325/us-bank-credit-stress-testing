@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bankstress"
+version = "0.1.0"
+description = "Reproducible Call Report credit-panel engineering"
+requires-python = ">=3.11"
+dependencies = ["pandas>=2.2", "pyarrow>=15", "PyYAML>=6", "requests>=2.31", "ffiec-data-collector==2.0.0rc2"]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

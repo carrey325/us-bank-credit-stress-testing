@@ -1,0 +1,20 @@
+paths:
+  raw_ffiec: data/raw/ffiec
+  manifest: data/manifests/ffiec_manifest.csv
+  standard: data/standard/call_report_standard.parquet
+  derived: data/derived/credit_panel.parquet
+  metadata: metadata
+  qa: outputs/qa
+sample:
+  asset_min_thousands: 10000000
+  asset_max_thousands: 250000000
+  target_core_banks: 35
+  min_history_quarters: 40
+  small_exposure_thousands: 1000
+  exclude_merger_buffer_quarters: 1
+period:
+  start: 2005-03-31
+  end: 2025-12-31
+sources:
+  ffiec_bulk_url: https://cdr.ffiec.gov/public/pws/downloadbulkdata.aspx
+  fdic_api_url: https://banks.data.fdic.gov/api
