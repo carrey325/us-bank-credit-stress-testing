@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from bankstress.eda import write_eda
+from bankstress.io.fdic_financials import download_noncurrent_panel
 from bankstress.macro import build_macro_panel
 from bankstress.modeling import build_model_panel, run_cre_interaction, run_oos_models, run_split_panel_jackknife
 
@@ -20,7 +21,8 @@ def main() -> None:
             raise FileNotFoundError("Batch 2 requires data/derived/credit_panel.parquet. Run the completed Batch 1 pipeline to recreate this ignored input.")
         credit = pd.read_parquet(credit_path)
         macro = build_macro_panel(ROOT, credit["report_date"])
-        model = build_model_panel(credit, macro)
+        noncurrent = download_noncurrent_panel(ROOT, credit["cert"])
+        model = build_model_panel(credit, macro, noncurrent)
         model.to_parquet(ROOT / "data" / "derived" / "model_panel.parquet", index=False)
         write_eda(model, ROOT)
         eligible, metrics, _ = run_oos_models(model, ROOT)
@@ -33,6 +35,7 @@ def main() -> None:
             f"- Model-panel rows: {len(model):,}\n"
             f"- Unified OOS eligible rows: {len(eligible):,}\n"
             "- FFIEC recovery provenance: `data/manifests/ffiec_recovery_manifest.csv`\n"
+            "- FDIC noncurrent-loan provenance: `metadata/fdic_noncurrent_manifest.csv`\n"
             "- Macro provenance: `metadata/macro_download_manifest.csv`\n",
             encoding="utf-8",
         )

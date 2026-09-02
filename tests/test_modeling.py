@@ -9,7 +9,7 @@ from bankstress.modeling import build_model_panel, run_cre_interaction, run_oos_
 
 def _root(tmp_path: Path) -> Path:
     (tmp_path / "configs").mkdir()
-    spec = {"primary_segments": ["CRE"], "dynamic_fe_spec": {"exclude_merger_recent": True, "bank_features": ["lagged_npl_rate"], "segment_macro_variables": {"CRE": ["lagged_gdp_growth"]}},
+    spec = {"primary_segments": ["CRE"], "dynamic_fe_spec": {"exclude_merger_recent": True, "bank_features": ["lagged_noncurrent_ratio"], "segment_macro_variables": {"CRE": ["lagged_gdp_growth"]}},
             "oos_windows": [{"train_start": "2005-01-01", "train_end": "2011-12-31", "test_start": "2012-01-01", "test_end": "2013-12-31"}],
             "cre_interaction_spec": {"segment": "CRE", "exposure": "cre_to_tier1", "shock": "cre_price_growth", "pre_shock_reference": "2011-12-31"}}
     (tmp_path / "configs" / "model_specs.yaml").write_text(yaml.safe_dump(spec), encoding="utf-8")
@@ -27,7 +27,9 @@ def _panel():
                          "merger_recent_flag": 0, "cre_to_tier1": 2 + int(bank), "cre_share": .2, "lagged_nco": nco - .001})
     credit = pd.DataFrame(rows)
     macro = pd.DataFrame({"report_date": dates, "gdp_growth": np.linspace(1, 3, len(dates)), "cre_price_growth": np.linspace(-2, 2, len(dates))})
-    return build_model_panel(credit, macro)
+    noncurrent = pd.DataFrame([{"bank_id": bank, "report_date": date, "fdic_noncurrent_loans": 10 + number, "fdic_total_loans": 1000, "fdic_noncurrent_ratio": (10 + number) / 1000} for bank in ["1", "2", "3"] for number, date in enumerate(dates)])
+    credit["cert"] = credit["bank_id"]
+    return build_model_panel(credit, macro, noncurrent)
 
 
 def test_oos_models_use_same_complete_sample_and_write_spj(tmp_path):

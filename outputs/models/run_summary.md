@@ -3,6 +3,7 @@
 - Credit-panel rows: 8,145
 - Macro rows: 84
 - Model-panel rows: 8,145
-- Unified OOS eligible rows: 1,509
+- Unified OOS eligible rows: 3,704
 - FFIEC recovery provenance: `data/manifests/ffiec_recovery_manifest.csv`
+- FDIC noncurrent-loan provenance: `metadata/fdic_noncurrent_manifest.csv`
 - Macro provenance: `metadata/macro_download_manifest.csv`

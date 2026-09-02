@@ -14,7 +14,7 @@ def load_model_specs(root: Path) -> dict:
         return yaml.safe_load(handle)
 
 
-def build_model_panel(credit_panel: pd.DataFrame, macro_panel: pd.DataFrame) -> pd.DataFrame:
+def build_model_panel(credit_panel: pd.DataFrame, macro_panel: pd.DataFrame, fdic_noncurrent: pd.DataFrame | None = None) -> pd.DataFrame:
     panel = credit_panel.copy()
     panel["report_date"] = pd.to_datetime(panel["report_date"])
     macro_panel = macro_panel.copy()
@@ -22,12 +22,21 @@ def build_model_panel(credit_panel: pd.DataFrame, macro_panel: pd.DataFrame) -> 
     panel = panel.merge(macro_panel, on="report_date", how="left", validate="many_to_one")
     panel = panel.sort_values(["bank_id", "segment", "report_date"]).copy()
     panel["nco_rate"] = panel["annualized_nco_rate"]
-    panel["npl"] = panel["total_npl"]
-    # Batch 1 supplies total bank noncurrent loans, not segment-level NPL.  Use
-    # the matching bank-level denominator; dividing by a segment exposure would
-    # silently overstate the control and mislabel it as a segment NPL rate.
-    panel["npl_rate"] = panel["total_npl"] / panel["total_loans"].where(panel["total_loans"] > 0)
-    panel["lagged_npl_rate"] = panel.groupby(["bank_id", "segment"])["npl_rate"].shift(1)
+    if fdic_noncurrent is None:
+        raise ValueError("Batch 2 requires FDIC NCLNLS/LNLSNET historical noncurrent-loan input")
+    fdic = fdic_noncurrent.copy()
+    fdic["bank_id"] = fdic["bank_id"].astype(str)
+    fdic["report_date"] = pd.to_datetime(fdic["report_date"])
+    panel["cert"] = panel["cert"].astype(str)
+    panel = panel.merge(fdic, left_on=["cert", "report_date"], right_on=["bank_id", "report_date"], how="left", validate="many_to_one", suffixes=("", "_fdic"))
+    panel = panel.drop(columns="bank_id_fdic")
+    # `NCLNLS / LNLSNET` is a bank-level ratio supplied by one FDIC financial
+    # record.  It has historical GFC coverage and never uses a segment denominator.
+    panel["npl"] = panel["fdic_noncurrent_loans"]
+    panel["npl_rate"] = panel["fdic_noncurrent_ratio"]
+    bank_npl = panel.drop_duplicates(["bank_id", "report_date"])[["bank_id", "report_date", "npl_rate"]].sort_values(["bank_id", "report_date"])
+    bank_npl["lagged_noncurrent_ratio"] = bank_npl.groupby("bank_id")["npl_rate"].shift(1)
+    panel = panel.merge(bank_npl[["bank_id", "report_date", "lagged_noncurrent_ratio"]], on=["bank_id", "report_date"], how="left", validate="many_to_one")
     panel["lagged_nco_rate"] = panel.groupby(["bank_id", "segment"])["nco_rate"].shift(1)
     bank = panel.drop_duplicates(["bank_id", "report_date"])[["bank_id", "report_date", "allowance_coverage", "tier1_ratio", "total_loans"]].sort_values(["bank_id", "report_date"]).copy()
     bank["loan_growth_clean"] = bank.groupby("bank_id")["total_loans"].pct_change(fill_method=None)
@@ -188,7 +197,7 @@ def run_cre_interaction(panel: pd.DataFrame, root: Path) -> pd.DataFrame:
     data = data.join(exposure, on="bank_id")
     data["cre_price_shock"] = data[spec["shock"]]
     data["exposure_x_cre_price_shock"] = data["pre_shock_exposure"] * data["cre_price_shock"]
-    controls = ["lagged_nco_rate", "lagged_npl_rate", "lagged_allowance_coverage", "lagged_loan_growth"]
+    controls = ["lagged_nco_rate", "lagged_noncurrent_ratio", "lagged_allowance_coverage", "lagged_loan_growth"]
     terms = [*controls, "exposure_x_cre_price_shock"]
     data = data.dropna(subset=["nco_rate", *terms]).copy()
     demeaned = _two_way_demean(data, ["nco_rate", *terms])
