@@ -38,7 +38,9 @@ def main() -> None:
     panel = build_credit_panel(standard, institutions, config, lineage)
     config["paths"]["derived"].parent.mkdir(parents=True, exist_ok=True)
     panel.to_parquet(config["paths"]["derived"], index=False)
-    write_qa(standard, panel, pd.read_csv(config["paths"]["metadata"] / "field_mapping.csv"), config["paths"]["qa"])
+    exception_path = config["paths"]["metadata"] / "nco_reconciliation_exceptions.csv"
+    exceptions = pd.read_csv(exception_path) if exception_path.exists() else None
+    write_qa(standard, panel, pd.read_csv(config["paths"]["metadata"] / "field_mapping.csv"), config["paths"]["qa"], exceptions)
     print(f"manifest rows={len(manifest)} standard rows={len(standard)} panel rows={len(panel)} banks={panel.bank_id.nunique()}")
 
 

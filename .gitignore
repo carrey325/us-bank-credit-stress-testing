@@ -3,12 +3,49 @@ __pycache__/
 .pytest_cache/
 .pytest-tmp-*/
 *.egg-info/
-data/raw/
-data/standard/*.parquet
-data/derived/*.parquet
+# Raw/standard/derived data are local reproducibility inputs, never Git assets.
+/data/raw/
+/data/standard/
+/data/derived/
+*.parquet
+*.duckdb
+*.feather
+*.arrow
+
+# Local environments, credentials, and private-key material.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+credentials*.json
+secrets*.json
+
+# Downloaded bulk archives and local caches.
+*.zip
+*.7z
+*.tar
+*.gz
+*.bz2
+*.xz
+.cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Generated outputs: retain intentionally tracked, small model summaries only.
 outputs/qa/*.csv
 outputs/qa/*.md
 outputs/batch1_recovery/
 outputs/models/*_stdout.log
 outputs/models/*_stderr.log
 outputs/models/run_failures.log
+outputs/**/*.pkl
+outputs/**/*.pickle
+outputs/**/*.joblib
+outputs/**/*.h5
+outputs/**/*.hdf5

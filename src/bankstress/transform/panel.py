@@ -9,6 +9,10 @@ from .flows import quarterize_ytd
 def _coalesce_reporting_variants(data: pd.DataFrame) -> pd.DataFrame:
     """Prefer a single consolidated/domestic variant instead of double-counting it."""
     output = data.copy()
+    # Unit-level callers may provide just the measurement columns; production
+    # standard-layer rows always carry the archive provenance.
+    if "source_file" not in output:
+        output["source_file"] = pd.NA
     # The aggregate domestic C&I item (RCON1766) is available for many reporters
     # alongside its geographic breakout (RCFD1763/1764).  Use the aggregate when
     # present; otherwise retain the breakout sum for reporters without it.
@@ -22,7 +26,7 @@ def _coalesce_reporting_variants(data: pd.DataFrame) -> pd.DataFrame:
     keys = ["bank_id", "report_date", "standard_metric", "segment", "series_key"]
     output = output.sort_values([*keys, "raw_code"]).groupby(keys, as_index=False).agg(
         numeric_value=("numeric_value", "max"), raw_code=("raw_code", "first"), stock_flow=("stock_flow", "first"),
-        ytd_flag=("ytd_flag", "first"), formula_group=("formula_group", "first")
+        ytd_flag=("ytd_flag", "first"), formula_group=("formula_group", "first"), source_file=("source_file", "first")
     )
     return output
 
