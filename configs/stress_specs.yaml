@@ -1,0 +1,20 @@
+fed_2026:
+  baseline_url: https://www.federalreserve.gov/supervisionreg/files/2026_Final_Supervisory_Baseline_Domestic.csv
+  severely_adverse_url: https://www.federalreserve.gov/supervisionreg/files/2026_Final_Supervisory_Severely_Adverse_Domestic.csv
+  historic_domestic_url: https://www.federalreserve.gov/supervisionreg/files/2026_Final_Historic_Domestic.csv
+  primary_start: 2026-03-31
+  primary_end: 2028-03-31
+  source_label: Federal Reserve Board 2026 final supervisory stress-test scenarios
+stress:
+  jump_off: 2025-12-31
+  primary_segments: [CRE, CI]
+  primary_model: dynamic_fe
+  tail_model: quantile_0.9
+  loss_rate_floor: 0.0
+  require_complete_primary_segments: true
+  macro_timing: one_quarter_lag_from_approved_model_interface
+  lambdas: [0.5, 1.0, 1.25]
+  exposure_sensitivities: [-0.05, 0.05]
+  # The rate sensitivity holds these rates at their actual 2025Q4 Fed historic
+  # scenario values while retaining every other supervisory-baseline variable.
+  partial_shocks: [cre_only, unemployment_only, high_for_longer_rates]

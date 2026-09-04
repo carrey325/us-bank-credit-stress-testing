@@ -1,0 +1,4 @@
+model,status,reason
+dynamic_fe,included,approved mean model
+quantile_0.9,included_with_limitation,pre-specified downstream tail model; Batch 3 records inadequate recursive tail calibration
+bayesian,unavailable,Bayesian sampling explicitly skipped by BANKSTRESS_SKIP_BAYESIAN=1; no posterior results are used.

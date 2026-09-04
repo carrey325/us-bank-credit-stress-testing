@@ -1,0 +1,11 @@
+{
+  "n_banks": 14,
+  "n_observations": 8145,
+  "n_raw_fields": 66,
+  "reconciliation_rate": 0.9996315401621223,
+  "best_oos_rmse_improvement_vs_ar": -0.0662838199240909,
+  "best_model_name": "dynamic_fe",
+  "high_cre_capital_depletion_difference": 0.2966438255852524,
+  "high_cre_group_definition": "2025Q4 CRE-to-Tier1 terciles among the final stress universe",
+  "stress_scenario": "Fed 2026 severely adverse"
+}

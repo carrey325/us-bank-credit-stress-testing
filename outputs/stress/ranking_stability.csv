@@ -1,0 +1,2 @@
+scenario,left_model,right_model,n_banks,spearman_rank_correlation,top_quartile_n,top_quartile_overlap
+severely_adverse,dynamic_fe,quantile_0.9,14,0.8461538461538461,4,0.75
