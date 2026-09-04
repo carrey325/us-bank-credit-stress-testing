@@ -34,7 +34,39 @@ oos_windows:
   - {train_start: '2005-01-01', train_end: '2019-12-31', test_start: '2020-01-01', test_end: '2021-12-31'}
   - {train_start: '2005-01-01', train_end: '2021-12-31', test_start: '2022-01-01', test_end: '2025-12-31'}
 quantiles: [0.5, 0.75, 0.9]
-bayesian_core_spec: deferred_to_batch_3
+quantile_spec:
+  estimator: statsmodels.QuantReg
+  entity_effect: bank_segment_dummies
+  max_iter: 10000
+  p_tol: 0.000001
+  tail_threshold_quantile: 0.9
+  interval: {lower_quantile: 0.5, upper_quantile: 0.9}
+bayesian_core_spec:
+  estimator: pymc_student_t_hierarchical
+  outcome: nco_rate
+  likelihood: student_t
+  entity_effect: bank_segment_varying_intercept
+  coefficient_structure: segment_specific
+  non_centered: true
+  random_seed: 772
+  draws: 300
+  tune: 300
+  chains: 2
+  target_accept: 0.9
+  priors:
+    standardized_intercept_sd: 2.0
+    standardized_coefficient_sd: 1.0
+    standardized_entity_sd: 1.0
+    standardized_residual_sd: 1.0
+    student_t_nu_minus_two_rate: 0.05
+  convergence:
+    rhat_max: 1.01
+    ess_bulk_min: 100
+    divergences_ideal: 0
+pseudo_stress_windows:
+  - {name: GFC, train_end: '2006-12-31', test_start: '2007-01-01', test_end: '2010-12-31'}
+  - {name: COVID, train_end: '2019-12-31', test_start: '2020-01-01', test_end: '2021-12-31'}
+  - {name: High_Rate_CRE, train_end: '2021-12-31', test_start: '2022-01-01', test_end: '2025-12-31'}
 secondary_hypotheses:
   - CI losses interact with BBB spread.
   - Mortgage losses interact with unemployment and house-price growth when a sufficiently long loss series is available.

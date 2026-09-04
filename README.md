@@ -34,6 +34,24 @@ macro availability audit to `metadata/macro_release_calendar.csv`; its explicit
 ALFRED/final-vintage fallback limitation is written to
 `metadata/macro_vintage_limitation.md`.
 
+## Batch 3
+
+Batch 3 consumes the ignored real `data/derived/model_panel.parquet` generated
+by the preceding batches.  It fits segment-specific 0.50/0.75/0.90 quantile
+models with bank effects, a Student-t partial-pooling Bayesian model, frozen
+expanding-window OOS comparisons, and recursive historical pseudo-stress
+windows.  Install the declared Bayesian extra and run:
+
+```powershell
+python -m pip install -r requirements.txt
+python scripts/run_batch3.py
+```
+
+The output in `outputs/validation/` records all OOS and tail metrics.  The
+historical pseudo-stress forecasts use observed historical macro paths, recurse
+only through lagged NCO, and freeze future bank controls at their final
+pre-window values to prevent future-control leakage.
+
 `--pilot` obtains 2005Q1, 2009Q4, 2020Q2, and 2025Q4.  `--full` obtains the
 complete 2005Q1–2025Q4 sequence, reuses manifest-backed raw snapshots without
 overwriting them, and regenerates the standard layer, panel, QA reports, and

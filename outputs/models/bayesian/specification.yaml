@@ -1,0 +1,21 @@
+estimator: pymc_student_t_hierarchical
+outcome: nco_rate
+likelihood: student_t
+entity_effect: bank_segment_varying_intercept
+coefficient_structure: segment_specific
+non_centered: true
+random_seed: 772
+draws: 300
+tune: 300
+chains: 2
+target_accept: 0.9
+priors:
+  standardized_intercept_sd: 2.0
+  standardized_coefficient_sd: 1.0
+  standardized_entity_sd: 1.0
+  standardized_residual_sd: 1.0
+  student_t_nu_minus_two_rate: 0.05
+convergence:
+  rhat_max: 1.01
+  ess_bulk_min: 100
+  divergences_ideal: 0

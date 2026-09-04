@@ -1,0 +1,8 @@
+estimator: statsmodels.QuantReg
+entity_effect: bank_segment_dummies
+max_iter: 10000
+p_tol: 1.0e-06
+tail_threshold_quantile: 0.9
+interval:
+  lower_quantile: 0.5
+  upper_quantile: 0.9

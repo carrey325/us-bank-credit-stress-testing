@@ -1,10 +1,10 @@
 {
   "project": "MF772 Bank Credit Stress Testing",
   "version": 2,
-  "current_batch": 1,
+  "current_batch": 3,
   "status": "WAITING_REVIEW",
-  "latest_completed_batch": 0,
-  "first_incomplete_batch": 1,
+  "latest_completed_batch": 2,
+  "first_incomplete_batch": 3,
   "bootstrap_audit_path": "workflow/bootstrap_audit.md",
   "migration_mode": "MIGRATION_MODE_A",
   "model_policy": {
@@ -14,39 +14,43 @@
     "terra_core_method_attempts_before_sol_escalation": 2
   },
   "worker": {
-    "thread_or_task_id": "01a069d7-de21-7000-b974-abfd75b626e1",
+    "thread_or_task_id": "01a06b29-dc8f-7d91-8497-3e897c529ce0",
     "model": "GPT-5.6 Terra High",
-    "started_at": "2026-09-04T00:35:55Z",
-    "last_activity_at": "2026-09-04T00:50:16Z",
+    "started_at": "2026-09-04T06:44:42Z",
+    "last_activity_at": "2026-09-04T06:53:21Z",
     "status": "COMPLETE",
-    "retry_count": 0
+    "retry_count": 1
   },
   "core_method_problem": {
-    "problem_key": null,
-    "description": null,
-    "terra_attempts": 0,
+    "problem_key": "batch3_bootstrap_acceptance_gaps",
+    "description": "Complete the preserved Batch 3 implementation against the approved 2005-based windows, including pseudo-stress validation, six required figures, and all remaining acceptance criteria.",
+    "terra_attempts": 1,
     "sol_high_used": false,
-    "resolved": false
+    "resolved": true
   },
   "reviewer": {
     "chat_url": "https://chatgpt.com/g/g-p-6a94847cd07081918912d6efaf3a3581/c/6a9a04ae-33d0-83e9-bd03-70c62265901f",
     "quick_model": "GPT-5.6 Sol High",
     "stage_model": "GPT-5.6 Pro",
-    "status": null,
-    "decision": null
+    "status": "COMPLETE",
+    "decision": "APPROVED",
+    "worker_instruction": null
   },
   "github": {
     "repo_url": "https://github.com/carrey325/MF772",
     "branch": "main",
-    "commit_sha": "cc7fb08ccadbd10de888c3700e9f38f258c6bfcd"
+    "commit_sha": "bc669d8017f9c030f726bcd2c98da60ba535d52d"
   },
   "handoff": {
     "summary_path": "workflow/bootstrap_audit.md",
     "deviations": [],
     "limitations": [
-      "Batch 1 deterministic formula trace is not a completed human source-document audit.",
-      "Batch 1 mapped-segment NCO reconciliation lacks an explicit acceptance threshold and documented closure.",
-      "Batch 3 outputs use obsolete pre-amendment OOS windows and pseudo-stress/figures are absent."
+      "Historical reporting-detail changes and shorter Mortgage-NCO coverage may remain only if verified against official FFIEC definitions.",
+      "Total NPL may remain only as a documented bank-level fallback, not a segment NPL metric.",
+      "One directly verified source-filing inconsistency may remain as an explicit exception.",
+      "The 100-observation source audit is sample evidence rather than exhaustive validation.",
+      "Batch 3 uses the approved 2005-based expanding windows and includes all three pseudo-stress windows plus six figures.",
+      "Bayesian posterior forecasts are excluded under the documented environment fallback; diagnostics contain no sampled posterior results."
     ]
   },
   "blocker": {
@@ -55,9 +59,9 @@
     "question": null
   },
   "router": {
-    "last_check_at": "2026-09-04T00:50:16Z",
+    "last_check_at": "2026-09-04T06:53:21Z",
     "next_action": "PUSH_AND_SUBMIT_STAGE_REVIEW",
-    "notes": "Batch 1 acceptance repair commit cc7fb08 passed Router verification: full suite 15 passed and focused Batch 2 regression 5 passed. Push and submit Stage Review; do not launch Batch 2 implementation."
+    "notes": "Batch 3 worker completed local validation: approved OOS windows, pseudo-stress outputs, six figures, and full test suite. Commit/push this checkpoint before any independent stage review."
   },
   "allowed_statuses": [
     "READY",
