@@ -14,20 +14,41 @@ NCO_GROSS_FLOW_TOLERANCE_THOUSANDS = 50.0
 
 
 def _flow_reclass_flags(standard: pd.DataFrame) -> pd.DataFrame:
-    """Flag bank-quarters with a source YTD downward revision/reclassification."""
+    """Return gross-flow-specific YTD revision flags for causal reconciliation."""
     flows = standard.loc[standard["stock_flow"].eq("flow")].copy()
     if flows.empty:
         return pd.DataFrame(columns=["bank_id", "report_date", "flow_reclass_flag"])
-    return quarterize_ytd(flows).groupby(["bank_id", "report_date"], as_index=False).agg(
-        flow_reclass_flag=("amendment_or_reclass_flag", "max")
-    )
+    flows = quarterize_ytd(flows)
+    categories = {
+        "total_charge_off": "total_charge_off_reclass_flag",
+        "total_recovery": "total_recovery_reclass_flag",
+        "charge_off": "mapped_charge_off_reclass_flag",
+        "recovery": "mapped_recovery_reclass_flag",
+    }
+    result: pd.DataFrame | None = None
+    for metric, column in categories.items():
+        subset = flows.loc[flows["standard_metric"].eq(metric)].groupby(["bank_id", "report_date"], as_index=False).agg(
+            **{column: ("amendment_or_reclass_flag", "max")}
+        )
+        result = subset if result is None else result.merge(subset, on=["bank_id", "report_date"], how="outer")
+    assert result is not None
+    result = result.fillna(0)
+    flag_columns = [column for column in categories.values()]
+    result[flag_columns] = result[flag_columns].astype(int)
+    result["flow_reclass_flag"] = result[flag_columns].max(axis=1)
+    return result
 
 
 def write_qa(standard: pd.DataFrame, panel: pd.DataFrame, mapping: pd.DataFrame, qa_dir: Path, nco_exceptions: pd.DataFrame | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
     qa_dir.mkdir(parents=True, exist_ok=True)
+    panel = panel.copy()
+    for column in ["tier1_capital", "tier1_ratio", "equity_capital", "equity_to_assets_ratio"]:
+        if column not in panel:
+            panel[column] = pd.NA
     controls = panel.groupby(["bank_id", "report_date"], as_index=False).agg(
         total_loans=("total_loans", "first"), total_charge_off=("total_charge_off", "first"),
-        total_recovery=("total_recovery", "first"), tier1_capital=("tier1_capital", "first"), total_assets=("total_assets", "first"),
+        total_recovery=("total_recovery", "first"), tier1_capital=("tier1_capital", "first"), tier1_ratio=("tier1_ratio", "first"),
+        equity_capital=("equity_capital", "first"), equity_to_assets_ratio=("equity_to_assets_ratio", "first"), total_assets=("total_assets", "first"),
     )
     mapped = panel.groupby(["bank_id", "report_date"], as_index=False).agg(
         mapped_exposure=("exposure", "sum"), mapped_charge_off=("charge_off", lambda values: values.sum(min_count=1)),
@@ -45,7 +66,8 @@ def write_qa(standard: pd.DataFrame, panel: pd.DataFrame, mapping: pd.DataFrame,
     else:
         recon["exception_type"] = pd.NA
     recon = recon.merge(_flow_reclass_flags(standard), on=["bank_id", "report_date"], how="left")
-    recon["flow_reclass_flag"] = recon["flow_reclass_flag"].fillna(0).astype(int)
+    reclass_columns = [column for column in recon if column.endswith("_reclass_flag")]
+    recon[reclass_columns] = recon[reclass_columns].fillna(0).astype(int)
     recon["covered_share_of_total_loans"] = recon["mapped_exposure"] / recon["total_loans"].where(recon["total_loans"] > 0)
     recon["reported_total_nco"] = recon["total_charge_off"] - recon["total_recovery"]
     recon["mapped_minus_reported_nco"] = recon["mapped_nco"] - recon["reported_total_nco"]
@@ -53,15 +75,20 @@ def write_qa(standard: pd.DataFrame, panel: pd.DataFrame, mapping: pd.DataFrame,
     recon["recovery_subset_difference"] = recon["mapped_recovery"] - recon["total_recovery"]
     recon["nco_reconciliation_tolerance_thousands"] = NCO_GROSS_FLOW_TOLERANCE_THOUSANDS
     has_controls = recon[["mapped_charge_off", "mapped_recovery", "total_charge_off", "total_recovery"]].notna().all(axis=1)
-    gross_subset_pass = recon["charge_off_subset_difference"].le(NCO_GROSS_FLOW_TOLERANCE_THOUSANDS) & recon["recovery_subset_difference"].le(NCO_GROSS_FLOW_TOLERANCE_THOUSANDS)
+    charge_off_excess = recon["charge_off_subset_difference"].gt(NCO_GROSS_FLOW_TOLERANCE_THOUSANDS)
+    recovery_excess = recon["recovery_subset_difference"].gt(NCO_GROSS_FLOW_TOLERANCE_THOUSANDS)
+    gross_subset_pass = ~charge_off_excess & ~recovery_excess
+    # A downward revision of a reported *total* flow can explain an excess only
+    # in that same gross-flow comparison.  A reclassification in an unrelated
+    # component (or a mapped component) does not explain a different mismatch.
+    recon["charge_off_ytd_reclass_causally_explains"] = charge_off_excess & recon["total_charge_off_reclass_flag"].eq(1)
+    recon["recovery_ytd_reclass_causally_explains"] = recovery_excess & recon["total_recovery_reclass_flag"].eq(1)
+    unexplained_excess = (charge_off_excess & ~recon["charge_off_ytd_reclass_causally_explains"]) | (recovery_excess & ~recon["recovery_ytd_reclass_causally_explains"])
     recon["nco_reconciliation_status"] = "NOT_EVALUABLE_MISSING_FLOW"
     recon.loc[has_controls & gross_subset_pass, "nco_reconciliation_status"] = "PASS_SUBSET_GROSS_FLOWS"
-    # Source YTD downward revisions/reclassifications are explained differences,
-    # not a reason to force a mapped subset to equal total-bank net NCO.
-    recon.loc[has_controls & recon["flow_reclass_flag"].eq(1), "nco_reconciliation_status"] = "EXPLAINED_YTD_RECLASS_OR_AMENDMENT"
-    recon.loc[has_controls & ~gross_subset_pass & recon["flow_reclass_flag"].eq(0), "nco_reconciliation_status"] = "REVIEW_REQUIRED"
+    recon.loc[has_controls & ~gross_subset_pass & ~unexplained_excess, "nco_reconciliation_status"] = "EXPLAINED_YTD_RECLASS_GROSS_FLOW"
+    recon.loc[has_controls & unexplained_excess, "nco_reconciliation_status"] = "REVIEW_REQUIRED"
     recon.loc[has_controls & recon["exception_type"].notna(), "nco_reconciliation_status"] = "EXPLAINED_SOURCE_FILING_INCONSISTENCY"
-    recon["capital_ratio_proxy"] = recon["tier1_capital"] / recon["total_assets"].where(recon["total_assets"] > 0)
     recon.to_csv(qa_dir / "reconciliation_summary.csv", index=False)
 
     audit_source = panel.dropna(subset=["charge_off", "recovery", "segment_nco"])
@@ -72,8 +99,9 @@ def write_qa(standard: pd.DataFrame, panel: pd.DataFrame, mapping: pd.DataFrame,
     present = standard.assign(report_date=standard.report_date.astype(str)).groupby("report_date").raw_code.nunique()
     mapping_validation = {date: int(present.get(date, 0)) for date in expected_dates}
     nco_statuses = recon["nco_reconciliation_status"].value_counts().to_dict()
+    review_count = int((recon["nco_reconciliation_status"] == "REVIEW_REQUIRED").sum())
     report = "\n".join([
-        "# Batch 1 data-quality report", "", f"- Standard observations: {len(standard):,}", f"- Derived observations: {len(panel):,}", f"- Core banks: {panel.bank_id.nunique():,}", f"- Field-mapping rows: {len(mapping):,}", f"- Duplicate standard bank/date/raw-code keys: {int(standard.duplicated(['bank_id', 'report_date', 'raw_code']).sum())}", f"- Negative NCO observations retained: {int((panel.segment_nco < 0).sum())}", f"- FDIC merger quarters flagged: {int(panel.merger_quarter_flag.sum())}", f"- Asset-jump quarters flagged: {int(panel.asset_jump_flag.sum())}", f"- Manual formula-audit failures: {int((audit.pass_fail == 'fail').sum())}", "", "## NCO reconciliation rule", "", "- CRE, C&I, and mortgage are mapped loan segments, not the entire Call Report loan portfolio; their net NCO is therefore not required to equal reported total NCO.", f"- For bank-quarters with all four gross-flow values, mapped charge-offs and recoveries must each be no more than reported total plus {NCO_GROSS_FLOW_TOLERANCE_THOUSANDS:,.0f} thousand dollars.", "- A source YTD downward revision/reclassification is reported as an explained difference, rather than forced through the gross-flow subset rule.", "- A directly verified source-filing inconsistency may be explained only when it is listed in `metadata/nco_reconciliation_exceptions.csv`; it remains visible in the reconciliation output.", *[f"- {status}: {count:,}" for status, count in sorted(nco_statuses.items())], "", "## Mapped raw-field presence", "", *[f"- {date}: {count} mapped raw codes" for date, count in mapping_validation.items()], "", "## Limitations", "", "- The historical Call Report taxonomy has genuine reporting-detail changes. Missing segment detail remains missing; it is never filled with zero.", "- `tier1_capital` is a conservative RC proxy pending Batch 2's capital-model interface; the reconciliation file labels it as a proxy rather than a reported Tier 1 ratio.", "- FDIC history events are branch-granular and collapsed to bank-quarter merger flags; no virtual-bank reconstruction is claimed.", "- `metadata/manual_source_audit.csv` records the independent raw-archive source-document sample; the deterministic audit is retained as a separate formula control.", ""
+        "# Batch 1 data-quality report", "", f"- Standard observations: {len(standard):,}", f"- Derived observations: {len(panel):,}", f"- Core banks: {panel.bank_id.nunique():,}", f"- Field-mapping rows: {len(mapping):,}", f"- Duplicate standard bank/date/raw-code keys: {int(standard.duplicated(['bank_id', 'report_date', 'raw_code']).sum())}", f"- Negative NCO observations retained: {int((panel.segment_nco < 0).sum())}", f"- FDIC merger quarters flagged: {int(panel.merger_quarter_flag.sum())}", f"- Asset-jump quarters flagged: {int(panel.asset_jump_flag.sum())}", f"- Manual formula-audit failures: {int((audit.pass_fail == 'fail').sum())}", "", "## Definitions", "", "- Mortgage is closed-end 1-4 family residential lending only: RC-C RCON/RCFD5367 + 5368 and RI-B RIADC234 + C235 - C217 - C218. Revolving/open-end RCON/RCFD1797 is excluded.", "- Segment NPL is unavailable in a stable mapping. `bank_total_npl`, `bank_total_npl_ratio`, and their lags are bank-level fallback controls; `segment_npl_rate` is deliberately missing rather than total NPL divided by segment exposure.", "- `tier1_capital` and `tier1_ratio` use Schedule RC-R fields; `equity_capital` and `equity_to_assets_ratio` are separately named book-equity measures.", "- `allowance_coverage` equals allowance / bank total noncurrent loans (also named `allowance_to_total_npl`), not allowance / total loans.", "", "## NCO reconciliation rule", "", "- CRE, C&I, and mortgage are mapped loan segments, not the entire Call Report loan portfolio; their net NCO is therefore not required to equal reported total NCO.", f"- For bank-quarters with all four gross-flow values, mapped charge-offs and recoveries must each be no more than reported total plus {NCO_GROSS_FLOW_TOLERANCE_THOUSANDS:,.0f} thousand dollars.", "- A downward YTD revision explains only the corresponding gross-flow excess when the reported total for that same flow is revised downward. Unrelated or mapped-component revisions remain REVIEW_REQUIRED.", "- A directly verified source-filing inconsistency may be explained only when it is listed in `metadata/nco_reconciliation_exceptions.csv`; it remains visible in the reconciliation output.", *[f"- {status}: {count:,}" for status, count in sorted(nco_statuses.items())], f"- Open review items: {review_count:,}; see `metadata/nco_reconciliation_review.md`.", "", "## Mapped raw-field presence", "", *[f"- {date}: {count} mapped raw codes" for date, count in mapping_validation.items()], "", "## Limitations", "", "- The historical Call Report taxonomy has genuine reporting-detail changes. Missing segment detail remains missing; it is never filled with zero.", "- FDIC history events are branch-granular and collapsed to bank-quarter merger flags; no virtual-bank reconstruction is claimed.", "- `metadata/manual_source_audit.csv` records the independent raw-archive source-document sample; the deterministic audit is retained as a separate formula control.", ""
     ])
     (qa_dir / "data_quality_report.md").write_text(report, encoding="utf-8")
     return recon, audit

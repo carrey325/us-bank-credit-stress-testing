@@ -48,6 +48,6 @@ Field definitions, effective dates, units, and source references live in
 missing predecessor quarters stay missing and downward revisions stay negative.
 
 The lineage history is branch-granular, so its merger events are collapsed to a
-bank-quarter flag.  The capital field is labeled a proxy pending the Batch 2
-capital-model interface.  No estimated results or filled-zero loss observations
-are used.
+bank-quarter flag. Schedule RC-R supplies the actual Tier 1 capital and Tier 1
+risk-based ratio; Schedule RC book equity is retained separately as
+`equity_capital`. No estimated results or filled-zero loss observations are used.

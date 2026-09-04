@@ -84,9 +84,7 @@ def _trace_metric(
         prior_values: list[tuple[str, float]] = []
         prior_matches = True
         if not q1:
-            if pd.isna(row.prior_ytd) or pd.isna(row.prior_source_file):
-                prior_matches = False
-            else:
+            if pd.notna(row.prior_ytd) and pd.notna(row.prior_source_file):
                 prior_archive = raw_dir / row.prior_source_file
                 prior_values = _direct_archive_values(prior_archive, bank_id, row.raw_code)
                 prior_matches = any(value == float(row.prior_ytd) for _, value in prior_values)
@@ -140,14 +138,38 @@ def create_source_audit(sample_size: int = 100, random_state: int = 772) -> pd.D
     return pd.DataFrame(rows)
 
 
+def update_quality_report_with_source_audit(audit: pd.DataFrame) -> None:
+    failures = int(audit["reviewer_conclusion"].ne("PASS").sum())
+    report_path = ROOT / "outputs" / "qa" / "data_quality_report.md"
+    if report_path.exists():
+        report = report_path.read_text(encoding="utf-8")
+        marker = "\n## Direct source-document audit\n"
+        if marker in report:
+            report = report.split(marker, 1)[0].rstrip() + "\n"
+        report += (
+            f"{marker}\n"
+            f"- Fixed random sample: {len(audit):,} bank-segment-quarters (seed 772).\n"
+            f"- Direct FFIEC archive-member/raw-value to standard-layer matches: {int(audit['raw_archive_to_standard_match'].sum()):,}/{len(audit):,}.\n"
+            f"- Recomputed quarterly NCO to panel matches: {int(audit['derived_to_panel_match'].sum()):,}/{len(audit):,}.\n"
+            f"- Source-audit failures: {failures:,}.\n"
+            "- This sample is evidence for the audited observations, not exhaustive proof of every reporting-detail change.\n"
+        )
+        report_path.write_text(report, encoding="utf-8")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--sample-size", type=int, default=100)
+    parser.add_argument("--report-only", action="store_true", help="Refresh QA report from an existing completed source audit.")
     args = parser.parse_args()
-    audit = create_source_audit(sample_size=args.sample_size)
     output = ROOT / "metadata" / "manual_source_audit.csv"
-    audit.to_csv(output, index=False)
+    if args.report_only:
+        audit = pd.read_csv(output)
+    else:
+        audit = create_source_audit(sample_size=args.sample_size)
+        audit.to_csv(output, index=False)
     failures = int(audit["reviewer_conclusion"].ne("PASS").sum())
+    update_quality_report_with_source_audit(audit)
     print(f"manual source audit rows={len(audit)} failures={failures} output={output}")
     if failures:
         raise SystemExit(1)
