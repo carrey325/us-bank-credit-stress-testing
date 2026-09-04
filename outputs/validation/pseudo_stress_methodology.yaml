@@ -14,3 +14,6 @@ windows:
   train_end: '2021-12-31'
   test_start: '2022-01-01'
   test_end: '2025-12-31'
+tail_model_limitation: Recursive CRE Q0.90 paths are unstable in the COVID and 2022+
+  high-rate/CRE windows; these historical paths are diagnostic tail-model evidence,
+  not full recursive-stress validation.

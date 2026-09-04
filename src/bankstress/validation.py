@@ -36,24 +36,35 @@ def pinball_loss(actual: pd.Series | np.ndarray, forecast: pd.Series | np.ndarra
     return float(np.maximum(quantile * error, (quantile - 1) * error).mean())
 
 
-def interval_scores(actual: pd.Series | np.ndarray, lower: pd.Series | np.ndarray, upper: pd.Series | np.ndarray, nominal_coverage: float = 0.40) -> dict[str, float]:
-    """Score an explicitly labelled equal-tailed or asymmetric prediction band."""
+def interval_scores(
+    actual: pd.Series | np.ndarray,
+    lower: pd.Series | np.ndarray,
+    upper: pd.Series | np.ndarray,
+    *,
+    lower_quantile: float,
+    upper_quantile: float,
+) -> dict[str, float]:
+    """Score a quantile interval with the proper penalty for each bound.
+
+    For an equal-tailed interval this is the ordinary Winkler score.  For an
+    asymmetric band, each miss is instead weighted by its own tail probability:
+    ``1 / lower_quantile`` below the lower bound and
+    ``1 / (1 - upper_quantile)`` above the upper bound.  This matters for the
+    retained Q0.50--Q0.90 band, whose two tails are deliberately unequal.
+    """
     actual_array, lower_array, upper_array = (np.asarray(item, dtype=float) for item in (actual, lower, upper))
     if np.any(upper_array < lower_array):
         raise ValueError("Prediction interval upper bound is below lower bound")
+    if not 0 < lower_quantile < upper_quantile < 1:
+        raise ValueError("Interval quantiles must satisfy 0 < lower < upper < 1")
     width = upper_array - lower_array
-    # A 50th--90th conditional-quantile band has nominal mass 0.40.  The
-    # generalized Winkler score uses that declared mass, not a mislabelled 90%.
-    if not 0 < nominal_coverage < 1:
-        raise ValueError("Nominal interval coverage must be between zero and one")
-    alpha = 1 - nominal_coverage
-    penalty = (2 / alpha) * np.where(actual_array < lower_array, lower_array - actual_array, 0)
-    penalty += (2 / alpha) * np.where(actual_array > upper_array, actual_array - upper_array, 0)
+    penalty = np.where(actual_array < lower_array, (lower_array - actual_array) / lower_quantile, 0)
+    penalty += np.where(actual_array > upper_array, (actual_array - upper_array) / (1 - upper_quantile), 0)
     return {
         "empirical_coverage": float(((actual_array >= lower_array) & (actual_array <= upper_array)).mean()),
         "interval_width": float(width.mean()),
         "winkler_score": float((width + penalty).mean()),
-        "nominal_coverage": nominal_coverage,
+        "nominal_coverage": upper_quantile - lower_quantile,
     }
 
 
@@ -286,6 +297,8 @@ def run_unified_oos(panel: pd.DataFrame, root: Path) -> tuple[pd.DataFrame, pd.D
     comparison_rows: list[dict] = []
     tail_rows: list[dict] = []
     diagnostics: list[dict] = []
+    interval = spec["quantile_spec"]["interval"]
+    lower_q, upper_q = (float(interval[item]) for item in ("lower_quantile", "upper_quantile"))
     for window_id, window in enumerate(spec["oos_windows"], start=1):
         train = eligible[eligible["report_date"].between(pd.Timestamp(window["train_start"]), pd.Timestamp(window["train_end"]))].copy()
         test = eligible[eligible["report_date"].between(pd.Timestamp(window["test_start"]), pd.Timestamp(window["test_end"]))].copy()
@@ -335,12 +348,17 @@ def run_unified_oos(panel: pd.DataFrame, root: Path) -> tuple[pd.DataFrame, pd.D
                                   "quantile": float(quantile), **window})
             tail_rows.append({"window": window_id, "segment": segment, "model": "quantile_rearrangement", "metric": "crossing_count",
                               "value": crossing_count, "quantile": np.nan, **window})
-            lower_q, upper_q = (float(spec["quantile_spec"]["interval"][item]) for item in ("lower_quantile", "upper_quantile"))
             low, high = quantile_predictions[lower_q], quantile_predictions[upper_q]
             aligned = low.merge(high[["bank_id", "segment", "report_date", "prediction"]], on=["bank_id", "segment", "report_date"], suffixes=("_lower", "_upper"), validate="one_to_one")
-            for metric, value in interval_scores(aligned.nco_rate, aligned.prediction_lower, aligned.prediction_upper).items():
+            for metric, value in interval_scores(
+                aligned.nco_rate,
+                aligned.prediction_lower,
+                aligned.prediction_upper,
+                lower_quantile=lower_q,
+                upper_quantile=upper_q,
+            ).items():
                 tail_rows.append({"window": window_id, "segment": segment, "model": f"quantile_{lower_q}_{upper_q}_band", "metric": metric,
-                                  "value": value, "quantile": np.nan, **window})
+                                  "value": value, "quantile": np.nan, "lower_quantile": lower_q, "upper_quantile": upper_q, **window})
         if os.environ.get("BANKSTRESS_SKIP_BAYESIAN") == "1":
             diagnostics.append({"window": window_id, "status": "environment_fallback", "reason": "Bayesian sampling explicitly skipped by BANKSTRESS_SKIP_BAYESIAN=1; no posterior results are used."})
             continue
@@ -358,9 +376,16 @@ def run_unified_oos(panel: pd.DataFrame, root: Path) -> tuple[pd.DataFrame, pd.D
                 row["posterior_upper"] = segment_predicted["posterior_upper"].to_numpy()
                 prediction_rows.append(row)
                 comparison_rows.append(metric)
-                values = interval_scores(segment_predicted.nco_rate, segment_predicted.posterior_lower, segment_predicted.posterior_upper, nominal_coverage=0.90)
+                values = interval_scores(
+                    segment_predicted.nco_rate,
+                    segment_predicted.posterior_lower,
+                    segment_predicted.posterior_upper,
+                    lower_quantile=0.05,
+                    upper_quantile=0.95,
+                )
                 for name, value in values.items():
-                    tail_rows.append({"window": window_id, "segment": segment, "model": "bayesian_90pct_interval", "metric": name, "value": value, "quantile": np.nan, **window})
+                    tail_rows.append({"window": window_id, "segment": segment, "model": "bayesian_90pct_interval", "metric": name,
+                                      "value": value, "quantile": np.nan, "lower_quantile": 0.05, "upper_quantile": 0.95, **window})
             diagnostics.append({"window": window_id, **fit.diagnostics})
         except Exception as error:  # optional dependency or a recorded convergence/fitting fallback
             diagnostics.append({"window": window_id, "status": "unavailable_or_failed", "reason": f"{type(error).__name__}: {error}"})
@@ -433,15 +458,37 @@ def run_historical_pseudo_stress(panel: pd.DataFrame, root: Path) -> pd.DataFram
     result.to_parquet(validation / "pseudo_stress.parquet", index=False)
     error = result["nco_rate"] - result["prediction"]
     result_with_error = result.assign(_absolute_error=error.abs(), _squared_error=error.pow(2), _error=error)
-    summary = result_with_error.groupby(["pseudo_window", "model", "segment"], as_index=False).agg(
-        n=("_error", "size"),
-        rmse=("_squared_error", lambda value: float(np.sqrt(value.mean()))),
-        mae=("_absolute_error", "mean"),
-        bias=("_error", "mean"),
-    )
+    summary_rows: list[dict[str, float | int | str]] = []
+    for (pseudo_window, model, segment), group in result_with_error.groupby(["pseudo_window", "model", "segment"], sort=True):
+        quantile = float(model.removeprefix("quantile_")) if model.startswith("quantile_") else np.nan
+        is_quantile = np.isfinite(quantile)
+        summary_rows.append({
+            "pseudo_window": pseudo_window,
+            "model": model,
+            "segment": segment,
+            "n": len(group),
+            "rmse": float(np.sqrt(group["_squared_error"].mean())),
+            "mae": float(group["_absolute_error"].mean()),
+            "bias": float(group["_error"].mean()),
+            "quantile": quantile,
+            "pinball_loss": pinball_loss(group["nco_rate"], group["prediction"], quantile) if is_quantile else np.nan,
+            "exceedance_count": int((group["nco_rate"] > group["prediction"]).sum()) if is_quantile else np.nan,
+            "empirical_exceedance_rate": float((group["nco_rate"] > group["prediction"]).mean()) if is_quantile else np.nan,
+            "nominal_exceedance_rate": 1 - quantile if is_quantile else np.nan,
+        })
+    summary = pd.DataFrame(summary_rows)
     summary.to_csv(validation / "pseudo_stress_metrics.csv", index=False)
     with (validation / "pseudo_stress_methodology.yaml").open("w", encoding="utf-8") as handle:
-        yaml.safe_dump({"macro_path": "realised historical macro path", "lagged_nco": "recursive predicted NCO after jump-off", "bank_controls": "last pre-window value, held fixed", "windows": spec["pseudo_stress_windows"]}, handle, sort_keys=False)
+        yaml.safe_dump({
+            "macro_path": "realised historical macro path",
+            "lagged_nco": "recursive predicted NCO after jump-off",
+            "bank_controls": "last pre-window value, held fixed",
+            "windows": spec["pseudo_stress_windows"],
+            "tail_model_limitation": (
+                "Recursive CRE Q0.90 paths are unstable in the COVID and 2022+ high-rate/CRE windows; "
+                "these historical paths are diagnostic tail-model evidence, not full recursive-stress validation."
+            ),
+        }, handle, sort_keys=False)
     return result
 
 

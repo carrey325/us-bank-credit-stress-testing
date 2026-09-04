@@ -29,10 +29,28 @@ def test_quantile_uses_bank_effects_and_predicts_known_banks():
 def test_tail_metrics_are_labelled_and_pinball_is_zero_for_exact_forecast():
     actual = np.array([0.01, 0.02, 0.03])
     assert pinball_loss(actual, actual, 0.9) == 0.0
-    metrics = interval_scores(actual, np.array([0.005, 0.015, 0.025]), np.array([0.015, 0.025, 0.035]))
+    metrics = interval_scores(
+        actual,
+        np.array([0.005, 0.015, 0.025]),
+        np.array([0.015, 0.025, 0.035]),
+        lower_quantile=0.5,
+        upper_quantile=0.9,
+    )
     assert metrics["nominal_coverage"] == 0.40
     assert metrics["empirical_coverage"] == 1.0
     assert metrics["interval_width"] > 0
+
+
+def test_asymmetric_quantile_interval_uses_bound_specific_proper_penalties():
+    actual = np.array([0.0, 1.5, 3.0])
+    lower = np.array([1.0, 1.0, 1.0])
+    upper = np.array([2.0, 2.0, 2.0])
+    metrics = interval_scores(actual, lower, upper, lower_quantile=0.5, upper_quantile=0.9)
+    symmetric_winkler = np.mean((upper - lower) + (2 / (1 - 0.4)) * np.array([1.0, 0.0, 1.0]))
+    # The lower miss costs 1 / 0.50 and the upper miss costs 1 / (1 - 0.90),
+    # so this intentionally differs from a symmetric 40%-coverage formula.
+    assert np.isclose(metrics["winkler_score"], 5.0)
+    assert metrics["winkler_score"] != symmetric_winkler
 
 
 def test_crisis_period_mask_uses_only_predeclared_historical_windows():

@@ -32,7 +32,8 @@ def main() -> None:
         f"- Recursive pseudo-stress forecasts: {len(stress):,}\n"
         f"- Bayesian status: {bayesian_status}.\n"
         "- Figures: six required OOS/pseudo-stress figures in `outputs/validation/figures/`; the Bayesian panel is explicitly labelled unavailable if fallback is active.\n"
-        "- The pseudo-stress path uses realised macro history and recursive NCO; future bank controls are held at their last pre-window values.\n",
+        "- The pseudo-stress path uses realised macro history and recursive NCO; future bank controls are held at their last pre-window values.\n"
+        "- `pseudo_stress_metrics.csv` reports quantile pinball loss and empirical/nominal exceedance rates alongside mean-error metrics. Recursive CRE Q0.90 paths are unstable in COVID and 2022+; they are a tail-model limitation, not full recursive-stress validation.\n",
         encoding="utf-8",
     )
     print(f"oos={len(predictions)} comparison={len(comparison)} tail={len(tail)} pseudo_stress={len(stress)}")
