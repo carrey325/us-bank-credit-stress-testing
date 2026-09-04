@@ -176,11 +176,29 @@ def update_quality_report_with_source_audit(audit: pd.DataFrame) -> None:
     report_path = ROOT / "outputs" / "qa" / "data_quality_report.md"
     if report_path.exists():
         report = report_path.read_text(encoding="utf-8")
-        marker = "\n## Direct source-document audit\n"
-        if marker in report:
-            report = report.split(marker, 1)[0].rstrip() + "\n"
+        markers = ["\n## Core-universe primary-source review\n", "\n## Direct source-document audit\n"]
+        cut_points = [report.index(marker) for marker in markers if marker in report]
+        if cut_points:
+            report = report[:min(cut_points)].rstrip() + "\n"
+        review = pd.read_csv(ROOT / "metadata" / "specialized_business_review.csv", dtype={"bank_id": str})
+        institutions = pd.read_csv(ROOT / "metadata" / "institutions.csv", dtype={"bank_id": str})
+        specialized = institutions.loc[institutions["specialized_business_flag"].eq(1), ["bank_name", "exclusion_reason"]]
+        category_counts = {
+            "credit-card": int(review["credit_card_assessment"].eq("yes").sum()),
+            "auto-finance": int(review["auto_finance_assessment"].eq("yes").sum()),
+            "custody/asset-servicing": int(review["custody_asset_servicing_assessment"].eq("yes").sum()),
+            "broker-dealer/trading": int(review["broker_dealer_trading_assessment"].eq("yes").sum()),
+        }
+        universe_section = (
+            "\n## Core-universe primary-source review\n\n"
+            f"- Reviewed legal entities: {len(review):,}; current eligible core banks: {int(institutions['core_sample_flag'].sum()):,}.\n"
+            "- Review input: `metadata/specialized_business_review.csv`; the screen is fail-closed for candidates lacking a dated primary-source review.\n"
+            "- Reviewed prohibited classifications: " + "; ".join(f"{name}={count:,}" for name, count in category_counts.items()) + ".\n"
+            "- Specialized exclusions: " + "; ".join(f"{row.bank_name} ({row.exclusion_reason})" for row in specialized.itertuples(index=False)) + ".\n"
+            "- Classification is applied to the FDIC legal entity; a parent or sibling affiliate's business is not imputed without primary-source support.\n"
+        )
         report += (
-            f"{marker}\n"
+            f"{universe_section}\n## Direct source-document audit\n\n"
             f"- Fixed reproducible sample: {len(audit):,} bank-segment-quarters (seed 772), including required transition rows.\n"
             f"- Direct FFIEC archive-member/raw-value to standard-layer matches: {int(audit['raw_archive_to_standard_match'].sum()):,}/{len(audit):,}.\n"
             f"- Recomputed quarterly NCO to panel matches: {int(audit['derived_to_panel_match'].sum()):,}/{len(audit):,}.\n"

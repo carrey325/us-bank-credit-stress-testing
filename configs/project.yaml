@@ -9,6 +9,7 @@ sample:
   asset_min_thousands: 10000000
   asset_max_thousands: 250000000
   target_core_banks: 35
+  specialized_credit_card_ratio: 0.50
   min_history_quarters: 40
   small_exposure_thousands: 1000
   exclude_merger_buffer_quarters: 1

@@ -1,14 +1,14 @@
 # Batch 1 data-quality report
 
-- Standard observations: 94,390
+- Standard observations: 93,778
 - Derived observations: 8,145
 - Core banks: 33
 - Field-mapping rows: 66
 - Duplicate standard bank/date/raw-code keys: 0
-- Negative NCO observations retained: 1854
-- Suppressed incomplete segment gross flows: 42
-- FDIC merger quarters flagged: 519
-- Asset-jump quarters flagged: 72
+- Negative NCO observations retained: 1838
+- Suppressed incomplete segment gross flows: 40
+- FDIC merger quarters flagged: 561
+- Asset-jump quarters flagged: 75
 - Manual formula-audit failures: 0
 
 ## Definitions
@@ -37,22 +37,31 @@
 
 - Formula: mapped Tier 1 capital / mapped risk-weighted assets versus the separately reported Tier 1 risk-based capital ratio.
 - Absolute tolerance: 1 basis point; ratios carrying a `%` suffix in the CDR files are normalized to decimal fractions before comparison.
-- Evaluable bank-quarters: 2,715/2,715 (100.00%).
-- Within tolerance: 2,715/2,715 (100.00%) when evaluable.
-- PASS_WITHIN_TOLERANCE: 2,715
+- Evaluable bank-quarters: 2,707/2,715 (99.71%).
+- Within tolerance: 2,707/2,707 (100.00%) when evaluable.
+- NOT_EVALUABLE_MISSING_INPUT: 8
+- PASS_WITHIN_TOLERANCE: 2,707
 
 ## Mapped raw-field presence
 
 - 2005-03-31: 36 mapped raw codes
 - 2010-03-31: 43 mapped raw codes
-- 2020-03-31: 52 mapped raw codes
-- 2025-12-31: 52 mapped raw codes
+- 2020-03-31: 50 mapped raw codes
+- 2025-12-31: 50 mapped raw codes
 
 ## Limitations
 
 - The historical Call Report taxonomy has genuine reporting-detail changes. Missing segment detail remains missing; it is never filled with zero.
 - FDIC history events are branch-granular and collapsed to bank-quarter merger flags; no virtual-bank reconstruction is claimed.
 - `metadata/manual_source_audit.csv` records the independent raw-archive source-document sample; the deterministic audit is retained as a separate formula control.
+
+## Core-universe primary-source review
+
+- Reviewed legal entities: 42; current eligible core banks: 33.
+- Review input: `metadata/specialized_business_review.csv`; the screen is fail-closed for candidates lacking a dated primary-source review.
+- Reviewed prohibited classifications: credit-card=5; auto-finance=1; custody/asset-servicing=1; broker-dealer/trading=0.
+- Specialized exclusions: SYNCHRONY BANK (credit_card_dominant); AMERICAN EXPRESS NB (credit_card_dominant); NORTHERN TRUST CO (custody_asset_servicing_dominant); TD BANK USA NATIONAL ASSN (credit_card_dominant); BARCLAYS BANK DELAWARE (credit_card_dominant); COMENITY CAPITAL BANK (credit_card_dominant); ALLY BANK (auto_finance_dominant).
+- Classification is applied to the FDIC legal entity; a parent or sibling affiliate's business is not imputed without primary-source support.
 
 ## Direct source-document audit
 
