@@ -23,9 +23,9 @@ cre_interaction_spec:
   outcome: annualized_nco_rate
   segment: CRE
   exposure: cre_to_tier1
+  exposure_timing: bank_quarter_lagged_at_forecast_origin
   alternative_exposure: cre_share
   shock: cre_price_growth
-  pre_shock_reference: 2021-12-31
   entity_effect: bank_fixed_effect
   time_effect: quarter_fixed_effect
 oos_windows:

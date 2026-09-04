@@ -4,14 +4,14 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from bankstress.modeling import build_model_panel, run_cre_interaction, run_oos_models, run_split_panel_jackknife
+from bankstress.modeling import _prepare_cre_interaction_data, build_model_panel, load_model_specs, run_cre_interaction, run_oos_models, run_split_panel_jackknife
 
 
 def _root(tmp_path: Path) -> Path:
     (tmp_path / "configs").mkdir()
     spec = {"primary_segments": ["CRE"], "dynamic_fe_spec": {"exclude_merger_recent": True, "bank_features": ["lagged_noncurrent_ratio"], "segment_macro_variables": {"CRE": ["lagged_gdp_growth"]}},
             "oos_windows": [{"train_start": "2005-01-01", "train_end": "2011-12-31", "test_start": "2012-01-01", "test_end": "2013-12-31"}],
-            "cre_interaction_spec": {"segment": "CRE", "exposure": "cre_to_tier1", "shock": "cre_price_growth", "pre_shock_reference": "2011-12-31"}}
+            "cre_interaction_spec": {"segment": "CRE", "exposure": "cre_to_tier1", "exposure_timing": "bank_quarter_lagged_at_forecast_origin", "shock": "cre_price_growth"}}
     (tmp_path / "configs" / "model_specs.yaml").write_text(yaml.safe_dump(spec), encoding="utf-8")
     return tmp_path
 
@@ -47,3 +47,15 @@ def test_cre_interaction_runs_with_bank_and_quarter_effects(tmp_path):
     result = run_cre_interaction(panel, root)
     assert "exposure_x_cre_price_shock" in set(result.term)
     assert (root / "outputs" / "models" / "cre_interaction" / "interaction_coefficients.csv").exists()
+
+
+def test_cre_interaction_exposure_never_postdates_forecast_origin(tmp_path):
+    root, panel = _root(tmp_path), _panel()
+    panel = panel.sort_values(["bank_id", "report_date"]).copy()
+    panel["cre_to_tier1"] = np.arange(len(panel), dtype=float)
+    prepared = _prepare_cre_interaction_data(panel, load_model_specs(root)["cre_interaction_spec"]).dropna(subset=["lagged_exposure"])
+
+    assert prepared["exposure_as_of_date"].le(prepared["forecast_origin"]).all()
+    bank_one = prepared[prepared.bank_id.eq("1")].iloc[0]
+    prior = panel[(panel.bank_id.eq("1")) & (panel.report_date.eq(bank_one["exposure_as_of_date"]))].iloc[0]
+    assert bank_one["lagged_exposure"] == prior["cre_to_tier1"]

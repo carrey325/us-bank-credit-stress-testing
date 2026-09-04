@@ -190,23 +190,56 @@ def _two_way_demean(frame: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     return out
 
 
+def _prepare_cre_interaction_data(panel: pd.DataFrame, spec: dict) -> pd.DataFrame:
+    """Build the CRE-interaction estimation frame using only exposure known at origin."""
+    data = panel[panel.segment.eq(spec["segment"])].copy()
+    data["report_date"] = pd.to_datetime(data["report_date"])
+    if "forecast_origin" not in data:
+        data["forecast_origin"] = data["report_date"] - pd.offsets.QuarterEnd()
+    else:
+        data["forecast_origin"] = pd.to_datetime(data["forecast_origin"])
+    if data.duplicated(["bank_id", "report_date"]).any():
+        raise ValueError("CRE interaction requires one eligible CRE observation per bank-quarter")
+
+    # At the forecast origin for quarter t, the latest eligible bank exposure is
+    # the bank's prior reported quarter.  Sorting and shifting within bank avoids
+    # attaching an end-of-sample value to historical observations.
+    data = data.sort_values(["bank_id", "report_date"]).copy()
+    by_bank = data.groupby("bank_id", sort=False)
+    data["exposure_as_of_date"] = by_bank["report_date"].shift(1)
+    data["lagged_exposure"] = by_bank[spec["exposure"]].shift(1)
+    data = data[(data.eligible_for_model.eq(1)) & (data.merger_recent_flag.eq(0))].copy()
+    data["cre_price_shock"] = data[spec["shock"]]
+    data["exposure_x_cre_price_shock"] = data["lagged_exposure"] * data["cre_price_shock"]
+    return data
+
+
 def run_cre_interaction(panel: pd.DataFrame, root: Path) -> pd.DataFrame:
     spec = load_model_specs(root)["cre_interaction_spec"]
-    data = panel[(panel.segment.eq(spec["segment"])) & (panel.eligible_for_model.eq(1)) & (panel.merger_recent_flag.eq(0))].copy()
-    reference = pd.Timestamp(spec["pre_shock_reference"])
-    exposure = data[data.report_date.le(reference)].sort_values("report_date").groupby("bank_id")[spec["exposure"]].last().rename("pre_shock_exposure")
-    data = data.join(exposure, on="bank_id")
-    data["cre_price_shock"] = data[spec["shock"]]
-    data["exposure_x_cre_price_shock"] = data["pre_shock_exposure"] * data["cre_price_shock"]
+    data = _prepare_cre_interaction_data(panel, spec)
     controls = ["lagged_nco_rate", "lagged_noncurrent_ratio", "lagged_allowance_coverage", "lagged_loan_growth"]
     terms = [*controls, "exposure_x_cre_price_shock"]
     data = data.dropna(subset=["nco_rate", *terms]).copy()
+    if not data["exposure_as_of_date"].le(data["forecast_origin"]).all():
+        raise ValueError("CRE interaction exposure date is after its forecast origin")
     demeaned = _two_way_demean(data, ["nco_rate", *terms])
     beta, se, _ = _ols(demeaned["nco_rate"].to_numpy(), demeaned[terms].to_numpy(), data["bank_id"].astype(str).to_numpy())
     result = pd.DataFrame({"term": terms, "estimate": beta, "bank_clustered_se": se, "nobs": len(data), "banks": data.bank_id.nunique(),
-                           "exposure_definition": spec["exposure"], "shock": spec["shock"], "pre_shock_reference": reference.date().isoformat()})
+                           "exposure_definition": spec["exposure"], "exposure_timing": spec["exposure_timing"], "shock": spec["shock"],
+                           "max_exposure_as_of_date": data["exposure_as_of_date"].max().date().isoformat(),
+                           "exposure_after_forecast_origin_count": 0})
     path = root / "outputs" / "models" / "cre_interaction"
     path.mkdir(parents=True, exist_ok=True)
     result.to_csv(path / "interaction_coefficients.csv", index=False)
-    (path / "result_status.md").write_text("# CRE concentration interaction\n\nThe table reports a bank- and quarter-fixed-effects CRE-only regression. The interaction is the concentration effect on the unit CRE NCO rate; it is distinct from mechanical dollar exposure. Statistical interpretation requires the reported bank-clustered standard error and must not be replaced with significance hunting.\n", encoding="utf-8")
+    (path / "result_status.md").write_text(
+        "# CRE concentration interaction\n\n"
+        "The primary table reports a bank- and quarter-fixed-effects CRE-only regression. "
+        "For each outcome quarter, its CRE-to-Tier1 exposure is the same bank's prior reported quarter, "
+        "which is available at (or before) the forecast origin; no frozen future exposure is used. "
+        "The interaction is the concentration effect on the unit CRE NCO rate and is distinct from mechanical dollar exposure. "
+        f"The regenerated estimation sample contains {len(data):,} observations across {data.bank_id.nunique():,} banks, "
+        "with zero exposure dates after forecast origin. Statistical interpretation requires the reported bank-clustered "
+        "standard error and must not be replaced with significance hunting.\n",
+        encoding="utf-8",
+    )
     return result
