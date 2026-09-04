@@ -14,6 +14,11 @@ windows:
   train_end: '2021-12-31'
   test_start: '2022-01-01'
   test_end: '2025-12-31'
-tail_model_limitation: Recursive CRE Q0.90 paths are unstable in the COVID and 2022+
-  high-rate/CRE windows; these historical paths are diagnostic tail-model evidence,
-  not full recursive-stress validation.
+tail_model_limitation: 'Recursive CRE Q0.90 is not historically calibrated; its differing
+  pre-specified window results show recursive-path instability. GFC: severe undercoverage
+  (296/443 exceedances, 66.8% observed versus 10.0% nominal; pinball loss 0.08928);
+  COVID: extreme overprediction (1/241 exceedances, 0.4% observed versus 10.0% nominal;
+  pinball loss 0.01101); 2022+ high-rate/CRE: instability/mild undercoverage (63/457
+  exceedances, 13.8% observed versus 10.0% nominal; pinball loss 0.06346). Q0.90 remains
+  the pre-specified downstream tail model where required, but is not validated by
+  these historical recursive paths.'

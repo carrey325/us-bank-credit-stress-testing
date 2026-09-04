@@ -8,7 +8,13 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from bankstress.validation import run_historical_pseudo_stress, run_unified_oos, write_validation_figures
+from bankstress.validation import (
+    recursive_cre_q90_calibration_statement,
+    run_historical_pseudo_stress,
+    run_unified_oos,
+    write_validation_figures,
+)
+from bankstress.modeling import load_model_specs
 
 
 def main() -> None:
@@ -22,6 +28,11 @@ def main() -> None:
     stress = run_historical_pseudo_stress(panel, ROOT)
     write_validation_figures(predictions, stress, ROOT)
     diagnostics = pd.read_csv(ROOT / "outputs" / "models" / "bayesian" / "diagnostics.csv")
+    pseudo_stress_metrics = pd.read_csv(ROOT / "outputs" / "validation" / "pseudo_stress_metrics.csv")
+    tail_model_limitation = recursive_cre_q90_calibration_statement(
+        pseudo_stress_metrics,
+        load_model_specs(ROOT)["pseudo_stress_windows"],
+    )
     bayesian_status = "posterior forecasts included" if diagnostics["status"].eq("sampled").all() else "explicit fallback; no posterior forecasts included"
     summary = ROOT / "outputs" / "validation" / "run_summary.md"
     summary.write_text(
@@ -33,7 +44,8 @@ def main() -> None:
         f"- Bayesian status: {bayesian_status}.\n"
         "- Figures: six required OOS/pseudo-stress figures in `outputs/validation/figures/`; the Bayesian panel is explicitly labelled unavailable if fallback is active.\n"
         "- The pseudo-stress path uses realised macro history and recursive NCO; future bank controls are held at their last pre-window values.\n"
-        "- `pseudo_stress_metrics.csv` reports quantile pinball loss and empirical/nominal exceedance rates alongside mean-error metrics. Recursive CRE Q0.90 paths are unstable in COVID and 2022+; they are a tail-model limitation, not full recursive-stress validation.\n",
+        "- `pseudo_stress_metrics.csv` reports quantile pinball loss and empirical/nominal exceedance rates alongside mean-error metrics. "
+        f"{tail_model_limitation}\n",
         encoding="utf-8",
     )
     print(f"oos={len(predictions)} comparison={len(comparison)} tail={len(tail)} pseudo_stress={len(stress)}")

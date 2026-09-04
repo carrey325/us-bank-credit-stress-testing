@@ -82,6 +82,57 @@ def _crisis_period_mask(dates: pd.Series) -> pd.Series:
     )
 
 
+def recursive_cre_q90_calibration_statement(summary: pd.DataFrame, windows: list[dict[str, str]]) -> str:
+    """Describe recursive CRE Q0.90 calibration from generated stress metrics.
+
+    The labels apply a fixed, transparent interpretation rule to the
+    pre-specified pseudo-stress windows.  They are not selected after looking
+    for a favourable window: an observed exceedance rate at least twice the
+    nominal rate is severe undercoverage, a rate at most one quarter of nominal
+    is extreme overprediction, and any remaining positive gap is mild
+    undercoverage.  The differing directions across the three windows are
+    reported as recursive-path instability.
+    """
+    target = summary.loc[
+        summary["model"].eq("quantile_0.9") & summary["segment"].eq("CRE")
+    ].copy()
+    expected_windows = [window["name"] for window in windows]
+    target = target.set_index("pseudo_window").reindex(expected_windows)
+    required = ["n", "pinball_loss", "exceedance_count", "empirical_exceedance_rate", "nominal_exceedance_rate"]
+    if target[required].isna().any().any():
+        missing = target.index[target[required].isna().any(axis=1)].tolist()
+        return (
+            "Recursive CRE Q0.90 is not historically calibrated because the required "
+            f"pseudo-stress metrics are unavailable for: {', '.join(missing)}."
+        )
+
+    labels = {"GFC": "GFC", "COVID": "COVID", "High_Rate_CRE": "2022+ high-rate/CRE"}
+    details = []
+    for name, row in target.iterrows():
+        observed = float(row["empirical_exceedance_rate"])
+        nominal = float(row["nominal_exceedance_rate"])
+        if observed >= 2 * nominal:
+            interpretation = "severe undercoverage"
+        elif observed <= nominal / 4:
+            interpretation = "extreme overprediction"
+        elif observed > nominal:
+            interpretation = "instability/mild undercoverage"
+        else:
+            interpretation = "instability/overcoverage"
+        details.append(
+            f"{labels.get(name, name)}: {interpretation} "
+            f"({int(row['exceedance_count'])}/{int(row['n'])} exceedances, "
+            f"{observed:.1%} observed versus {nominal:.1%} nominal; "
+            f"pinball loss {float(row['pinball_loss']):.5f})"
+        )
+    return (
+        "Recursive CRE Q0.90 is not historically calibrated; its differing pre-specified "
+        "window results show recursive-path instability. "
+        + "; ".join(details)
+        + ". Q0.90 remains the pre-specified downstream tail model where required, but is not validated by these historical recursive paths."
+    )
+
+
 @dataclass
 class QuantileFit:
     result: Any
@@ -478,16 +529,14 @@ def run_historical_pseudo_stress(panel: pd.DataFrame, root: Path) -> pd.DataFram
         })
     summary = pd.DataFrame(summary_rows)
     summary.to_csv(validation / "pseudo_stress_metrics.csv", index=False)
+    tail_model_limitation = recursive_cre_q90_calibration_statement(summary, spec["pseudo_stress_windows"])
     with (validation / "pseudo_stress_methodology.yaml").open("w", encoding="utf-8") as handle:
         yaml.safe_dump({
             "macro_path": "realised historical macro path",
             "lagged_nco": "recursive predicted NCO after jump-off",
             "bank_controls": "last pre-window value, held fixed",
             "windows": spec["pseudo_stress_windows"],
-            "tail_model_limitation": (
-                "Recursive CRE Q0.90 paths are unstable in the COVID and 2022+ high-rate/CRE windows; "
-                "these historical paths are diagnostic tail-model evidence, not full recursive-stress validation."
-            ),
+            "tail_model_limitation": tail_model_limitation,
         }, handle, sort_keys=False)
     return result
 

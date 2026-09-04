@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from bankstress.modeling import load_model_specs
-from bankstress.validation import _bayesian_convergence_failure, _crisis_period_mask, fit_quantile, interval_scores, pinball_loss, predict_quantile, write_validation_figures
+from bankstress.validation import _bayesian_convergence_failure, _crisis_period_mask, fit_quantile, interval_scores, pinball_loss, predict_quantile, recursive_cre_q90_calibration_statement, write_validation_figures
 
 
 def _frame() -> pd.DataFrame:
@@ -76,6 +76,27 @@ def test_oos_windows_remain_the_approved_2005_expanding_windows():
         {"train_start": "2005-01-01", "train_end": "2019-12-31", "test_start": "2020-01-01", "test_end": "2021-12-31"},
         {"train_start": "2005-01-01", "train_end": "2021-12-31", "test_start": "2022-01-01", "test_end": "2025-12-31"},
     ]
+
+
+def test_recursive_cre_q90_status_is_derived_from_all_prespecified_windows():
+    summary = pd.DataFrame({
+        "pseudo_window": ["GFC", "COVID", "High_Rate_CRE"],
+        "model": ["quantile_0.9"] * 3,
+        "segment": ["CRE"] * 3,
+        "n": [443, 241, 457],
+        "pinball_loss": [0.0892845886, 0.0110109205, 0.0634617323],
+        "exceedance_count": [296, 1, 63],
+        "empirical_exceedance_rate": [296 / 443, 1 / 241, 63 / 457],
+        "nominal_exceedance_rate": [0.1] * 3,
+    })
+    statement = recursive_cre_q90_calibration_statement(summary, [
+        {"name": "GFC"}, {"name": "COVID"}, {"name": "High_Rate_CRE"},
+    ])
+    assert "not historically calibrated" in statement
+    assert "GFC: severe undercoverage (296/443 exceedances, 66.8% observed versus 10.0% nominal; pinball loss 0.08928)" in statement
+    assert "COVID: extreme overprediction (1/241 exceedances, 0.4% observed versus 10.0% nominal; pinball loss 0.01101)" in statement
+    assert "2022+ high-rate/CRE: instability/mild undercoverage (63/457 exceedances, 13.8% observed versus 10.0% nominal; pinball loss 0.06346)" in statement
+    assert "pre-specified downstream tail model" in statement
 
 
 def test_figures_include_explicit_bayesian_fallback_when_no_posterior_exists(tmp_path: Path):
