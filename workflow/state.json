@@ -1,0 +1,74 @@
+{
+  "project": "MF772 Bank Credit Stress Testing",
+  "version": 2,
+  "current_batch": 1,
+  "status": "WAITING_REVIEW",
+  "latest_completed_batch": 0,
+  "first_incomplete_batch": 1,
+  "bootstrap_audit_path": "workflow/bootstrap_audit.md",
+  "migration_mode": "MIGRATION_MODE_A",
+  "model_policy": {
+    "router": "GPT-5.6 Sol Mid",
+    "default_worker": "GPT-5.6 Terra High",
+    "escalation_repair_worker": "GPT-5.6 Sol High",
+    "terra_core_method_attempts_before_sol_escalation": 2
+  },
+  "worker": {
+    "thread_or_task_id": "01a069d7-de21-7000-b974-abfd75b626e1",
+    "model": "GPT-5.6 Terra High",
+    "started_at": "2026-09-04T00:35:55Z",
+    "last_activity_at": "2026-09-04T00:50:16Z",
+    "status": "COMPLETE",
+    "retry_count": 0
+  },
+  "core_method_problem": {
+    "problem_key": null,
+    "description": null,
+    "terra_attempts": 0,
+    "sol_high_used": false,
+    "resolved": false
+  },
+  "reviewer": {
+    "chat_url": "https://chatgpt.com/g/g-p-6a94847cd07081918912d6efaf3a3581/c/6a9a04ae-33d0-83e9-bd03-70c62265901f",
+    "quick_model": "GPT-5.6 Sol High",
+    "stage_model": "GPT-5.6 Pro",
+    "status": null,
+    "decision": null
+  },
+  "github": {
+    "repo_url": "https://github.com/carrey325/MF772",
+    "branch": "main",
+    "commit_sha": "cc7fb08ccadbd10de888c3700e9f38f258c6bfcd"
+  },
+  "handoff": {
+    "summary_path": "workflow/bootstrap_audit.md",
+    "deviations": [],
+    "limitations": [
+      "Batch 1 deterministic formula trace is not a completed human source-document audit.",
+      "Batch 1 mapped-segment NCO reconciliation lacks an explicit acceptance threshold and documented closure.",
+      "Batch 3 outputs use obsolete pre-amendment OOS windows and pseudo-stress/figures are absent."
+    ]
+  },
+  "blocker": {
+    "type": null,
+    "summary": null,
+    "question": null
+  },
+  "router": {
+    "last_check_at": "2026-09-04T00:50:16Z",
+    "next_action": "PUSH_AND_SUBMIT_STAGE_REVIEW",
+    "notes": "Batch 1 acceptance repair commit cc7fb08 passed Router verification: full suite 15 passed and focused Batch 2 regression 5 passed. Push and submit Stage Review; do not launch Batch 2 implementation."
+  },
+  "allowed_statuses": [
+    "READY",
+    "RUNNING",
+    "BLOCKED",
+    "WAITING_REVIEW",
+    "CHANGES_REQUIRED",
+    "APPROVED",
+    "RESOURCE_LIMIT",
+    "FAILED",
+    "STALE",
+    "PROJECT_COMPLETE"
+  ]
+}
