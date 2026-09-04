@@ -1,4 +1,4 @@
 artifact,source_url,sha256,download_timestamp_utc
-baseline,https://www.federalreserve.gov/supervisionreg/files/2026_Final_Supervisory_Baseline_Domestic.csv,76e236695be2c8372890078acf8c01273ba5198a19afb5037045a963737c1bcc,2026-09-04T15:24:14.593664+00:00
-severely_adverse,https://www.federalreserve.gov/supervisionreg/files/2026_Final_Supervisory_Severely_Adverse_Domestic.csv,45c2859ae7246c071b69df8623854751f0629b04393957e14fe28bc33c04ebbb,2026-09-04T15:24:14.908121+00:00
-historic_domestic,https://www.federalreserve.gov/supervisionreg/files/2026_Final_Historic_Domestic.csv,6d08aadcf82d65dcf36b856792040b82ceceef79a46ff0239afd41e0c4e7f653,2026-09-04T15:24:15.150346+00:00
+baseline,https://www.federalreserve.gov/supervisionreg/files/2026_Final_Supervisory_Baseline_Domestic.csv,76e236695be2c8372890078acf8c01273ba5198a19afb5037045a963737c1bcc,2026-09-04T16:13:32.581054+00:00
+severely_adverse,https://www.federalreserve.gov/supervisionreg/files/2026_Final_Supervisory_Severely_Adverse_Domestic.csv,45c2859ae7246c071b69df8623854751f0629b04393957e14fe28bc33c04ebbb,2026-09-04T16:13:32.839403+00:00
+historic_domestic,https://www.federalreserve.gov/supervisionreg/files/2026_Final_Historic_Domestic.csv,6d08aadcf82d65dcf36b856792040b82ceceef79a46ff0239afd41e0c4e7f653,2026-09-04T16:13:33.097361+00:00

@@ -18,19 +18,27 @@ import requests
 import yaml
 from matplotlib import pyplot as plt
 
+from bankstress.macro import load_macro_config
 from bankstress.modeling import _eligible_frame, _fit_entity_fe, _predict_entity_fe, load_model_specs
 from bankstress.validation import fit_quantile, predict_quantile
 
 
 OFFICIAL_SCENARIOS = ("baseline", "severely_adverse")
-MODEL_MACRO_COLUMNS = {
-    "lagged_gdp_growth": "gdp_growth",
-    "lagged_unemployment_rate": "unemployment",
-    "lagged_cre_price_growth": "cre_price_growth",
-    "lagged_house_price_growth": "house_price_growth",
-    "lagged_bbb_spread": "bbb_spread",
-    "lagged_short_rate": "short_rate",
-    "lagged_mortgage_rate": "mortgage_rate",
+SCENARIO_MACRO_COLUMNS = {
+    "gdp_growth": "gdp_growth",
+    "unemployment_rate": "unemployment",
+    "cre_price_growth": "cre_price_growth",
+    "house_price_growth": "house_price_growth",
+    "bbb_spread": "bbb_spread",
+    "short_rate": "short_rate",
+    "mortgage_rate": "mortgage_rate",
+}
+
+BANK_CONTROL_CURRENT_STATE = {
+    "lagged_noncurrent_ratio": "npl_rate",
+    "lagged_allowance_coverage": "allowance_coverage",
+    "lagged_loan_growth": "loan_growth",
+    "lagged_tier1_ratio": "tier1_ratio",
 }
 
 
@@ -116,19 +124,61 @@ def ingest_fed_2026_scenarios(root: Path, session: requests.sessions.Session | N
     return scenario
 
 
-def historic_q4_macro_state(root: Path, session: requests.sessions.Session | None = None) -> tuple[pd.Series, pd.Series]:
-    """Return the actual 2025Q4 macro state and Fed historic levels for lag alignment."""
+def historic_macro_history(root: Path, session: requests.sessions.Session | None = None) -> tuple[pd.DataFrame, pd.Series]:
+    """Return transformed Fed history used to seed the Batch 2 macro interface."""
     url = load_stress_specs(root)["fed_2026"]["historic_domestic_url"]
     historic, _ = _download_csv(url, session)
     historic["quarter"] = _quarter_end(historic["Date"])
-    window = historic[historic.quarter.isin([pd.Timestamp("2025-09-30"), pd.Timestamp("2025-12-31")])].copy()
-    if len(window) != 2:
+    normalized = _normalise_fed_frame(historic.drop(columns="quarter"), "actual")
+    required = {pd.Timestamp("2025-09-30"), pd.Timestamp("2025-12-31")}
+    if not required.issubset(set(normalized["quarter"])):
         raise ValueError("Fed historic domestic data lacks the 2025Q3/Q4 macro state")
-    normalized = _normalise_fed_frame(window.drop(columns="quarter"), "actual")
-    q4 = normalized.loc[normalized.quarter.eq(pd.Timestamp("2025-12-31"))].iloc[0]
     source_q4 = historic.loc[historic.quarter.eq(pd.Timestamp("2025-12-31"))].iloc[0]
     levels = pd.Series({"cre_price": float(source_q4["Commercial Real Estate Price Index (Level)"]), "house_price": float(source_q4["House Price Index (Level)"]), "short_rate": float(source_q4["3-month Treasury rate"]), "long_rate": float(source_q4["10-year Treasury yield"]), "mortgage_rate": float(source_q4["Mortgage rate"])})
-    return q4, levels
+    return normalized, levels
+
+
+def construct_stress_macro_predictors(scenarios: pd.DataFrame, actual_macro: pd.DataFrame, root: Path) -> pd.DataFrame:
+    """Apply the approved Batch 2 transformations and availability lags to Fed paths.
+
+    `build_macro_panel` exposes GDP and unemployment as values available at a
+    quarter-end origin, then `build_model_panel` lags them for the outcome.
+    The final-vintage fallback series are shifted once in `build_macro_panel`
+    and then once again in `build_model_panel`; therefore their future stress
+    predictors use a two-quarter, rather than one-quarter, source delay.
+    """
+    definitions = load_macro_config(root)["series"]
+    actual = actual_macro.set_index("quarter")
+    rows: list[pd.DataFrame] = []
+    for _, scenario in scenarios.groupby("scenario", sort=False):
+        future = scenario.sort_values("quarter").reset_index(drop=True).copy()
+        for definition in definitions.values():
+            output_column = definition["output_column"]
+            predictor = f"lagged_{output_column}"
+            scenario_column = SCENARIO_MACRO_COLUMNS[output_column]
+            # The model's own lag contributes one quarter.  Fallback final
+            # values have already been shifted one additional quarter in the
+            # leak-safe macro panel.
+            source_delay = 1 if definition["availability"] == "vintage" else 2
+            values: list[float] = []
+            source_quarters: list[pd.Timestamp] = []
+            for position, quarter in enumerate(future["quarter"]):
+                source_position = position - source_delay
+                if source_position >= 0:
+                    source = future.iloc[source_position]
+                    source_quarter = pd.Timestamp(source["quarter"])
+                else:
+                    source_quarter = pd.Period(quarter, freq="Q") - source_delay
+                    source_quarter = source_quarter.to_timestamp("Q")
+                    if source_quarter not in actual.index:
+                        raise ValueError(f"Fed historic macro data lacks {source_quarter.date()} for {predictor}")
+                    source = actual.loc[source_quarter]
+                values.append(float(source[scenario_column]))
+                source_quarters.append(source_quarter)
+            future[predictor] = values
+            future[f"{predictor}_source_quarter"] = source_quarters
+        rows.append(future)
+    return pd.concat(rows, ignore_index=True)
 
 
 def make_sensitivity_scenarios(official: pd.DataFrame, historic_rates: pd.Series, lambdas: list[float]) -> pd.DataFrame:
@@ -186,7 +236,7 @@ def stress_jump_off(panel: pd.DataFrame, root: Path) -> tuple[pd.DataFrame, pd.D
     spec, model_spec = load_stress_specs(root)["stress"], load_model_specs(root)
     date = pd.Timestamp(spec["jump_off"])
     candidates = panel[(pd.to_datetime(panel.report_date).eq(date)) & panel.segment.isin(spec["primary_segments"])].copy()
-    required = ["nco_rate", "exposure", "tier1_capital", "allowance", "total_loans", "lagged_nco_rate", "lagged_noncurrent_ratio", "lagged_allowance_coverage", "lagged_loan_growth"]
+    required = ["nco_rate", "exposure", "tier1_capital", "allowance", "total_loans", "npl_rate", "allowance_coverage", "loan_growth", "tier1_ratio"]
     missing = candidates[required].isna().any(axis=1) | candidates["exposure"].le(0) | candidates["tier1_capital"].le(0)
     invalid = candidates["eligible_for_model"].ne(1) | candidates["merger_recent_flag"].ne(0) | missing
     exclusions = candidates.loc[invalid, ["bank_id", "bank_name", "segment"]].copy()
@@ -224,17 +274,18 @@ def fit_stress_models(panel: pd.DataFrame, root: Path) -> list[StressFit]:
 
 def _freeze_controls(jump_off: pd.DataFrame, current: pd.DataFrame, predictors: list[str]) -> pd.DataFrame:
     state = current.copy()
+    current_states = jump_off.copy()
+    current_states["bank_id"] = current_states["bank_id"].astype(str)
+    current_states = current_states.set_index("bank_id")
     for predictor in predictors:
         if predictor == "lagged_nco_rate":
             continue
-        if predictor in MODEL_MACRO_COLUMNS:
-            state[predictor] = state[MODEL_MACRO_COLUMNS[predictor]]
-        else:
-            state[predictor] = state["bank_id"].astype(str).map(jump_off.set_index(jump_off.bank_id.astype(str))[predictor])
+        if predictor in BANK_CONTROL_CURRENT_STATE:
+            state[predictor] = state["bank_id"].astype(str).map(current_states[BANK_CONTROL_CURRENT_STATE[predictor]])
     return state
 
 
-def recursive_stress_paths(jump_off: pd.DataFrame, scenarios: pd.DataFrame, models: list[StressFit], initial_macro: pd.Series, loss_rate_floor: float = 0.0) -> pd.DataFrame:
+def recursive_stress_paths(jump_off: pd.DataFrame, scenarios: pd.DataFrame, models: list[StressFit], loss_rate_floor: float = 0.0) -> pd.DataFrame:
     pieces: list[pd.DataFrame] = []
     for scenario_name, scenario in scenarios.groupby("scenario", sort=True):
         for model in models:
@@ -249,32 +300,35 @@ def recursive_stress_paths(jump_off: pd.DataFrame, scenarios: pd.DataFrame, mode
                     current["bank_id"] = current.bank_id.astype(str)
                     current["lagged_nco_rate"] = current.bank_id.map(states)
                     current["nco_rate"] = current["lagged_nco_rate"]  # required placeholder, never a future outcome
-                    # Every approved model macro coefficient is one-quarter
-                    # lagged.  The 2026Q1 outcome therefore uses actual 2025Q4
-                    # macro data; Q2--Q1 2028 use scenario Q1 2026--Q4 2027.
-                    macro_input = initial_macro if position == 0 else ordered_scenario.iloc[position - 1]
-                    for column in ("gdp_growth", "unemployment", "cre_price_growth", "house_price_growth", "bbb_spread", "short_rate", "mortgage_rate"):
-                        current[column] = macro_input[column]
                     current = _freeze_controls(origin.assign(bank_id=origin.bank_id.astype(str)), current, model.predictors[segment])
+                    for predictor in model.predictors[segment]:
+                        if predictor in BANK_CONTROL_CURRENT_STATE or predictor == "lagged_nco_rate":
+                            continue
+                        if predictor in macro._fields:
+                            current[predictor] = getattr(macro, predictor)
                     predicted = (_predict_entity_fe(fit, current, "nco_rate") if model.kind == "fe" else predict_quantile(fit, current))
                     if len(predicted) != len(origin):
                         raise ValueError(f"{model.name}/{segment} lost bank rows during recursive forecast")
                     raw_rate = predicted["prediction"].to_numpy(float)
-                    loss_rate = np.maximum(raw_rate, float(loss_rate_floor))
-                    # The floored rate is also the next-period NCO state: a
-                    # projected recovery cannot create negative credit loss or
-                    # reduce the recursively forecast stress-loss state.
-                    states.update(dict(zip(predicted.bank_id.astype(str), loss_rate, strict=True)))
+                    aggregation_rate = np.maximum(raw_rate, float(loss_rate_floor))
+                    # NCO is a net flow and can be negative.  The approved
+                    # recursion therefore feeds the raw prediction forward;
+                    # any non-negative loss floor affects dollar aggregation only.
+                    states.update(dict(zip(predicted.bank_id.astype(str), raw_rate, strict=True)))
                     output = predicted[["bank_id", "bank_name", "segment", "exposure", "tier1_capital", "allowance", "total_loans"]].copy()
                     output["scenario"], output["scenario_type"], output["model"] = scenario_name, macro.scenario_type, model.name
                     output["quarter"], output["horizon"] = macro.quarter, macro.horizon
                     output["raw_predicted_nco_rate"] = raw_rate
-                    output["predicted_nco_rate"] = loss_rate
+                    output["predicted_nco_rate"] = raw_rate
+                    output["loss_rate_for_aggregation"] = aggregation_rate
                     output["loss_rate_floor_applied"] = raw_rate < float(loss_rate_floor)
-                    output["macro_input_quarter"] = macro_input["quarter"]
+                    for predictor in model.predictors[segment]:
+                        source_column = f"{predictor}_source_quarter"
+                        if source_column in macro._fields:
+                            output[source_column] = getattr(macro, source_column)
                     # The fitted outcome is an annualized NCO rate.  Convert it
                     # to its quarterly-dollar equivalent before aggregation.
-                    output["predicted_loss"] = output["predicted_nco_rate"] * output["exposure"] / 4
+                    output["predicted_loss"] = output["loss_rate_for_aggregation"] * output["exposure"] / 4
                     output.rename(columns={"tier1_capital": "starting_tier1", "allowance": "starting_allowance", "total_loans": "starting_loans"}, inplace=True)
                     pieces.append(output)
     return pd.concat(pieces, ignore_index=True)
@@ -349,24 +403,63 @@ def write_stress_figures(paths: pd.DataFrame, summary: pd.DataFrame, cre_detail:
     fig, ax = plt.subplots(figsize=(7, 5)); rankings.rank(ascending=False).plot.scatter(x="dynamic_fe", y="quantile_0.9", ax=ax); ax.set(title="Model stress-rank comparison", xlabel="Dynamic FE rank", ylabel="Q0.90 rank"); fig.tight_layout(); fig.savefig(directory / "model_ranking_stability.png", dpi=150); plt.close(fig)
 
 
+def floor_use_qa(paths: pd.DataFrame) -> pd.DataFrame:
+    """Report the aggregation-only non-negative-floor use by stress path."""
+    return (paths.groupby(["scenario", "scenario_type", "model", "segment"], as_index=False)
+            .agg(floor_use_count=("loss_rate_floor_applied", "sum"),
+                 path_observations=("loss_rate_floor_applied", "size"),
+                 raw_predicted_nco_min=("raw_predicted_nco_rate", "min"),
+                 aggregated_loss=("predicted_loss", "sum")))
+
+
+def committed_mean_model_oos_comparison(root: Path) -> tuple[pd.DataFrame, str, float]:
+    """Select the best mean model from committed AR and Dynamic-FE OOS evidence."""
+    paths = {
+        "ar": root / "outputs" / "models" / "ar" / "oos_metrics.csv",
+        "dynamic_fe": root / "outputs" / "models" / "dynamic_fe" / "oos_metrics.csv",
+    }
+    frames = []
+    for model, path in paths.items():
+        frame = pd.read_csv(path)
+        if frame.empty or not {"n", "rmse"}.issubset(frame.columns):
+            raise ValueError(f"Committed OOS metrics are incomplete for {model}")
+        frames.append(frame.assign(model=model))
+    metrics = pd.concat(frames, ignore_index=True)
+    comparison = (metrics.groupby("model", as_index=False)
+                  .apply(lambda group: pd.Series({
+                      "oos_observations": int(group["n"].sum()),
+                      "pooled_oos_rmse": float(np.sqrt(np.average(group["rmse"].pow(2), weights=group["n"]))),
+                  }), include_groups=False)
+                  .reset_index(drop=True))
+    ar_rmse = float(comparison.loc[comparison.model.eq("ar"), "pooled_oos_rmse"].iloc[0])
+    comparison["rmse_improvement_vs_ar"] = (ar_rmse - comparison["pooled_oos_rmse"]) / ar_rmse
+    best = comparison.sort_values(["pooled_oos_rmse", "model"], kind="stable").iloc[0]
+    return comparison, str(best["model"]), float(best["rmse_improvement_vs_ar"])
+
+
 def run_batch4(root: Path, session: requests.sessions.Session | None = None) -> dict[str, Any]:
     panel_path = root / "data" / "derived" / "model_panel.parquet"
     if not panel_path.exists():
         raise FileNotFoundError("Batch 4 requires the real Batch 1--3 model panel")
     panel = pd.read_parquet(panel_path)
     official = ingest_fed_2026_scenarios(root, session)
-    initial_macro, historic_rates = historic_q4_macro_state(root, session)
+    actual_macro, historic_rates = historic_macro_history(root, session)
     stress_spec = load_stress_specs(root)["stress"]
     all_scenarios = pd.concat([official, make_sensitivity_scenarios(official, historic_rates, stress_spec["lambdas"])], ignore_index=True)
+    all_scenarios = construct_stress_macro_predictors(all_scenarios, actual_macro, root)
     jump, exclusions = stress_jump_off(panel, root)
     models = fit_stress_models(panel, root)
-    paths = recursive_stress_paths(jump, all_scenarios, models, initial_macro, float(stress_spec["loss_rate_floor"]))
+    paths = recursive_stress_paths(jump, all_scenarios, models, float(stress_spec["loss_rate_floor"]))
     summaries, segments = summarize_stress(paths)
     detail, groups = cre_group_table(summaries, jump)
     stability, availability = ranking_stability(summaries, root)
     stress_dir, report_dir = root / "outputs" / "stress", root / "outputs" / "reporting"
     stress_dir.mkdir(parents=True, exist_ok=True); report_dir.mkdir(parents=True, exist_ok=True)
     paths.to_parquet(stress_dir / "stress_paths.parquet", index=False)
+    floor_qa = floor_use_qa(paths)
+    floor_qa.to_csv(stress_dir / "loss_rate_floor_qa.csv", index=False)
+    timing_columns = ["scenario", "scenario_type", "quarter", "horizon", *[column for column in all_scenarios if column.endswith("_source_quarter")]]
+    all_scenarios[timing_columns].to_csv(stress_dir / "macro_predictor_timing.csv", index=False)
     # T4 is one row per bank/model.  Its loss attribution and capital fields are
     # deliberately the official severely-adverse result, while baseline loss is
     # retained alongside it for the required comparison.
@@ -402,17 +495,18 @@ def run_batch4(root: Path, session: requests.sessions.Session | None = None) -> 
     reconciliation = pd.read_csv(root / "outputs" / "qa" / "reconciliation_summary.csv")
     evaluable = reconciliation[~reconciliation["nco_reconciliation_status"].eq("NOT_EVALUABLE_MISSING_FLOW")]
     reconciliation_rate = float(evaluable["nco_reconciliation_status"].str.startswith(("PASS", "EXPLAINED")).mean()) if not evaluable.empty else np.nan
-    dynamic_metrics = pd.read_csv(root / "outputs" / "models" / "dynamic_fe" / "oos_metrics.csv")
-    best_improvement = float(dynamic_metrics["rmse_improvement_vs_ar"].max())
+    mean_model_comparison, best_model_name, best_improvement = committed_mean_model_oos_comparison(root)
+    mean_model_comparison.to_csv(stress_dir / "mean_model_oos_comparison.csv", index=False)
     mapping = pd.read_csv(root / "metadata" / "field_mapping.csv")
-    metrics = {"n_banks": int(jump.bank_id.nunique()), "n_observations": int(len(panel)), "n_raw_fields": int(mapping["raw_code"].nunique()), "reconciliation_rate": reconciliation_rate, "best_oos_rmse_improvement_vs_ar": best_improvement, "best_model_name": "dynamic_fe", "high_cre_capital_depletion_difference": high_low, "high_cre_group_definition": "2025Q4 CRE-to-Tier1 terciles among the final stress universe", "stress_scenario": "Fed 2026 severely adverse"}
+    metrics = {"n_banks": int(jump.bank_id.nunique()), "n_observations": int(len(panel)), "n_raw_fields": int(mapping["raw_code"].nunique()), "reconciliation_rate": reconciliation_rate, "best_oos_rmse_improvement_vs_ar": best_improvement, "best_model_name": best_model_name, "high_cre_capital_depletion_difference": high_low, "high_cre_group_definition": "2025Q4 CRE-to-Tier1 terciles among the final stress universe", "stress_scenario": "Fed 2026 severely adverse"}
     import json
     (report_dir / "resume_metrics.json").write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
     write_stress_figures(paths, summaries, detail, groups, root)
     (stress_dir / "run_summary.md").write_text("# Batch 4 Fed stress results\n\n"
         f"- Final stress universe: {metrics['n_banks']} banks, each with complete CRE and C&I 2025Q4 states.\n"
         "- Official scenarios are the Federal Reserve's 2026 final baseline and severely adverse domestic CSVs; lambda and partial shocks are clearly labelled researcher sensitivities.\n"
-        "- Primary capital result is cumulative credit loss / starting Tier 1 capital, not a Federal Reserve CET1 projection. Annualized NCO rates are divided by four and floored at zero before quarterly-loss aggregation.\n"
-        "- The one-quarter-lag model uses actual 2025Q4 macro data for the 2026Q1 outcome; official scenario Q1 2026 first affects 2026Q2. Mortgage attribution is unavailable, not zero-filled, because no approved mortgage stress model exists.\n"
+        "- Primary capital result is cumulative credit loss / starting Tier 1 capital, not a Federal Reserve CET1 projection. Annualized NCO rates are divided by four; the non-negative floor applies only to dollar-loss aggregation and not to the recursive NCO state.\n"
+        "- 2026Q1 bank controls use the actual 2025Q4 current state and remain static. GDP/unemployment scenario features first affect 2026Q2, while final-vintage fallback features first affect 2026Q3 because Batch 2 applies their documented availability lag and the model then applies its own lag; `macro_predictor_timing.csv` records all sources.\n"
+        f"- Dollar-loss floor use: {int(floor_qa.floor_use_count.sum())} of {int(floor_qa.path_observations.sum())} path observations; see `loss_rate_floor_qa.csv`. Mortgage attribution is unavailable, not zero-filled, because no approved mortgage stress model exists.\n"
         "- Bayesian ranking is unavailable because Batch 3 recorded no usable posterior forecasts; it is not imputed.\n", encoding="utf-8")
     return {"paths": paths, "summary": summaries, "groups": groups, "stability": stability, "metrics": metrics}

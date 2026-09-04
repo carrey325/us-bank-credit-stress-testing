@@ -1,4 +1,4 @@
 comparison,aggregate_loss,nondecreasing_vs_prior
-lambda_0.5,16113741.672118073,True
-lambda_1.0,28260062.95527838,True
-lambda_1.25,34628940.20782973,True
+lambda_0.5,15824737.43908257,True
+lambda_1.0,27039038.134722956,True
+lambda_1.25,32905292.74760473,True
