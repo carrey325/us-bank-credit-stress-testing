@@ -1,17 +1,20 @@
 # Batch 1 data-quality report
 
-- Standard observations: 88,772
+- Standard observations: 94,390
 - Derived observations: 8,145
 - Core banks: 33
-- Field-mapping rows: 64
+- Field-mapping rows: 66
 - Duplicate standard bank/date/raw-code keys: 0
-- Negative NCO observations retained: 1856
+- Negative NCO observations retained: 1854
+- Suppressed incomplete segment gross flows: 42
 - FDIC merger quarters flagged: 519
 - Asset-jump quarters flagged: 72
 - Manual formula-audit failures: 0
 
 ## Definitions
 
+- CRE uses reported aggregate RIAD3582/3583 and RIAD3590/3591 through 2007Q4. From 2008Q1, construction is RIADC891+C893 / C892+C894 and nonfarm nonresidential is RIADC895+C897 / C896+C898; multifamily RIAD3588/3589 remains continuous.
+- A segment gross flow is emitted only when every required component is present and quarterized; incomplete component sets remain missing rather than becoming partial flows.
 - Mortgage is closed-end 1-4 family residential lending only: RC-C RCON/RCFD5367 + 5368 and RI-B RIADC234 + C235 - C217 - C218. Revolving/open-end RCON/RCFD1797 is excluded.
 - Segment NPL is unavailable in a stable mapping. `bank_total_npl`, `bank_total_npl_ratio`, and their lags are bank-level fallback controls; `segment_npl_rate` is deliberately missing rather than total NPL divided by segment exposure.
 - `tier1_capital` and reported `tier1_ratio` use Schedule RC-R fields; `computed_tier1_ratio` is Tier 1 capital divided by mapped RWA. `equity_capital` and `equity_to_assets_ratio` are separately named book-equity measures.
@@ -41,9 +44,9 @@
 ## Mapped raw-field presence
 
 - 2005-03-31: 36 mapped raw codes
-- 2010-03-31: 41 mapped raw codes
-- 2020-03-31: 50 mapped raw codes
-- 2025-12-31: 50 mapped raw codes
+- 2010-03-31: 43 mapped raw codes
+- 2020-03-31: 52 mapped raw codes
+- 2025-12-31: 52 mapped raw codes
 
 ## Limitations
 
@@ -53,8 +56,9 @@
 
 ## Direct source-document audit
 
-- Fixed random sample: 100 bank-segment-quarters (seed 772).
+- Fixed reproducible sample: 100 bank-segment-quarters (seed 772), including required transition rows.
 - Direct FFIEC archive-member/raw-value to standard-layer matches: 100/100.
 - Recomputed quarterly NCO to panel matches: 100/100.
 - Source-audit failures: 0.
+- Deliberate CRE taxonomy-transition coverage: 6 observations across 3 quarters; 6/6 passed.
 - This sample is evidence for the audited observations, not exhaustive proof of every reporting-detail change.

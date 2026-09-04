@@ -57,7 +57,7 @@ def standardize_archives(raw_dir: Path, mapping_path: Path, output_path: Path, b
                 long["report_date"] = report_date
                 long["source_file"] = archive.name
                 long["source_version"] = 1
-                long["mapping_version"] = "batch1-v2"
+                long["mapping_version"] = "batch1-v3"
                 long["form"] = long["form"].fillna("unknown")
                 rows.append(long[["bank_id", "report_date", "form", "raw_code", "standard_metric", "segment", "raw_value", "numeric_value", "unit", "source_file", "source_version", "mapping_version", "stock_flow", "ytd_flag", "formula_group"]])
     if not rows:

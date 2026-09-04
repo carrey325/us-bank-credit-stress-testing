@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from bankstress.transform.panel import _coalesce_reporting_variants, build_credit_panel
+from bankstress.transform.panel import _aggregate_complete_flows, _coalesce_reporting_variants, build_credit_panel
 
 
 def test_ci_aggregate_is_not_added_to_geographic_breakout():
@@ -65,6 +65,85 @@ def test_mortgage_mapping_is_closed_end_and_includes_both_lien_nco_components():
     consolidated = mortgage.loc[mortgage["raw_code"].isin(["RCFD5367", "RCFD5368"])]
     assert consolidated["start_date"].eq("2013-06-30").all()
     assert consolidated["form"].eq("031").all()
+
+
+def test_cre_mapping_uses_complete_predecessor_and_successor_taxonomies():
+    mapping = pd.read_csv(Path(__file__).parents[1] / "metadata" / "field_mapping.csv")
+    cre_flows = mapping.loc[mapping["segment"].eq("CRE") & mapping["standard_metric"].isin(["charge_off", "recovery"])]
+    legacy = cre_flows.loc[cre_flows["raw_code"].isin(["RIAD3582", "RIAD3583", "RIAD3590", "RIAD3591"])]
+    successor = cre_flows.loc[cre_flows["raw_code"].str.match(r"RIADC89[1-8]")]
+    assert legacy["end_date"].eq("2007-12-31").all()
+    assert set(successor["raw_code"]) == {f"RIADC{code}" for code in range(891, 899)}
+    assert successor["start_date"].eq("2008-03-31").all()
+
+
+def _cre_flow_rows(date: str, charge_value: float, recovery_value: float, omit: set[str] | None = None) -> list[dict[str, object]]:
+    omit = omit or set()
+    components = {
+        "charge_off": ["RIADC891", "RIADC893", "RIAD3588", "RIADC895", "RIADC897"],
+        "recovery": ["RIADC892", "RIADC894", "RIAD3589", "RIADC896", "RIADC898"],
+    }
+    values = {"charge_off": charge_value, "recovery": recovery_value}
+    return [
+        {"bank_id": "1", "report_date": date, "standard_metric": metric, "segment": "CRE", "raw_code": code,
+         "numeric_value": values[metric], "formula_group": "cre_nco"}
+        for metric, codes in components.items() for code in codes if code not in omit
+    ]
+
+
+def _legacy_cre_flow_rows(date: str, charge_value: float, recovery_value: float) -> list[dict[str, object]]:
+    components = {
+        "charge_off": ["RIAD3582", "RIAD3588", "RIAD3590"],
+        "recovery": ["RIAD3583", "RIAD3589", "RIAD3591"],
+    }
+    values = {"charge_off": charge_value, "recovery": recovery_value}
+    return [
+        {"bank_id": "1", "report_date": date, "standard_metric": metric, "segment": "CRE", "raw_code": code,
+         "numeric_value": values[metric], "formula_group": "cre_nco"}
+        for metric, codes in components.items() for code in codes
+    ]
+
+
+def test_cre_year_boundary_transitions_from_reported_aggregates_to_complete_split_components():
+    flows = pd.DataFrame(
+        _legacy_cre_flow_rows("2007-09-30", 10, 2)
+        + _legacy_cre_flow_rows("2007-12-31", 15, 3)
+        + _cre_flow_rows("2008-03-31", 2, 1)
+    )
+    result = _aggregate_complete_flows(flows)
+    q4 = result.loc[result["report_date"].eq("2007-12-31")].set_index("standard_metric")
+    q1 = result.loc[result["report_date"].eq("2008-03-31")].set_index("standard_metric")
+    assert q4.loc["charge_off", "value"] == 15
+    assert q4.loc["recovery", "value"] == 3
+    assert q1.loc["charge_off", "value"] == 10
+    assert q1.loc["recovery", "value"] == 5
+    assert pd.concat([q4["component_complete_flag"], q1["component_complete_flag"]]).eq(1).all()
+
+
+def test_cre_successor_flow_sums_every_construction_and_nonfarm_component():
+    flows = pd.DataFrame(_cre_flow_rows("2008-03-31", 2, 1) + _cre_flow_rows("2008-06-30", 5, 2))
+    result = _aggregate_complete_flows(flows)
+    q1 = result.loc[result["report_date"].eq("2008-03-31")].set_index("standard_metric")
+    q2 = result.loc[result["report_date"].eq("2008-06-30")].set_index("standard_metric")
+    assert q1.loc["charge_off", "value"] == 10
+    assert q1.loc["recovery", "value"] == 5
+    assert q2.loc["charge_off", "value"] == 15
+    assert q2.loc["recovery", "value"] == 5
+    assert result["component_complete_flag"].eq(1).all()
+
+
+def test_cre_flow_is_missing_when_a_required_component_cannot_be_quarterized():
+    flows = pd.DataFrame(
+        _cre_flow_rows("2008-03-31", 2, 1, omit={"RIADC891"})
+        + _cre_flow_rows("2008-06-30", 5, 2)
+    )
+    result = _aggregate_complete_flows(flows)
+    charge_off = result.loc[
+        result["report_date"].eq("2008-06-30") & result["standard_metric"].eq("charge_off")
+    ].iloc[0]
+    assert pd.isna(charge_off["value"])
+    assert charge_off["component_complete_flag"] == 0
+    assert charge_off["missing_flow_components"] == "RIADC891"
 
 
 def test_capital_mapping_has_legacy_and_post_2014_ratio_and_rwa_variants():

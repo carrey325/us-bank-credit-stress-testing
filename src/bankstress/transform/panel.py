@@ -6,6 +6,19 @@ import pandas as pd
 from .flows import quarterize_ytd
 
 
+CRE_TAXONOMY_TRANSITION = pd.Timestamp("2008-03-31")
+FLOW_COMPONENT_REQUIREMENTS = {
+    ("cre_nco_legacy", "charge_off"): frozenset({"RIAD3582", "RIAD3588", "RIAD3590"}),
+    ("cre_nco_legacy", "recovery"): frozenset({"RIAD3583", "RIAD3589", "RIAD3591"}),
+    ("cre_nco_successor", "charge_off"): frozenset({"RIADC891", "RIADC893", "RIAD3588", "RIADC895", "RIADC897"}),
+    ("cre_nco_successor", "recovery"): frozenset({"RIADC892", "RIADC894", "RIAD3589", "RIADC896", "RIADC898"}),
+    ("mortgage_closed_end_nco", "charge_off"): frozenset({"RIADC234", "RIADC235"}),
+    ("mortgage_closed_end_nco", "recovery"): frozenset({"RIADC217", "RIADC218"}),
+    ("ci_nco", "charge_off"): frozenset({"RIAD4638"}),
+    ("ci_nco", "recovery"): frozenset({"RIAD4608"}),
+}
+
+
 def _column_or_na(frame: pd.DataFrame, name: str) -> pd.Series:
     """Return a named column or an index-aligned missing series."""
     if name in frame:
@@ -47,25 +60,64 @@ def _coalesce_reporting_variants(data: pd.DataFrame) -> pd.DataFrame:
     return output
 
 
+def required_flow_components(segment: str, metric: str, report_date: object, formula_groups: set[str]) -> frozenset[str]:
+    """Return the complete MDRM set required to emit one segment gross flow."""
+    if segment == "CRE" and "cre_nco" in formula_groups:
+        taxonomy = "cre_nco_successor" if pd.Timestamp(report_date) >= CRE_TAXONOMY_TRANSITION else "cre_nco_legacy"
+        return FLOW_COMPONENT_REQUIREMENTS[(taxonomy, metric)]
+    required: set[str] = set()
+    for formula_group in formula_groups:
+        required.update(FLOW_COMPONENT_REQUIREMENTS.get((formula_group, metric), ()))
+    return frozenset(required)
+
+
+def _aggregate_complete_flows(flows: pd.DataFrame) -> pd.DataFrame:
+    """Quarterize components, suppressing aggregates when any component is missing."""
+    quarterized = quarterize_ytd(flows)
+    keys = ["bank_id", "report_date", "standard_metric", "segment"]
+    rows: list[dict[str, object]] = []
+    for key, group in quarterized.groupby(keys, dropna=False, sort=False):
+        formula_groups = set(group["formula_group"].dropna().astype(str))
+        required = required_flow_components(str(key[3]), str(key[2]), key[1], formula_groups)
+        quarterized_codes = set(group.loc[group["quarterly_value"].notna(), "raw_code"].astype(str))
+        unquarterized_codes = set(group.loc[group["quarterly_value"].isna(), "raw_code"].astype(str))
+        missing_components = sorted((required - quarterized_codes) | unquarterized_codes)
+        complete = not missing_components and group["quarterly_value"].notna().all()
+        rows.append({
+            **dict(zip(keys, key)),
+            "value": group["quarterly_value"].sum(min_count=1) if complete else np.nan,
+            "amendment_or_reclass_flag": int(group["amendment_or_reclass_flag"].max()),
+            "missing_prior_ytd_flag": int(group["missing_prior_ytd_flag"].max()),
+            "component_complete_flag": int(complete),
+            "missing_flow_components": ",".join(missing_components),
+        })
+    return pd.DataFrame(rows)
+
+
 def build_credit_panel(standard: pd.DataFrame, institutions: pd.DataFrame, config: dict, lineage: pd.DataFrame | None = None) -> pd.DataFrame:
     data = _coalesce_reporting_variants(standard)
     flows = data[data["stock_flow"].eq("flow")].copy()
     stocks = data[data["stock_flow"].eq("stock")].copy()
-    flows = quarterize_ytd(flows)
-    flows["value"] = flows["quarterly_value"]
+    flow_measures = _aggregate_complete_flows(flows)
     stocks["value"] = stocks["numeric_value"]
-    combined = pd.concat([stocks, flows], ignore_index=True, sort=False)
+    stocks["amendment_or_reclass_flag"] = 0
+    stocks["missing_prior_ytd_flag"] = 0
     aggregate_keys = ["bank_id", "report_date", "standard_metric", "segment"]
-    measures = combined.groupby(aggregate_keys, as_index=False, dropna=False).agg(
+    stock_measures = stocks.groupby(aggregate_keys, as_index=False, dropna=False).agg(
         value=("value", lambda values: values.sum(min_count=1)),
         amendment_or_reclass_flag=("amendment_or_reclass_flag", "max"),
         missing_prior_ytd_flag=("missing_prior_ytd_flag", "max"),
     )
+    measures = pd.concat([stock_measures, flow_measures], ignore_index=True, sort=False)
     measures["amendment_or_reclass_flag"] = measures["amendment_or_reclass_flag"].fillna(0).astype(int)
     measures["missing_prior_ytd_flag"] = measures["missing_prior_ytd_flag"].fillna(0).astype(int)
     segment = measures[measures.segment.isin(["CRE", "CI", "Mortgage"])].pivot_table(
         index=["bank_id", "report_date", "segment"], columns="standard_metric", values="value", aggfunc="first"
     ).reset_index()
+    flow_quality = flow_measures[flow_measures.segment.isin(["CRE", "CI", "Mortgage"])].pivot_table(
+        index=["bank_id", "report_date", "segment"], columns="standard_metric", values="component_complete_flag", aggfunc="first"
+    ).rename(columns=lambda metric: f"{metric}_component_complete").reset_index()
+    segment = segment.merge(flow_quality, on=["bank_id", "report_date", "segment"], how="left", validate="one_to_one")
     controls = measures[measures.segment.eq("All")].pivot_table(
         index=["bank_id", "report_date"], columns="standard_metric", values="value", aggfunc="first"
     ).reset_index()
