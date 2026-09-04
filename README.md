@@ -1,71 +1,50 @@
-# MF772 bank credit-stress panel
+# MF772 Bank Credit Stress Testing
 
-Batch 1 builds a reproducible `bank × loan segment × quarter` panel from FFIEC
-Call Report bulk archives for 2005Q1–2025Q4.  The implementation does not ship
-raw Call Report data: `data/raw/` is ignored and every archive is recorded in
-`data/manifests/ffiec_manifest.csv` with its official URL, timestamp, SHA-256,
-report date, and version.
+## Problem
 
-## Run
+This project is a reproducible, public-data, top-down credit stress-testing framework for U.S. regional banks. It reconstructs quarterly segment-level net charge-off (NCO) rates and uses the approved Federal Reserve 2026 baseline and severely adverse scenarios to produce transparent credit-loss and loss-to-starting-Tier-1-capital estimates. It is not a bank-failure classifier, a trading strategy, a causal CRE study, or a reproduction of confidential FR Y-14 supervisory models.
 
-```powershell
-python -m pip install -r requirements.txt
-python scripts/run_batch1.py --pilot
-python scripts/run_batch1.py --full
-python -m pytest -q
-```
+## Data
 
-## Batch 2
+The core unit is bank x loan segment x quarter. The generated historical panel contains 33 banks, 3 segments (CRE, C&I, and closed-end Mortgage), 84 quarters, and 8,145 observations. Inputs are official FFIEC Call Report bulk archives, FDIC BankFind records, and documented macroeconomic series. Raw source files are intentionally excluded from Git; manifests preserve source URLs, retrieval timestamps, and SHA-256 hashes.
 
-Batch 2 consumes the ignored, real `data/derived/credit_panel.parquet` produced
-by Batch 1.  If a checkout contains the committed manifest but not its ignored
-archives, restore the archives without changing the original manifest, then run
-the existing Batch 1 pipeline followed by Batch 2:
+The effective-dated regulatory mapping is in `metadata/field_mapping.csv`. Source and reconciliation caveats are retained in `metadata/` rather than silently repaired.
 
-```powershell
-python scripts/recover_batch1_inputs.py
-python scripts/run_batch1.py --full
-python scripts/run_batch2.py
-```
+## Method
 
-The recovery command writes `data/manifests/ffiec_recovery_manifest.csv`, which
-records each fresh source download timestamp and SHA-256.  Batch 2 writes its
-macro availability audit to `metadata/macro_release_calendar.csv`; its explicit
-ALFRED/final-vintage fallback limitation is written to
-`metadata/macro_vintage_limitation.md`.
+The project reconstructs quarterly NCO as charge-offs less recoveries divided by average segment exposure. It uses AR and dynamic fixed-effects mean models, split-panel-jackknife comparison, Q0.50/Q0.75/Q0.90 quantile models, historical pseudo-stress tests, and Fed 2026 scenario recursion. Primary capital output is cumulative credit loss divided by starting Tier 1 capital.
 
-## Batch 3
+Batch 5 adds a documented rolling residual-bootstrap 90% interval fallback around out-of-sample Dynamic-FE forecasts. It is a model-risk layer, not a replacement credit-loss model. The adaptive interval uses only earlier OOS residuals; methodology and metrics are written to `outputs/model_risk/`.
 
-Batch 3 consumes the ignored real `data/derived/model_panel.parquet` generated
-by the preceding batches.  It fits segment-specific 0.50/0.75/0.90 quantile
-models with bank effects, a Student-t partial-pooling Bayesian model, frozen
-expanding-window OOS comparisons, and recursive historical pseudo-stress
-windows.  Install the declared Bayesian extra and run:
+## Key Results
+
+All figures and numbers are generated from the saved pipeline outputs. The 2025Q4 CRE/C&I stress universe has 14 banks. In the committed mean-model comparison, AR has the lowest pooled OOS RMSE; the Dynamic-FE result is therefore not described as an RMSE improvement. Under the Fed severely adverse Dynamic-FE run, the high-minus-low CRE-to-Tier-1 tercile difference in mean capital depletion is 28.41 percentage points.
+
+The rolling residual-calibrated intervals achieve 94.4% CI coverage and 92.1% CRE coverage over their post-seed OOS periods, versus 96.9% and 92.8% for the static residual-calibrated comparator. Rolling calibration increases crisis upper misses in this run (CI: 9 to 21; CRE: 27 to 31), so it does not achieve the desired crisis-underprediction reduction. These are empirical calibration results, not guarantees. See the final ten-page draft at `outputs/reporting/MF772_final_report_draft.pdf`.
+
+## Reproducibility
+
+Install the project dependencies, restore the manifest-backed raw inputs when needed, and run the checkpoints in order:
 
 ```powershell
 python -m pip install -r requirements.txt
-python scripts/run_batch3.py
+make raw
+make standard
+make panel
+make qa
+make models
+make stress
+make report
+python -m pytest -q --basetemp .pytest-local
 ```
 
-The output in `outputs/validation/` records all OOS and tail metrics.  The
-historical pseudo-stress forecasts use observed historical macro paths, recurse
-only through lagged NCO, and freeze future bank controls at their final
-pre-window values to prevent future-control leakage.
+`make report` runs `scripts/run_batch5.py`, which regenerates final tables, figures, the report draft, resume metrics, and the reproducibility audit. The audit must report `PASS`; its detailed output is `outputs/reporting/reproducibility_audit.md`.
 
-`--pilot` obtains 2005Q1, 2009Q4, 2020Q2, and 2025Q4.  `--full` obtains the
-complete 2005Q1–2025Q4 sequence, reuses manifest-backed raw snapshots without
-overwriting them, and regenerates the standard layer, panel, QA reports, and
-metadata.  Paths and selection policy are in `configs/project.yaml`.
+## Limitations
 
-## Sources and limits
-
-The raw source is FFIEC CDR Public Data Distribution; the FDIC BankFind public
-API supplies the 2025Q4 candidate universe and merger/consolidation history.
-Field definitions, effective dates, units, and source references live in
-`metadata/field_mapping.csv`.  YTD flow values are quarterlyized explicitly;
-missing predecessor quarters stay missing and downward revisions stay negative.
-
-The lineage history is branch-granular, so its merger events are collapsed to a
-bank-quarter flag. Schedule RC-R supplies the actual Tier 1 capital and Tier 1
-risk-based ratio; Schedule RC book equity is retained separately as
-`equity_capital`. No estimated results or filled-zero loss observations are used.
+- One FFIEC source reconciliation item remains `REVIEW_REQUIRED`; it is not reclassified without evidence.
+- Some macro variables use a documented final-vintage, one-quarter-lag fallback rather than a full real-time vintage feed.
+- Bayesian posterior forecasts are unavailable under the documented environment fallback, so no posterior result is claimed.
+- Recursive CRE Q0.90 is not historically calibrated across all three pre-specified pseudo-stress windows and is not presented as a validated tail forecast.
+- Mortgage stress attribution is unavailable because no approved Mortgage stress model exists; it is never filled with zero.
+- Market external validation is not completed because this checkout does not contain a verified bank legal entity -> BHC/parent -> listed ticker mapping. No name-based ticker match or market-validation claim was made.

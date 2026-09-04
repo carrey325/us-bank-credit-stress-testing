@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "checks": {
+    "required_final_tables_exist": true,
+    "required_final_figures_exist": true,
+    "model_panel_retains_missing_nco": true,
+    "ytd_quarterization_regression_check": true,
+    "field_mapping_has_effective_dates": true,
+    "merger_quarters_are_recorded": true,
+    "macro_release_calendar_has_no_future_observation": true,
+    "panel_forecast_origins_precede_outcomes": true,
+    "oos_windows_preserve_time_order_without_shuffle": true,
+    "conformal_has_strict_time_order": true,
+    "bayesian_diagnostics_saved": true,
+    "stress_totals_reconcile_to_paths": true,
+    "final_t4_is_rebuilt_from_stress_output": true,
+    "final_t5_is_rebuilt_from_model_risk_and_stress_outputs": true,
+    "final_t1_matches_generated_panel_scope": true,
+    "market_validation_not_fabricated": true,
+    "quantile_uses_pinball_not_rmse_for_tail_scoring": true,
+    "cre_specification_record_is_present": true,
+    "resume_metrics_match_generated_scope": true
+  },
+  "limitations": [
+    "One source reconciliation item remains REVIEW_REQUIRED; it is not reclassified.",
+    "Some macro features use documented final-vintage fallback lags rather than a complete real-time vintage feed.",
+    "Bayesian posterior forecasts are unavailable under the documented environment fallback.",
+    "Recursive CRE Q0.90 is not historically calibrated across all pre-specified pseudo-stress windows.",
+    "Mortgage stress attribution is unavailable because no approved mortgage stress model exists.",
+    "Market validation is not completed because no verified legal-entity-to-parent-to-ticker mapping is available."
+  ]
+}

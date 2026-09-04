@@ -1,5 +1,5 @@
 {
-  "n_banks": 14,
+  "n_banks": 33,
   "n_observations": 8145,
   "n_raw_fields": 66,
   "reconciliation_rate": 0.9996315401621223,
@@ -7,5 +7,7 @@
   "best_model_name": "ar",
   "high_cre_capital_depletion_difference": 0.28413368835117503,
   "high_cre_group_definition": "2025Q4 CRE-to-Tier1 terciles among the final stress universe",
-  "stress_scenario": "Fed 2026 severely adverse"
+  "stress_scenario": "Fed 2026 severely adverse",
+  "stress_universe_banks": 14,
+  "resume_metric_scope": "n_banks is the final historical panel; stress_universe_banks is the 2025Q4 CRE/C&I stress universe."
 }

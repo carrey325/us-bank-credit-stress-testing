@@ -1,0 +1,5 @@
+model,oos_observations,pooled_oos_rmse,pooled_oos_mae,mean_bias,availability
+ar,2437,0.036353848334301234,0.019526822345325552,-0.018451394285225887,included
+bias_corrected_fe,2437,0.10726690675580718,0.06068835622963404,-0.032819158650250195,included
+dynamic_fe,2437,0.04730088487576233,0.03012479293615535,-0.013140653784869743,included
+bayesian,0,,,,unavailable: documented Batch 3 environment fallback; no posterior forecast results

@@ -1,0 +1,3 @@
+# Batch 5 rolling residual-bootstrap fallback
+
+This is an explicitly labelled fallback, not a new primary credit-loss model or a Bayesian result. The available quantile outputs form a Q0.50--Q0.90 band rather than a two-sided 90% band, and Batch 3 recorded no usable posterior forecasts. Accordingly, the method centers two-sided 90% intervals on OOS Dynamic-FE forecasts. A static comparator uses absolute residuals from the first eight OOS quarters; the adaptive version uses only residuals from the preceding twenty OOS quarters. No residual from the forecast date or a later date enters its interval.

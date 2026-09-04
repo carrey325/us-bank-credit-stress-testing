@@ -1,0 +1,6 @@
+method,segment,n,target_coverage,empirical_coverage,coverage_gap,mean_interval_width,winkler_score,crisis_underprediction_count,all_period_underprediction_count,first_forecast_date,last_forecast_date,crisis_underprediction_change_vs_static,section,scenario,left_model,right_model,n_banks,spearman_rank_correlation,top_quartile_n,top_quartile_overlap
+rolling_adaptive_residual_bootstrap,CI,709.0,0.9,0.9435825105782792,0.04358251057827922,0.025426150654491286,0.035099047829611416,21.0,29.0,2014-03-31,2025-12-31,12.0,conformal,,,,,,,
+rolling_adaptive_residual_bootstrap,CRE,1392.0,0.9,0.9209770114942529,0.020977011494252906,0.2132590533372587,0.2707860071125826,31.0,50.0,2014-03-31,2025-09-30,4.0,conformal,,,,,,,
+static_residual_bootstrap,CI,709.0,0.9,0.9689703808180536,0.06897038081805362,0.03726078202371851,0.04241229300827895,9.0,15.0,2014-03-31,2025-12-31,0.0,conformal,,,,,,,
+static_residual_bootstrap,CRE,1392.0,0.9,0.9281609195402298,0.028160919540229812,0.22124464665564417,0.2672533864900906,27.0,46.0,2014-03-31,2025-09-30,0.0,conformal,,,,,,,
+,,,,,,,,,,,,,ranking_stability,severely_adverse,dynamic_fe,quantile_0.9,14.0,0.7538461538461538,4.0,0.5
