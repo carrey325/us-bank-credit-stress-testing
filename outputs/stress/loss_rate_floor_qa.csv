@@ -1,33 +1,33 @@
 scenario,scenario_type,model,segment,floor_use_count,path_observations,raw_predicted_nco_min,aggregated_loss
 baseline,Fed official,dynamic_fe,CI,55,126,-0.0020265825661355055,475151.6367060176
-baseline,Fed official,dynamic_fe,CRE,72,126,-0.0506407180007556,5788258.548176143
+baseline,Fed official,dynamic_fe,CRE,71,126,-0.0497598950478285,6031696.243550882
 baseline,Fed official,quantile_0.9,CI,0,126,0.0008312776406324239,2465694.43714167
-baseline,Fed official,quantile_0.9,CRE,9,126,-0.03897809811970814,35702049.05863861
+baseline,Fed official,quantile_0.9,CRE,9,126,-0.08068627576181879,36105781.620169595
 researcher_cre_only,Researcher partial-shock sensitivity,dynamic_fe,CI,55,126,-0.0020265825661355055,475151.6367060176
-researcher_cre_only,Researcher partial-shock sensitivity,dynamic_fe,CRE,72,126,-0.050637727522744945,5788856.634099626
+researcher_cre_only,Researcher partial-shock sensitivity,dynamic_fe,CRE,51,126,-0.04555200284899042,7318082.494458038
 researcher_cre_only,Researcher partial-shock sensitivity,quantile_0.9,CI,0,126,0.0008312776406324239,2465694.43714167
-researcher_cre_only,Researcher partial-shock sensitivity,quantile_0.9,CRE,9,126,-0.03904413566982216,35693140.222641364
+researcher_cre_only,Researcher partial-shock sensitivity,quantile_0.9,CRE,9,126,-0.09619666064788966,34120185.91756659
 researcher_high_for_longer_rates,Researcher partial-shock sensitivity,dynamic_fe,CI,46,126,-0.0020265825661355055,533434.4662959286
-researcher_high_for_longer_rates,Researcher partial-shock sensitivity,dynamic_fe,CRE,64,126,-0.0471359214935509,6542791.150801847
+researcher_high_for_longer_rates,Researcher partial-shock sensitivity,dynamic_fe,CRE,60,126,-0.04680131910263747,6751692.623997213
 researcher_high_for_longer_rates,Researcher partial-shock sensitivity,quantile_0.9,CI,0,126,0.0008312776406324239,2596929.103549426
-researcher_high_for_longer_rates,Researcher partial-shock sensitivity,quantile_0.9,CRE,9,126,-0.030919691534957206,36729968.672839135
+researcher_high_for_longer_rates,Researcher partial-shock sensitivity,quantile_0.9,CRE,9,126,-0.07148446873425741,37279407.30964693
 researcher_lambda_0.5,Researcher sensitivity scenario,dynamic_fe,CI,12,126,-0.0019617237027891293,1996016.5646809742
-researcher_lambda_0.5,Researcher sensitivity scenario,dynamic_fe,CRE,26,126,-0.044743022924884364,13828720.874401597
+researcher_lambda_0.5,Researcher sensitivity scenario,dynamic_fe,CRE,23,126,-0.042655114085260744,14255189.830417449
 researcher_lambda_0.5,Researcher sensitivity scenario,quantile_0.9,CI,0,126,0.000866911363233646,4254931.672687304
-researcher_lambda_0.5,Researcher sensitivity scenario,quantile_0.9,CRE,2,126,-0.0013270395639655565,53528542.76010107
+researcher_lambda_0.5,Researcher sensitivity scenario,quantile_0.9,CRE,3,126,-0.0027128633576300534,53706012.28219525
 researcher_lambda_1,Researcher sensitivity scenario,dynamic_fe,CI,12,126,-0.0018997469932234452,3569223.4613937032
-researcher_lambda_1,Researcher sensitivity scenario,dynamic_fe,CRE,19,126,-0.04610230742895773,23469814.67332925
+researcher_lambda_1,Researcher sensitivity scenario,dynamic_fe,CRE,16,126,-0.04395931852889074,24019785.15953309
 researcher_lambda_1,Researcher sensitivity scenario,quantile_0.9,CI,0,126,0.000866911363233646,6044913.982054358
-researcher_lambda_1,Researcher sensitivity scenario,quantile_0.9,CRE,2,126,-0.00139345090401882,71348543.1432364
+researcher_lambda_1,Researcher sensitivity scenario,quantile_0.9,CRE,2,126,-0.0027702034421858163,71288346.22992356
 researcher_lambda_1.25,Researcher sensitivity scenario,dynamic_fe,CI,12,126,-0.0018699003526168913,4355704.662430413
-researcher_lambda_1.25,Researcher sensitivity scenario,dynamic_fe,CRE,18,126,-0.04679675001333026,28549588.08517432
+researcher_lambda_1.25,Researcher sensitivity scenario,dynamic_fe,CRE,17,126,-0.044625621353406454,29201815.32461972
 researcher_lambda_1.25,Researcher sensitivity scenario,quantile_0.9,CI,0,126,0.000866911363233646,6940197.559984651
-researcher_lambda_1.25,Researcher sensitivity scenario,quantile_0.9,CRE,2,126,-0.001427379682343024,80254219.0745444
+researcher_lambda_1.25,Researcher sensitivity scenario,quantile_0.9,CRE,2,126,-0.0027994978219773293,80068223.7059937
 researcher_unemployment_only,Researcher partial-shock sensitivity,dynamic_fe,CI,22,126,-0.00169291569561765,738426.9190915116
-researcher_unemployment_only,Researcher partial-shock sensitivity,dynamic_fe,CRE,72,126,-0.0506407180007556,5788258.548176143
+researcher_unemployment_only,Researcher partial-shock sensitivity,dynamic_fe,CRE,71,126,-0.0497598950478285,6031696.243550882
 researcher_unemployment_only,Researcher partial-shock sensitivity,quantile_0.9,CI,0,126,0.0007623094567681746,2382956.6322036134
-researcher_unemployment_only,Researcher partial-shock sensitivity,quantile_0.9,CRE,9,126,-0.03897809811970814,35702049.05863861
+researcher_unemployment_only,Researcher partial-shock sensitivity,quantile_0.9,CRE,9,126,-0.08068627576181879,36105781.620169595
 severely_adverse,Fed official,dynamic_fe,CI,12,126,-0.0018997469932234452,3569223.4613937032
-severely_adverse,Fed official,dynamic_fe,CRE,19,126,-0.04610230742895773,23469814.67332925
+severely_adverse,Fed official,dynamic_fe,CRE,16,126,-0.04395931852889074,24019785.15953309
 severely_adverse,Fed official,quantile_0.9,CI,0,126,0.000866911363233646,6044913.982054358
-severely_adverse,Fed official,quantile_0.9,CRE,2,126,-0.00139345090401882,71348543.1432364
+severely_adverse,Fed official,quantile_0.9,CRE,2,126,-0.0027702034421858163,71288346.22992356

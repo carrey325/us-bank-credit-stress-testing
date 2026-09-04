@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from bankstress.stress import (
     _annualized_to_qoq_percent,
@@ -13,6 +14,7 @@ from bankstress.stress import (
     summarize_stress,
     StressFit,
 )
+from bankstress.macro import _quarterly
 
 
 def _fed(name: str, gdp: float, cre: float, house: float) -> pd.DataFrame:
@@ -20,20 +22,39 @@ def _fed(name: str, gdp: float, cre: float, house: float) -> pd.DataFrame:
 
 
 def test_fed_normalisation_anchors_q1_price_growth_and_converts_gdp_units():
-    normal = _normalise_fed_frame(_fed("baseline", 4.0, 110.0, 210.0), "baseline", pd.Series({"cre_price": 100.0, "house_price": 200.0}))
+    history = pd.DataFrame({"quarter": pd.date_range("2025-03-31", periods=4, freq="QE"), "cre_price": [100.0] * 4, "house_price": [200.0, 200.0, 200.0, 200.0]})
+    normal = _normalise_fed_frame(_fed("baseline", 4.0, 110.0, 210.0), "baseline", history)
     assert np.isclose(normal.iloc[0].cre_price_growth, 10.0)
     assert np.isclose(normal.iloc[0].house_price_growth, 5.0)
     assert np.isclose(normal.iloc[0].gdp_growth, _annualized_to_qoq_percent(pd.Series([4.0])).iloc[0])
     assert normal.iloc[0].bbb_spread == 2.0
 
 
+def test_historical_and_fed_cre_growth_use_matching_yoy_percent_units():
+    # COMREPUSQ159N reports this historical value directly as YoY percent growth.
+    historical = pd.DataFrame({"observation_date": pd.to_datetime(["2025-03-31"]), "value": [5.0]})
+    historical_growth = _quarterly(historical, "quarter_end", "reported_yoy_pct_change")
+    levels = pd.DataFrame({"quarter": pd.date_range("2025-03-31", periods=4, freq="QE"), "cre_price": [100.0, 100.0, 100.0, 100.0], "house_price": [200.0, 200.0, 200.0, 200.0]})
+    fed = _normalise_fed_frame(_fed("baseline", 4.0, 105.0, 210.0), "baseline", levels)
+    assert historical_growth.iloc[0].value == 5.0
+    assert fed.iloc[0].cre_price_growth == pytest.approx(5.0)
+
+
 def test_lambda_and_partial_shocks_are_labelled_researcher_sensitivities():
-    historic = pd.Series({"cre_price": 100.0, "house_price": 200.0, "short_rate": 4.0, "long_rate": 5.0, "mortgage_rate": 6.5})
+    historic = pd.DataFrame({
+        "quarter": pd.date_range("2025-03-31", periods=4, freq="QE"),
+        "cre_price": [100.0] * 4,
+        "house_price": [200.0] * 4,
+        "short_rate": [4.0] * 4,
+        "long_rate": [5.0] * 4,
+        "mortgage_rate": [6.5] * 4,
+    })
     baseline = _normalise_fed_frame(_fed("baseline", 2.0, 101.0, 201.0), "baseline", historic).assign(horizon=[1, 2], scenario_type="Fed official")
     severe = _normalise_fed_frame(_fed("severe", -4.0, 91.0, 191.0), "severely_adverse", historic).assign(horizon=[1, 2], scenario_type="Fed official")
     result = make_sensitivity_scenarios(pd.concat([baseline, severe]), historic, [0.5, 1.0, 1.25])
     assert set(result.scenario) >= {"researcher_lambda_0.5", "researcher_lambda_1", "researcher_lambda_1.25", "researcher_cre_only", "researcher_unemployment_only", "researcher_high_for_longer_rates"}
     assert result.scenario_type.str.startswith("Researcher").all()
+    assert result.cre_price_growth.notna().all()
 
 
 def test_loss_summary_uses_rate_times_static_exposure_and_allowance_floor():

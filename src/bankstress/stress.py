@@ -68,7 +68,36 @@ def _annualized_to_qoq_percent(values: pd.Series) -> pd.Series:
     return ((1 + pd.to_numeric(values, errors="raise") / 100) ** 0.25 - 1) * 100
 
 
-def _normalise_fed_frame(frame: pd.DataFrame, scenario: str, historic_q4: pd.Series | None = None) -> pd.DataFrame:
+def _historical_level_values(historic_levels: pd.DataFrame | pd.Series | None, level: str) -> pd.Series:
+    """Return dated Fed index history used to bridge scenario transformations."""
+    if historic_levels is None:
+        return pd.Series(dtype=float, index=pd.DatetimeIndex([]))
+    if isinstance(historic_levels, pd.Series):
+        # Backward-compatible support for a Q4 state supplied by small tests.
+        if level not in historic_levels:
+            return pd.Series(dtype=float, index=pd.DatetimeIndex([]))
+        return pd.Series([float(historic_levels[level])], index=[pd.Timestamp("2025-12-31")])
+    required = {"quarter", level}
+    if not required.issubset(historic_levels.columns):
+        raise ValueError(f"Fed historical levels require columns {sorted(required)}")
+    history = historic_levels[["quarter", level]].copy()
+    history["quarter"] = pd.to_datetime(history["quarter"])
+    history[level] = pd.to_numeric(history[level], errors="raise")
+    return history.drop_duplicates("quarter", keep="last").set_index("quarter")[level].sort_index()
+
+
+def _growth_from_levels(data: pd.DataFrame, level: str, periods: int, historic_levels: pd.DataFrame | pd.Series | None = None) -> pd.Series:
+    """Calculate percent growth from Fed levels, seeding boundary quarters with history."""
+    current = data.set_index("quarter")[level].astype(float)
+    history = _historical_level_values(historic_levels, level)
+    history = history[history.index < current.index.min()]
+    combined = pd.concat([history, current]).sort_index()
+    if combined.index.has_duplicates:
+        raise ValueError(f"Duplicate Fed {level} level quarters")
+    return current.div(combined.shift(periods).reindex(current.index)).sub(1).mul(100)
+
+
+def _normalise_fed_frame(frame: pd.DataFrame, scenario: str, historic_levels: pd.DataFrame | pd.Series | None = None) -> pd.DataFrame:
     data = frame.copy()
     data["quarter"] = _quarter_end(data["Date"])
     data = data.sort_values("quarter").copy()
@@ -85,11 +114,12 @@ def _normalise_fed_frame(frame: pd.DataFrame, scenario: str, historic_q4: pd.Ser
     # The Batch 2 named "bbb_spread" feature is FRED BAA10YM, a corporate-yield
     # spread over the 10-year Treasury.  The Fed publishes levels, so derive it.
     data["bbb_spread"] = data["bbb_yield"] - data["long_rate"]
-    for level, growth in (("cre_price", "cre_price_growth"), ("house_price", "house_price_growth")):
-        prior = data[level].shift(1)
-        if historic_q4 is not None:
-            prior.iloc[0] = float(historic_q4[level])
-        data[growth] = data[level].div(prior).sub(1).mul(100)
+    # Batch 2's CRE feature is FRED's already-reported YoY growth rate.  The
+    # Fed publishes a CRE *level*, so derive the same YoY percent growth from
+    # t-4.  Historical 2025 levels seed the first four 2026 scenario quarters.
+    data["cre_price_growth"] = _growth_from_levels(data, "cre_price", 4, historic_levels).to_numpy()
+    # House price remains the separately configured QoQ price-index feature.
+    data["house_price_growth"] = _growth_from_levels(data, "house_price", 1, historic_levels).to_numpy()
     return data[["scenario", "quarter", "real_gdp_growth", "gdp_growth", "unemployment", "cre_price", "house_price", "bbb_yield", "mortgage_rate", "short_rate", "long_rate", "bbb_spread", "cre_price_growth", "house_price_growth"]]
 
 
@@ -104,13 +134,13 @@ def ingest_fed_2026_scenarios(root: Path, session: requests.sessions.Session | N
         manifest.append({"artifact": name, "source_url": spec[key], "sha256": _sha256(content), "download_timestamp_utc": pd.Timestamp.now(tz="UTC").isoformat()})
     historic = raw["historic_domestic"].copy()
     historic["quarter"] = _quarter_end(historic["Date"])
-    q4 = historic.loc[historic["quarter"].eq(pd.Timestamp("2025-12-31"))].iloc[0]
-    historic_levels = pd.Series({
-        "cre_price": float(q4["Commercial Real Estate Price Index (Level)"]),
-        "house_price": float(q4["House Price Index (Level)"]),
-        "short_rate": float(q4["3-month Treasury rate"]),
-        "long_rate": float(q4["10-year Treasury yield"]),
-        "mortgage_rate": float(q4["Mortgage rate"]),
+    historic_levels = pd.DataFrame({
+        "quarter": historic["quarter"],
+        "cre_price": pd.to_numeric(historic["Commercial Real Estate Price Index (Level)"], errors="raise"),
+        "house_price": pd.to_numeric(historic["House Price Index (Level)"], errors="raise"),
+        "short_rate": pd.to_numeric(historic["3-month Treasury rate"], errors="raise"),
+        "long_rate": pd.to_numeric(historic["10-year Treasury yield"], errors="raise"),
+        "mortgage_rate": pd.to_numeric(historic["Mortgage rate"], errors="raise"),
     })
     scenario = pd.concat([_normalise_fed_frame(raw[name], name, historic_levels) for name in OFFICIAL_SCENARIOS], ignore_index=True)
     start, end = pd.Timestamp(spec["primary_start"]), pd.Timestamp(spec["primary_end"])
@@ -133,8 +163,14 @@ def historic_macro_history(root: Path, session: requests.sessions.Session | None
     required = {pd.Timestamp("2025-09-30"), pd.Timestamp("2025-12-31")}
     if not required.issubset(set(normalized["quarter"])):
         raise ValueError("Fed historic domestic data lacks the 2025Q3/Q4 macro state")
-    source_q4 = historic.loc[historic.quarter.eq(pd.Timestamp("2025-12-31"))].iloc[0]
-    levels = pd.Series({"cre_price": float(source_q4["Commercial Real Estate Price Index (Level)"]), "house_price": float(source_q4["House Price Index (Level)"]), "short_rate": float(source_q4["3-month Treasury rate"]), "long_rate": float(source_q4["10-year Treasury yield"]), "mortgage_rate": float(source_q4["Mortgage rate"])})
+    levels = pd.DataFrame({
+        "quarter": historic["quarter"],
+        "cre_price": pd.to_numeric(historic["Commercial Real Estate Price Index (Level)"], errors="raise"),
+        "house_price": pd.to_numeric(historic["House Price Index (Level)"], errors="raise"),
+        "short_rate": pd.to_numeric(historic["3-month Treasury rate"], errors="raise"),
+        "long_rate": pd.to_numeric(historic["10-year Treasury yield"], errors="raise"),
+        "mortgage_rate": pd.to_numeric(historic["Mortgage rate"], errors="raise"),
+    })
     return normalized, levels
 
 
@@ -181,13 +217,13 @@ def construct_stress_macro_predictors(scenarios: pd.DataFrame, actual_macro: pd.
     return pd.concat(rows, ignore_index=True)
 
 
-def make_sensitivity_scenarios(official: pd.DataFrame, historic_rates: pd.Series, lambdas: list[float]) -> pd.DataFrame:
+def make_sensitivity_scenarios(official: pd.DataFrame, historic_rates: pd.DataFrame | pd.Series, lambdas: list[float]) -> pd.DataFrame:
     """Create clearly-labelled researcher sensitivities from the fixed official paths."""
     baseline = official[official.scenario.eq("baseline")].sort_values("quarter").reset_index(drop=True)
     severe = official[official.scenario.eq("severely_adverse")].sort_values("quarter").reset_index(drop=True)
     if not baseline.quarter.equals(severe.quarter):
         raise ValueError("Official baseline and severely-adverse quarters do not align")
-    numeric = [column for column in baseline if column not in {"scenario", "quarter", "horizon", "scenario_type"}]
+    numeric = [column for column in baseline if column not in {"scenario", "quarter", "horizon", "scenario_type", "cre_price_growth", "house_price_growth"}]
     rows: list[pd.DataFrame] = []
     for value in lambdas:
         item = baseline.copy()
@@ -199,24 +235,19 @@ def make_sensitivity_scenarios(official: pd.DataFrame, historic_rates: pd.Series
         # feature only after interpolation.
         item["gdp_growth"] = _annualized_to_qoq_percent(item["real_gdp_growth"])
         item["bbb_spread"] = item["bbb_yield"] - item["long_rate"]
-        # Recompute growth fields after interpolating price levels, preserving Q1
-        # first-period changes by interpolating the historical level consistently.
-        for level, growth in (("cre_price", "cre_price_growth"), ("house_price", "house_price_growth")):
-            previous = item[level].shift(1)
-            prior_level = float(historic_rates[level]) + float(value) * (float(historic_rates[level]) - float(historic_rates[level]))
-            previous.iloc[0] = prior_level
-            item[growth] = item[level].div(previous).sub(1).mul(100)
+        item["cre_price_growth"] = _growth_from_levels(item, "cre_price", 4, historic_rates).to_numpy()
+        item["house_price_growth"] = _growth_from_levels(item, "house_price", 1, historic_rates).to_numpy()
         rows.append(item)
     cre = baseline.copy()
     cre["cre_price"] = severe["cre_price"].to_numpy()
-    cre["cre_price_growth"] = severe["cre_price_growth"].to_numpy()
+    cre["cre_price_growth"] = _growth_from_levels(cre, "cre_price", 4, historic_rates).to_numpy()
     cre["scenario"], cre["scenario_type"] = "researcher_cre_only", "Researcher partial-shock sensitivity"
     unemployment = baseline.copy()
     unemployment["unemployment"] = severe["unemployment"].to_numpy()
     unemployment["scenario"], unemployment["scenario_type"] = "researcher_unemployment_only", "Researcher partial-shock sensitivity"
     rates = baseline.copy()
     for column in ("short_rate", "long_rate", "mortgage_rate"):
-        rates[column] = float(historic_rates[column])
+        rates[column] = float(_historical_level_values(historic_rates, column).loc[_historical_level_values(historic_rates, column).index.max()])
     rates["bbb_spread"] = rates["bbb_yield"] - rates["long_rate"]
     rates["scenario"], rates["scenario_type"] = "researcher_high_for_longer_rates", "Researcher partial-shock sensitivity"
     return pd.concat([*rows, cre, unemployment, rates], ignore_index=True)
@@ -506,6 +537,7 @@ def run_batch4(root: Path, session: requests.sessions.Session | None = None) -> 
         f"- Final stress universe: {metrics['n_banks']} banks, each with complete CRE and C&I 2025Q4 states.\n"
         "- Official scenarios are the Federal Reserve's 2026 final baseline and severely adverse domestic CSVs; lambda and partial shocks are clearly labelled researcher sensitivities.\n"
         "- Primary capital result is cumulative credit loss / starting Tier 1 capital, not a Federal Reserve CET1 projection. Annualized NCO rates are divided by four; the non-negative floor applies only to dollar-loss aggregation and not to the recursive NCO state.\n"
+        "- Reviewer-mandated CRE definition correction: the historical FRED input is its reported YoY CRE-price growth, and Fed CRE index levels are transformed to the same YoY percent-growth units using historical boundary levels.\n"
         "- 2026Q1 bank controls use the actual 2025Q4 current state and remain static. GDP/unemployment scenario features first affect 2026Q2, while final-vintage fallback features first affect 2026Q3 because Batch 2 applies their documented availability lag and the model then applies its own lag; `macro_predictor_timing.csv` records all sources.\n"
         f"- Dollar-loss floor use: {int(floor_qa.floor_use_count.sum())} of {int(floor_qa.path_observations.sum())} path observations; see `loss_rate_floor_qa.csv`. Mortgage attribution is unavailable, not zero-filled, because no approved mortgage stress model exists.\n"
         "- Bayesian ranking is unavailable because Batch 3 recorded no usable posterior forecasts; it is not imputed.\n", encoding="utf-8")

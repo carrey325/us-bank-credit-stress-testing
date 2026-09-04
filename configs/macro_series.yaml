@@ -24,7 +24,9 @@ series:
     series_id: COMREPUSQ159N
     frequency: quarterly
     aggregation_rule: quarter_end
-    transformation: qoq_pct_change
+    # COMREPUSQ159N is itself FRED's percent change from year ago series, not
+    # a price-index level.  Preserve that reported YoY percent growth directly.
+    transformation: reported_yoy_pct_change
     output_column: cre_price_growth
     source: FRED
     availability: fallback_final_lag1

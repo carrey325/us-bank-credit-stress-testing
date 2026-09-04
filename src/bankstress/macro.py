@@ -91,6 +91,12 @@ def _quarterly(values: pd.DataFrame, rule: str, transformation: str) -> pd.DataF
         raise ValueError(f"Unsupported aggregation rule: {rule}")
     if transformation == "qoq_pct_change":
         out["value"] = out["value"].pct_change(fill_method=None) * 100
+    elif transformation == "reported_yoy_pct_change":
+        # Some FRED series (including COMREPUSQ159N) already publish the
+        # percent change from year ago.  Applying pct_change again would turn
+        # an economically meaningful signed growth rate into a second-order
+        # percentage change with incompatible units.
+        pass
     elif transformation != "level":
         raise ValueError(f"Unsupported transformation: {transformation}")
     return out.reset_index().rename(columns={"observation_date": "report_date"})
@@ -159,7 +165,7 @@ def build_macro_panel(root: Path, report_dates: pd.Series, session: requests.ses
     calendar.to_csv(root / "metadata" / "macro_release_calendar.csv", index=False)
     _write_download_manifest(root, config)
     note = root / "metadata" / "macro_vintage_limitation.md"
-    note.write_text("# Macro vintage limitation\n\nGDP and unemployment use ALFRED snapshots at each quarter-end forecast origin. The release-calendar `release_date` field for these series is the snapshot availability date, not a separately sourced first-publication date; ALFRED proves the value was visible at that origin but this pipeline does not claim a complete release-calendar feed. CRE price, house price, BBB spread, short rate, and mortgage rate use final FRED vintages lagged one complete quarter because a release-calendar API feed was not available. These fallback variables are labeled in `macro_release_calendar.csv` and must not be described as real-time vintages.\n", encoding="utf-8")
+    note.write_text("# Macro vintage limitation\n\nGDP and unemployment use ALFRED snapshots at each quarter-end forecast origin. The release-calendar `release_date` field for these series is the snapshot availability date, not a separately sourced first-publication date; ALFRED proves the value was visible at that origin but this pipeline does not claim a complete release-calendar feed. CRE price growth is FRED's already-reported year-over-year percent-change series (`COMREPUSQ159N`), retained without applying a second percentage-change transformation. House price, BBB spread, short rate, and mortgage rate use final FRED vintages lagged one complete quarter because a release-calendar API feed was not available. These fallback variables are labeled in `macro_release_calendar.csv` and must not be described as real-time vintages.\n", encoding="utf-8")
     validate_release_calendar(calendar, origins)
     return panel
 

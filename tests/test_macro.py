@@ -11,6 +11,12 @@ def test_monthly_mean_and_growth_transform_are_deterministic():
     assert result.iloc[1].value == pytest.approx(10.0)
 
 
+def test_reported_yoy_growth_is_not_percentage_changed_again():
+    reported_growth = pd.DataFrame({"observation_date": pd.to_datetime(["2020-01-01", "2020-04-01"]), "value": [-8.0, -6.5]})
+    result = _quarterly(reported_growth, "quarter_end", "reported_yoy_pct_change")
+    assert result.value.tolist() == pytest.approx([-8.0, -6.5])
+
+
 def test_release_calendar_rejects_future_observation_or_availability():
     origins = pd.DatetimeIndex([pd.Timestamp("2010-03-31")])
     valid = pd.DataFrame({"release_date": [pd.Timestamp("2010-03-31")], "observation_date": [pd.Timestamp("2010-02-28")]})
