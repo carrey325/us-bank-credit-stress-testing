@@ -21,3 +21,20 @@ def test_standard_layer_preserves_missing_not_zero():
     assert result.bank_id.tolist() == ["2"]
     assert result.numeric_value.tolist() == [20]
     shutil.rmtree(tmp_path)
+
+
+def test_standard_layer_normalizes_percent_suffixed_ratio_to_decimal():
+    tmp_path = Path(".test-tmp-standardize-percent")
+    if tmp_path.exists():
+        shutil.rmtree(tmp_path)
+    tmp_path.mkdir()
+    raw = tmp_path / "raw"; raw.mkdir()
+    archive = raw / "FFIEC CDR Call Bulk All Schedules 03312025.zip"
+    with ZipFile(archive, "w") as z:
+        z.writestr("FFIEC CDR Call Schedule RCRI 03312025.txt", '"IDRSSD"\tRCFA7206\nDESCRIPTION\tDESCRIPTION\n1\t12.3456%\n')
+    mapping = tmp_path / "mapping.csv"
+    pd.DataFrame([{"raw_code":"RCFA7206", "standard_metric":"tier1_risk_based_ratio", "segment":"All", "schedule":"RC-R", "form":"031", "start_date":"2014-03-31", "end_date":"2025-12-31", "stock_flow":"stock", "ytd_flag":0, "unit":"decimal", "formula_group":"regulatory_capital"}]).to_csv(mapping, index=False)
+    result = standardize_archives(raw, mapping, tmp_path / "standard.parquet", {"1"})
+    assert result.loc[0, "raw_value"] == "12.3456%"
+    assert result.loc[0, "numeric_value"] == 0.123456
+    shutil.rmtree(tmp_path)

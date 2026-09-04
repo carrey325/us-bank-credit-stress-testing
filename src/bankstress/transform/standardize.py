@@ -8,6 +8,15 @@ from zipfile import ZipFile
 import pandas as pd
 
 
+def _parse_call_report_numeric(values: pd.Series) -> pd.Series:
+    """Parse CDR numeric cells, normalizing percent-formatted ratios to decimals."""
+    text = values.astype("string").str.strip()
+    percent = text.str.endswith("%", na=False)
+    numeric = pd.to_numeric(text.str.replace(",", "", regex=False).str.rstrip("%"), errors="coerce")
+    numeric.loc[percent] = numeric.loc[percent] / 100.0
+    return numeric
+
+
 def _report_date(path: Path) -> pd.Timestamp:
     match = re.search(r"(\d{8})\.zip$", path.name)
     if not match:
@@ -39,7 +48,7 @@ def standardize_archives(raw_dir: Path, mapping_path: Path, output_path: Path, b
                 if data.empty:
                     continue
                 long = data.melt(id_vars="bank_id", value_vars=selected, var_name="raw_code", value_name="raw_value")
-                long["numeric_value"] = pd.to_numeric(long["raw_value"], errors="coerce")
+                long["numeric_value"] = _parse_call_report_numeric(long["raw_value"])
                 long = long.dropna(subset=["numeric_value"])
                 applicable = mapping[(mapping.start_date <= report_date) & (mapping.end_date >= report_date)]
                 long = long.merge(applicable, on="raw_code", how="inner", validate="many_to_many")
@@ -48,7 +57,7 @@ def standardize_archives(raw_dir: Path, mapping_path: Path, output_path: Path, b
                 long["report_date"] = report_date
                 long["source_file"] = archive.name
                 long["source_version"] = 1
-                long["mapping_version"] = "batch1-v1"
+                long["mapping_version"] = "batch1-v2"
                 long["form"] = long["form"].fillna("unknown")
                 rows.append(long[["bank_id", "report_date", "form", "raw_code", "standard_metric", "segment", "raw_value", "numeric_value", "unit", "source_file", "source_version", "mapping_version", "stock_flow", "ytd_flag", "formula_group"]])
     if not rows:

@@ -4,7 +4,7 @@ The generated `outputs/qa/reconciliation_summary.csv` retains one `REVIEW_REQUIR
 
 | Bank ID | Bank | Quarter | Gross-flow discrepancy | Status |
 |---|---|---|---:|---|
-| 197478 | CIBC Bank USA | 2013Q2 | mapped recoveries exceed reported total recoveries by $89 thousand | REVIEW_REQUIRED |
+| 197478 | EAST WEST BANK | 2013Q2 | mapped recoveries exceed reported total recoveries by $89 thousand | REVIEW_REQUIRED |
 
 Direct inspection of the retained FFIEC RI-B archive members found the following YTD values (thousands):
 

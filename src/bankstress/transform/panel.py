@@ -29,10 +29,19 @@ def _coalesce_reporting_variants(data: pd.DataFrame) -> pd.DataFrame:
     drop_ci_breakout = ci.copy()
     drop_ci_breakout.loc[ci] = has_ci_aggregate & output.loc[ci, "raw_code"].ne("RCON1766")
     output = output[~drop_ci_breakout].copy()
-    output["series_key"] = output["raw_code"].str.replace(r"^(RCON|RCFD)", "", regex=True)
+    # RC-R uses A/W suffix families after the Basel III transition.  A bank can
+    # carry legacy and successor fields in the same 2014 filing, while later
+    # filings can populate either an A or W variant.  Strip the full reporting
+    # prefix and select one non-null observation so ratios and RWA are never
+    # added together.
+    prefixes = ["RCFA", "RCFW", "RCFD", "RCOA", "RCOW", "RCON"]
+    output["series_key"] = output["raw_code"].str.replace(r"^(RCFA|RCFW|RCFD|RCOA|RCOW|RCON)", "", regex=True)
+    output["variant_priority"] = output["raw_code"].str.extract(r"^(RCFA|RCFW|RCFD|RCOA|RCOW|RCON)", expand=False).map(
+        {prefix: priority for priority, prefix in enumerate(prefixes)}
+    ).fillna(len(prefixes))
     keys = ["bank_id", "report_date", "standard_metric", "segment", "series_key"]
-    output = output.sort_values([*keys, "raw_code"]).groupby(keys, as_index=False).agg(
-        numeric_value=("numeric_value", "max"), raw_code=("raw_code", "first"), stock_flow=("stock_flow", "first"),
+    output = output.sort_values([*keys, "variant_priority", "raw_code"]).groupby(keys, as_index=False).agg(
+        numeric_value=("numeric_value", "first"), raw_code=("raw_code", "first"), stock_flow=("stock_flow", "first"),
         ytd_flag=("ytd_flag", "first"), formula_group=("formula_group", "first"), source_file=("source_file", "first")
     )
     return output
@@ -70,6 +79,9 @@ def build_credit_panel(standard: pd.DataFrame, institutions: pd.DataFrame, confi
     bank["bank_total_npl_ratio"] = bank["bank_total_npl"] / _column_or_na(bank, "total_loans").where(_column_or_na(bank, "total_loans") > 0)
     bank["equity_to_assets_ratio"] = _column_or_na(bank, "equity_capital") / _column_or_na(bank, "total_assets").where(_column_or_na(bank, "total_assets") > 0)
     bank["tier1_ratio"] = _column_or_na(bank, "tier1_risk_based_ratio")
+    bank["computed_tier1_ratio"] = _column_or_na(bank, "tier1_capital") / _column_or_na(bank, "risk_weighted_assets").where(
+        _column_or_na(bank, "risk_weighted_assets") > 0
+    )
     bank["allowance_to_total_npl"] = _column_or_na(bank, "allowance") / bank["bank_total_npl"].where(bank["bank_total_npl"] > 0)
     # Compatibility name retained for the existing Batch 2 interface.  It is
     # now the proposal's allowance/noncurrent-loans definition, not allowance/
@@ -79,7 +91,7 @@ def build_credit_panel(standard: pd.DataFrame, institutions: pd.DataFrame, confi
     bank["lagged_npl"] = bank.groupby("bank_id")["bank_total_npl"].shift(1)
     bank["lagged_bank_total_npl_ratio"] = bank.groupby("bank_id")["bank_total_npl_ratio"].shift(1)
     assets_change = bank.groupby("bank_id")["total_assets"].pct_change(fill_method=None).abs()
-    bank["asset_jump_flag"] = (assets_change > 0.50).astype(int)
+    bank["asset_jump_flag"] = (assets_change > 0.50).fillna(False).astype(int)
     bank["merger_quarter_flag"] = 0
     if lineage is not None and not lineage.empty:
         events = lineage.assign(bank_id=lineage["bank_id"].astype(str), report_date=pd.to_datetime(lineage["event_date"]).dt.to_period("Q").dt.end_time.dt.normalize())[["bank_id", "report_date"]].drop_duplicates()

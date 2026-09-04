@@ -1,9 +1,9 @@
 # Batch 1 data-quality report
 
-- Standard observations: 84,239
+- Standard observations: 88,772
 - Derived observations: 8,145
 - Core banks: 33
-- Field-mapping rows: 56
+- Field-mapping rows: 64
 - Duplicate standard bank/date/raw-code keys: 0
 - Negative NCO observations retained: 1856
 - FDIC merger quarters flagged: 519
@@ -14,7 +14,7 @@
 
 - Mortgage is closed-end 1-4 family residential lending only: RC-C RCON/RCFD5367 + 5368 and RI-B RIADC234 + C235 - C217 - C218. Revolving/open-end RCON/RCFD1797 is excluded.
 - Segment NPL is unavailable in a stable mapping. `bank_total_npl`, `bank_total_npl_ratio`, and their lags are bank-level fallback controls; `segment_npl_rate` is deliberately missing rather than total NPL divided by segment exposure.
-- `tier1_capital` and `tier1_ratio` use Schedule RC-R fields; `equity_capital` and `equity_to_assets_ratio` are separately named book-equity measures.
+- `tier1_capital` and reported `tier1_ratio` use Schedule RC-R fields; `computed_tier1_ratio` is Tier 1 capital divided by mapped RWA. `equity_capital` and `equity_to_assets_ratio` are separately named book-equity measures.
 - `allowance_coverage` equals allowance / bank total noncurrent loans (also named `allowance_to_total_npl`), not allowance / total loans.
 
 ## NCO reconciliation rule
@@ -30,12 +30,20 @@
 - REVIEW_REQUIRED: 1
 - Open review items: 1; see `metadata/nco_reconciliation_review.md`.
 
+## Capital reconciliation
+
+- Formula: mapped Tier 1 capital / mapped risk-weighted assets versus the separately reported Tier 1 risk-based capital ratio.
+- Absolute tolerance: 1 basis point; ratios carrying a `%` suffix in the CDR files are normalized to decimal fractions before comparison.
+- Evaluable bank-quarters: 2,715/2,715 (100.00%).
+- Within tolerance: 2,715/2,715 (100.00%) when evaluable.
+- PASS_WITHIN_TOLERANCE: 2,715
+
 ## Mapped raw-field presence
 
-- 2005-03-31: 34 mapped raw codes
-- 2010-03-31: 39 mapped raw codes
-- 2020-03-31: 44 mapped raw codes
-- 2025-12-31: 44 mapped raw codes
+- 2005-03-31: 36 mapped raw codes
+- 2010-03-31: 41 mapped raw codes
+- 2020-03-31: 50 mapped raw codes
+- 2025-12-31: 50 mapped raw codes
 
 ## Limitations
 

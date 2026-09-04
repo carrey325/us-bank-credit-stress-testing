@@ -22,7 +22,8 @@ def _panel_with_gross_flows(mapped_charge_off: float, mapped_recovery: float, to
         "bank_id": "1", "report_date": pd.Timestamp("2025-06-30"), "segment": "CRE", "exposure": 1_000,
         "charge_off": mapped_charge_off, "recovery": mapped_recovery, "segment_nco": mapped_charge_off - mapped_recovery,
         "total_loans": 5_000, "total_charge_off": total_charge_off, "total_recovery": total_recovery,
-        "tier1_capital": 500, "tier1_ratio": 0.1, "equity_capital": 600, "equity_to_assets_ratio": 0.1,
+        "tier1_capital": 500, "risk_weighted_assets": 5_000, "tier1_ratio": 0.1, "computed_tier1_ratio": 0.1,
+        "equity_capital": 600, "equity_to_assets_ratio": 0.1,
         "total_assets": 6_000, "merger_quarter_flag": 0, "asset_jump_flag": 0,
     }])
 
@@ -67,3 +68,18 @@ def test_nco_reconciliation_records_only_explicit_source_exception(tmp_path: Pat
     recon, _ = write_qa(standard, panel, pd.DataFrame(), tmp_path, exceptions)
     assert recon.loc[0, "nco_reconciliation_status"] == "EXPLAINED_SOURCE_FILING_INCONSISTENCY"
     assert recon.loc[0, "recovery_subset_difference"] == 80
+
+
+def test_capital_reconciliation_compares_tier1_over_rwa_to_reported_ratio(tmp_path: Path):
+    panel = _panel_with_gross_flows(90, 10)
+    panel.loc[0, "computed_tier1_ratio"] = panel.loc[0, "tier1_capital"] / panel.loc[0, "risk_weighted_assets"]
+    recon, _ = write_qa(_standard_with_reclass(), panel, pd.DataFrame(), tmp_path)
+    assert recon.loc[0, "capital_reconciliation_status"] == "PASS_WITHIN_TOLERANCE"
+    assert recon.loc[0, "capital_ratio_difference_basis_points"] == 0
+
+
+def test_capital_reconciliation_flags_ratio_outside_one_basis_point(tmp_path: Path):
+    panel = _panel_with_gross_flows(90, 10)
+    panel.loc[0, "tier1_ratio"] = 0.1011
+    recon, _ = write_qa(_standard_with_reclass(), panel, pd.DataFrame(), tmp_path)
+    assert recon.loc[0, "capital_reconciliation_status"] == "FAIL_OUTSIDE_TOLERANCE"
