@@ -34,6 +34,7 @@ def build_model_panel(credit_panel: pd.DataFrame, macro_panel: pd.DataFrame, fdi
     # record.  It has historical GFC coverage and never uses a segment denominator.
     panel["npl"] = panel["fdic_noncurrent_loans"]
     panel["npl_rate"] = panel["fdic_noncurrent_ratio"]
+    panel["allowance_coverage"] = panel["allowance"] / panel["fdic_noncurrent_loans"].where(panel["fdic_noncurrent_loans"] > 0)
     bank_npl = panel.drop_duplicates(["bank_id", "report_date"])[["bank_id", "report_date", "npl_rate"]].sort_values(["bank_id", "report_date"])
     bank_npl["lagged_noncurrent_ratio"] = bank_npl.groupby("bank_id")["npl_rate"].shift(1)
     panel = panel.merge(bank_npl[["bank_id", "report_date", "lagged_noncurrent_ratio"]], on=["bank_id", "report_date"], how="left", validate="many_to_one")

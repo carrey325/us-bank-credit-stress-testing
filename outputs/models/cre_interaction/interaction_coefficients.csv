@@ -1,6 +1,6 @@
 term,estimate,bank_clustered_se,nobs,banks,exposure_definition,shock,pre_shock_reference
-lagged_nco_rate,0.13587236901902902,0.09904844860070185,1001,32,cre_to_tier1,cre_price_growth,2021-12-31
-lagged_noncurrent_ratio,0.10961175990331759,0.023612257439207498,1001,32,cre_to_tier1,cre_price_growth,2021-12-31
-lagged_allowance_coverage,-2.9840625520743993e-05,3.232737596427025e-05,1001,32,cre_to_tier1,cre_price_growth,2021-12-31
-lagged_loan_growth,0.000704704053072437,0.0005236697796414131,1001,32,cre_to_tier1,cre_price_growth,2021-12-31
-exposure_x_cre_price_shock,-1.996359159902954e-08,1.7240767305504372e-07,1001,32,cre_to_tier1,cre_price_growth,2021-12-31
+lagged_nco_rate,0.2752364025020844,0.1399870965961937,2331,32,cre_to_tier1,cre_price_growth,2021-12-31
+lagged_noncurrent_ratio,0.2653027219631337,0.3141820475310596,2331,32,cre_to_tier1,cre_price_growth,2021-12-31
+lagged_allowance_coverage,-0.00020003020624728845,0.00043788156886439064,2331,32,cre_to_tier1,cre_price_growth,2021-12-31
+lagged_loan_growth,-0.004198575937071138,0.004094612256516027,2331,32,cre_to_tier1,cre_price_growth,2021-12-31
+exposure_x_cre_price_shock,1.1221399920869763e-06,3.974158481169463e-07,2331,32,cre_to_tier1,cre_price_growth,2021-12-31

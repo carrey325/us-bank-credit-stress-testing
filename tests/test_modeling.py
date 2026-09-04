@@ -23,7 +23,7 @@ def _panel():
         for number, date in enumerate(dates):
             nco = .02 + effect + .001 * number
             rows.append({"bank_id": bank, "segment": "CRE", "report_date": date, "annualized_nco_rate": nco, "total_npl": 10 + number,
-                         "exposure": 1000, "total_loans": 5000, "allowance_coverage": .01, "tier1_ratio": .1, "loan_growth": .01, "eligible_for_model": 1,
+                         "exposure": 1000, "total_loans": 5000, "allowance": 5 + number, "allowance_coverage": .01, "tier1_ratio": .1, "loan_growth": .01, "eligible_for_model": 1,
                          "merger_recent_flag": 0, "cre_to_tier1": 2 + int(bank), "cre_share": .2, "lagged_nco": nco - .001})
     credit = pd.DataFrame(rows)
     macro = pd.DataFrame({"report_date": dates, "gdp_growth": np.linspace(1, 3, len(dates)), "cre_price_growth": np.linspace(-2, 2, len(dates))})
@@ -34,6 +34,7 @@ def _panel():
 
 def test_oos_models_use_same_complete_sample_and_write_spj(tmp_path):
     root, panel = _root(tmp_path), _panel()
+    assert panel.iloc[0]["allowance_coverage"] == (5 / 10)
     eligible, metrics, coefficients = run_oos_models(panel, root)
     assert set(metrics.model) == {"ar", "dynamic_fe"}
     assert metrics.groupby(["window", "segment"]).n.nunique().eq(1).all()

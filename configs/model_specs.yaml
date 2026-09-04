@@ -1,7 +1,7 @@
 # Frozen on 2026-09-02 before inspecting any Batch 2 estimates.
 primary_outcome: annualized_nco_rate
-# Mortgage NCO reporting begins in 2020 in the committed Batch 1 mapping; it
-# cannot support the pre-specified 2005--2019 OOS windows and remains secondary.
+# Mortgage NCO reporting is supported from 2005 in the repaired Batch 1 mapping;
+# it remains secondary under the frozen Batch 2 primary specification.
 primary_segments: [CRE, CI]
 primary_cre_exposure: cre_to_tier1
 primary_lags:
@@ -29,10 +29,10 @@ cre_interaction_spec:
   entity_effect: bank_fixed_effect
   time_effect: quarter_fixed_effect
 oos_windows:
-  - {train_start: '2017-01-01', train_end: '2019-12-31', test_start: '2020-01-01', test_end: '2020-12-31'}
-  - {train_start: '2017-01-01', train_end: '2020-12-31', test_start: '2021-01-01', test_end: '2021-12-31'}
-  - {train_start: '2017-01-01', train_end: '2021-12-31', test_start: '2022-01-01', test_end: '2023-12-31'}
-  - {train_start: '2017-01-01', train_end: '2023-12-31', test_start: '2024-01-01', test_end: '2025-12-31'}
+  - {train_start: '2005-01-01', train_end: '2011-12-31', test_start: '2012-01-01', test_end: '2016-12-31'}
+  - {train_start: '2005-01-01', train_end: '2016-12-31', test_start: '2017-01-01', test_end: '2019-12-31'}
+  - {train_start: '2005-01-01', train_end: '2019-12-31', test_start: '2020-01-01', test_end: '2021-12-31'}
+  - {train_start: '2005-01-01', train_end: '2021-12-31', test_start: '2022-01-01', test_end: '2025-12-31'}
 quantiles: [0.5, 0.75, 0.9]
 bayesian_core_spec: deferred_to_batch_3
 secondary_hypotheses:
