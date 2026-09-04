@@ -18,7 +18,7 @@ Batch 5 adds a documented rolling residual-bootstrap 90% interval fallback aroun
 
 ## Key Results
 
-All figures and numbers are generated from the saved pipeline outputs. The 2025Q4 CRE/C&I stress universe has 14 banks. In the committed mean-model comparison, AR has the lowest pooled OOS RMSE; the Dynamic-FE result is therefore not described as an RMSE improvement. Under the Fed severely adverse Dynamic-FE run, the high-minus-low CRE-to-Tier-1 tercile difference in mean capital depletion is 28.41 percentage points.
+All figures and numbers are generated from the saved pipeline outputs. The 2025Q4 CRE/C&I stress universe has 14 banks. In the committed mean-model comparison, AR has the lowest pooled OOS RMSE. Dynamic-FE remains the pre-specified structural stress model, so its result is not described as an RMSE improvement. Under the Fed severely adverse Dynamic-FE run, the high-minus-low CRE-to-Tier-1 tercile difference in mean capital depletion is 28.41 percentage points.
 
 The rolling residual-calibrated intervals achieve 94.4% CI coverage and 92.1% CRE coverage over their post-seed OOS periods, versus 96.9% and 92.8% for the static residual-calibrated comparator. Rolling calibration increases crisis upper misses in this run (CI: 9 to 21; CRE: 27 to 31), so it does not achieve the desired crisis-underprediction reduction. These are empirical calibration results, not guarantees. See the final ten-page draft at `outputs/reporting/MF772_final_report_draft.pdf`.
 

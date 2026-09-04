@@ -1,5 +1,8 @@
-model,oos_observations,pooled_oos_rmse,pooled_oos_mae,mean_bias,availability
-ar,2437,0.036353848334301234,0.019526822345325552,-0.018451394285225887,included
-bias_corrected_fe,2437,0.10726690675580718,0.06068835622963404,-0.032819158650250195,included
-dynamic_fe,2437,0.04730088487576233,0.03012479293615535,-0.013140653784869743,included
-bayesian,0,,,,unavailable: documented Batch 3 environment fallback; no posterior forecast results
+model,metric_family,evaluation_metric,oos_observations,score,pooled_oos_mae,mean_bias,availability
+AR,mean,pooled_oos_rmse,2437,0.036353848334301234,0.019526822345325552,-0.018451394285225887,included
+Bias-corrected FE,mean,pooled_oos_rmse,2437,0.10726690675580718,0.06068835622963404,-0.032819158650250195,included
+Dynamic FE,mean,pooled_oos_rmse,2437,0.04730088487576233,0.03012479293615535,-0.013140653784869743,included
+Quantile 0.50,quantile,pooled_oos_pinball_loss,2437,0.0018176758889945682,,,"included; quantile forecasts are scored by pinball loss, not RMSE"
+Quantile 0.75,quantile,pooled_oos_pinball_loss,2437,0.0016863511903602193,,,"included; quantile forecasts are scored by pinball loss, not RMSE"
+Quantile 0.90,quantile,pooled_oos_pinball_loss,2437,0.0018167055144512657,,,"included; quantile forecasts are scored by pinball loss, not RMSE"
+Bayesian,bayesian,unavailable,0,,,,unavailable: documented Batch 3 environment fallback; no posterior forecast results

@@ -2,7 +2,9 @@
   "status": "PASS",
   "checks": {
     "required_final_tables_exist": true,
+    "required_final_table_schemas_and_semantics": true,
     "required_final_figures_exist": true,
+    "required_final_figure_semantics": true,
     "model_panel_retains_missing_nco": true,
     "ytd_quarterization_regression_check": true,
     "field_mapping_has_effective_dates": true,
@@ -13,13 +15,14 @@
     "conformal_has_strict_time_order": true,
     "bayesian_diagnostics_saved": true,
     "stress_totals_reconcile_to_paths": true,
-    "final_t4_is_rebuilt_from_stress_output": true,
-    "final_t5_is_rebuilt_from_model_risk_and_stress_outputs": true,
+    "final_tables_are_rebuilt_from_approved_outputs": true,
     "final_t1_matches_generated_panel_scope": true,
     "market_validation_not_fabricated": true,
     "quantile_uses_pinball_not_rmse_for_tail_scoring": true,
     "cre_specification_record_is_present": true,
-    "resume_metrics_match_generated_scope": true
+    "resume_metrics_match_generated_scope": true,
+    "final_report_has_ten_pages_and_required_positioning": true,
+    "readme_states_final_delivery_and_model_positioning": true
   },
   "limitations": [
     "One source reconciliation item remains REVIEW_REQUIRED; it is not reclassified.",

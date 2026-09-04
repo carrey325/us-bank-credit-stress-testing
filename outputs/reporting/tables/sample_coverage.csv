@@ -1,2 +1,2 @@
-banks,quarters,observations,segments,mapped_raw_fields,model_eligible_observations
-33,84,8145,3,66,7925
+banks,quarters,observations,segments,mapped_raw_fields,model_eligible_observations,excluded_candidate_entities,exclusion_reason_categories,exclusion_reason_counts,stress_universe_excluded_bank_segment_rows,stress_universe_excluded_banks
+33,84,8145,3,66,7925,110,5,auto_finance_dominant=1; credit_card_dominant=5; custody_asset_servicing_dominant=1; insufficient_report_history=2; primary_source_review_required=101,38,19

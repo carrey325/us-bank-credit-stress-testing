@@ -1,5 +1,13 @@
-reconciliation_class,bank_quarters
-EXPLAINED,2
-NOT,1
-PASS,2711
-REVIEW,1
+component,metric,value,denominator,rate,status,notes
+mapping_coverage,mapped_raw_field_codes,66,66,1.0,PASS,Effective-dated FFIEC raw codes represented in the final mapping.
+mapping_coverage,effective_dated_mapping_rows,66,66,1.0,PASS,Mapping retains start_date and end_date fields.
+missingness,missing_nco_rate_observations_retained,1175,8145,0.14426028238182934,RETAINED_MISSING,Missing segment NCO rates are not filled with zero.
+reconciliation,nco_reconciliation_bank_quarters,1,2715,0.00036832412523020257,EXPLAINED_SOURCE_FILING_INCONSISTENCY,The REVIEW_REQUIRED item remains visible and is not reclassified.
+reconciliation,nco_reconciliation_bank_quarters,1,2715,0.00036832412523020257,EXPLAINED_YTD_RECLASS_GROSS_FLOW,The REVIEW_REQUIRED item remains visible and is not reclassified.
+reconciliation,nco_reconciliation_bank_quarters,1,2715,0.00036832412523020257,NOT_EVALUABLE_MISSING_FLOW,The REVIEW_REQUIRED item remains visible and is not reclassified.
+reconciliation,nco_reconciliation_bank_quarters,2711,2715,0.9985267034990792,PASS_SUBSET_GROSS_FLOWS,The REVIEW_REQUIRED item remains visible and is not reclassified.
+reconciliation,nco_reconciliation_bank_quarters,1,2715,0.00036832412523020257,REVIEW_REQUIRED,The REVIEW_REQUIRED item remains visible and is not reclassified.
+reconciliation,capital_reconciliation_bank_quarters,8,2715,0.0029465930018416206,NOT_EVALUABLE_MISSING_INPUT,Mapped Tier 1 / RWA is compared with the reported Tier 1 ratio.
+reconciliation,capital_reconciliation_bank_quarters,2707,2715,0.9970534069981584,PASS_WITHIN_TOLERANCE,Mapped Tier 1 / RWA is compared with the reported Tier 1 ratio.
+manual_audit,deterministic_formula_audit,200,200,1.0,PASS,Formula trace status; source-document audit is separately retained.
+manual_audit,source_document_audit,100,100,1.0,PASS,"Fixed reproducible source-document sample, not exhaustive validation."

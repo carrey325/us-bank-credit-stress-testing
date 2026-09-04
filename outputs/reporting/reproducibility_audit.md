@@ -5,7 +5,9 @@ Status: **PASS**
 ## Checks
 
 - PASS: required_final_tables_exist
+- PASS: required_final_table_schemas_and_semantics
 - PASS: required_final_figures_exist
+- PASS: required_final_figure_semantics
 - PASS: model_panel_retains_missing_nco
 - PASS: ytd_quarterization_regression_check
 - PASS: field_mapping_has_effective_dates
@@ -16,13 +18,14 @@ Status: **PASS**
 - PASS: conformal_has_strict_time_order
 - PASS: bayesian_diagnostics_saved
 - PASS: stress_totals_reconcile_to_paths
-- PASS: final_t4_is_rebuilt_from_stress_output
-- PASS: final_t5_is_rebuilt_from_model_risk_and_stress_outputs
+- PASS: final_tables_are_rebuilt_from_approved_outputs
 - PASS: final_t1_matches_generated_panel_scope
 - PASS: market_validation_not_fabricated
 - PASS: quantile_uses_pinball_not_rmse_for_tail_scoring
 - PASS: cre_specification_record_is_present
 - PASS: resume_metrics_match_generated_scope
+- PASS: final_report_has_ten_pages_and_required_positioning
+- PASS: readme_states_final_delivery_and_model_positioning
 
 ## Carry-forward limitations
 

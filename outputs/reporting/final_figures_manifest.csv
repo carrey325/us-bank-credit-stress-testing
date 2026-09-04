@@ -1,8 +1,8 @@
 figure_id,path,description,status
-F1,outputs/reporting/figures/segment_nco_npl_history.png,Segment NCO and NPL history,generated
+F1,outputs/reporting/figures/segment_nco_npl_history.png,Segment NCO history plus bank-level total NPL fallback (not segment NPL),generated
 F2,outputs/reporting/figures/exposure_loss_heatmap.png,Exposure/loss heatmap,generated
 F3,outputs/stress/figures/cre_to_capital_vs_depletion.png,CRE-to-capital versus severe capital depletion,Batch 4 generated
-F4,outputs/validation/figures/fe_mean_vs_actual.png,FE mean forecast,Batch 3 generated
+F4,outputs/reporting/figures/fe_mean_vs_tail_intervals.png,Dynamic FE mean versus Q0.75/Q0.90 tail interval; Bayesian unavailable,generated
 F5,outputs/validation/figures/gfc_pseudo_stress.png,Historical pseudo-stress,Batch 3 generated
 F6,outputs/stress/figures/baseline_vs_severe_system_loss.png,Fed baseline/severe paths,Batch 4 generated
 F7,outputs/stress/figures/model_ranking_stability.png,Stress ranking stability,Batch 4 generated
