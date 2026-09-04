@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from bankstress.reporting import _audit, conformal_metrics, rolling_residual_intervals
+from bankstress.reporting import _audit, _final_report_metric_semantics, _mean_model_rmse_improvement_vs_ar, conformal_metrics, rolling_residual_intervals
 
 
 def _oos() -> pd.DataFrame:
@@ -43,3 +43,25 @@ def test_final_delivery_audit_enforces_table_figure_and_report_semantics():
     assert audit["checks"]["required_final_figure_semantics"]
     assert audit["checks"]["final_report_has_ten_pages_and_required_positioning"]
     assert audit["checks"]["readme_states_final_delivery_and_model_positioning"]
+
+
+def test_final_report_metric_semantics_reject_dynamic_fe_attribution_of_ar_best_metric():
+    root = Path(__file__).resolve().parents[1]
+    model_comparison = pd.read_csv(root / "outputs" / "reporting" / "tables" / "model_comparison.csv")
+    resume = __import__("json").loads((root / "outputs" / "reporting" / "resume_metrics.json").read_text(encoding="utf-8"))
+    best_improvement = _mean_model_rmse_improvement_vs_ar(model_comparison, "AR")
+    dynamic_fe_improvement = _mean_model_rmse_improvement_vs_ar(model_comparison, "Dynamic FE")
+
+    correct = (
+        f"best-model improvement versus AR: {best_improvement:.2%}. "
+        "Because AR itself is the best pooled OOS RMSE model. "
+        f"The T3-derived Dynamic FE versus AR RMSE change is {dynamic_fe_improvement:.2%}."
+    )
+    prior_misattribution = (
+        f"best-model improvement versus AR: {best_improvement:.2%}. "
+        "Because AR itself is the best pooled OOS RMSE model. "
+        f"The generated resume metric records the Dynamic-FE versus AR RMSE change of {best_improvement:.2%}."
+    )
+
+    assert _final_report_metric_semantics(correct, model_comparison, resume)
+    assert not _final_report_metric_semantics(prior_misattribution, model_comparison, resume)

@@ -329,6 +329,62 @@ def _robustness_table(root: Path, metrics: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def _mean_model_rmse_improvement_vs_ar(model_comparison: pd.DataFrame, model: str) -> float:
+    """Derive a mean model's pooled-RMSE change against AR from generated T3."""
+    required = {"model", "metric_family", "evaluation_metric", "score"}
+    missing = required - set(model_comparison.columns)
+    if missing:
+        raise ValueError(f"T3 model comparison is missing columns: {sorted(missing)}")
+    mean_models = model_comparison.loc[
+        model_comparison["metric_family"].eq("mean")
+        & model_comparison["evaluation_metric"].eq("pooled_oos_rmse")
+    ].set_index("model")
+    if "AR" not in mean_models.index or model not in mean_models.index:
+        raise ValueError(f"T3 needs AR and {model} pooled OOS RMSE rows")
+    ar_rmse = float(mean_models.loc["AR", "score"])
+    model_rmse = float(mean_models.loc[model, "score"])
+    if not np.isfinite(ar_rmse) or ar_rmse <= 0 or not np.isfinite(model_rmse):
+        raise ValueError("T3 pooled OOS RMSE values must be finite and AR RMSE positive")
+    return (ar_rmse - model_rmse) / ar_rmse
+
+
+def _final_report_metric_semantics(report_text: str, model_comparison: pd.DataFrame, resume: dict[str, Any]) -> bool:
+    """Verify that best-model and Dynamic-FE RMSE statements name their metrics."""
+    # PDF extraction inserts line breaks at layout boundaries, which are not
+    # semantic breaks in the report prose.
+    report_text = " ".join(report_text.split())
+    try:
+        mean_models = model_comparison.loc[
+            model_comparison["metric_family"].eq("mean")
+            & model_comparison["evaluation_metric"].eq("pooled_oos_rmse")
+        ]
+        best_row = mean_models.loc[mean_models["score"].eq(mean_models["score"].min())].iloc[0]
+        best_model = str(best_row["model"])
+        best_improvement = _mean_model_rmse_improvement_vs_ar(model_comparison, best_model)
+        dynamic_fe_improvement = _mean_model_rmse_improvement_vs_ar(model_comparison, "Dynamic FE")
+    except (IndexError, KeyError, TypeError, ValueError):
+        return False
+
+    resume_best_model = str(resume.get("best_model_name", "")).replace("_", " ").casefold()
+    expected_best_model = best_model.casefold()
+    if resume_best_model != expected_best_model:
+        return False
+    try:
+        resume_improvement = float(resume["best_oos_rmse_improvement_vs_ar"])
+    except (KeyError, TypeError, ValueError):
+        return False
+    if not np.isclose(resume_improvement, best_improvement, rtol=1e-10, atol=1e-10):
+        return False
+
+    best_statement = (
+        f"best-model improvement versus AR: {best_improvement:.2%}. "
+        f"Because {best_model} itself is the best pooled OOS RMSE model"
+    )
+    dynamic_statement = f"Dynamic FE versus AR RMSE change is {dynamic_fe_improvement:.2%}"
+    old_misattribution = f"Dynamic-FE versus AR RMSE change of {resume_improvement:.2%}"
+    return best_statement in report_text and dynamic_statement in report_text and old_misattribution not in report_text
+
+
 def _write_final_report(root: Path, summary: dict[str, Any], conformal: pd.DataFrame) -> Path:
     """Render a plainly labelled ten-page draft from generated artifacts."""
     try:
@@ -344,6 +400,8 @@ def _write_final_report(root: Path, summary: dict[str, Any], conformal: pd.DataF
     styles = getSampleStyleSheet()
     body, heading = styles["BodyText"], styles["Heading1"]
     document = SimpleDocTemplate(str(destination), pagesize=letter, rightMargin=0.65 * inch, leftMargin=0.65 * inch, topMargin=0.6 * inch, bottomMargin=0.55 * inch)
+    model_comparison = pd.read_csv(root / "outputs" / "reporting" / "tables" / "model_comparison.csv")
+    dynamic_fe_improvement = _mean_model_rmse_improvement_vs_ar(model_comparison, "Dynamic FE")
     adaptive_misses = conformal.loc[conformal["method"].eq("rolling_adaptive_residual_bootstrap")].set_index("segment")["crisis_underprediction_count"]
     static_misses = conformal.loc[conformal["method"].eq("static_residual_bootstrap")].set_index("segment")["crisis_underprediction_count"]
     pages = [
@@ -361,7 +419,7 @@ def _write_final_report(root: Path, summary: dict[str, Any], conformal: pd.DataF
         ]),
         ("4. Dynamic fixed effects and CRE interaction", [
             "AR is the best pooled OOS RMSE mean model. Dynamic FE remains the pre-specified structural stress model. The CRE interaction uses lagged CRE-to-Tier-1 measured at or before the forecast origin, following the documented timing repair. The analysis separates mechanical exposure-driven loss from any incremental loss-rate interaction.",
-            f"T3 reports the committed mean-model comparison. The generated resume metric records the Dynamic-FE versus AR RMSE change of {summary['best_oos_rmse_improvement_vs_ar']:.2%}; it is not an improvement claim or a pre-planned target.",
+            f"T3 reports the committed mean-model comparison. The generated resume metric records the best-model improvement versus AR: {summary['best_oos_rmse_improvement_vs_ar']:.2%}. Because AR itself is the best pooled OOS RMSE model, this is AR versus AR, not a Dynamic-FE result. The T3-derived Dynamic FE versus AR RMSE change is {dynamic_fe_improvement:.2%} (worse); it is not an improvement claim or a pre-planned target.",
         ]),
         ("5. Quantile and Bayesian model-risk evidence", [
             "Q0.50/Q0.75/Q0.90 forecasts are evaluated with pinball loss and pre-specified historical pseudo-stress windows. The Q0.90 CRE recursive path is not historically calibrated across GFC, COVID, and the 2022+ high-rate/CRE window; it remains a downstream tail sensitivity, not a validated forecast.",
@@ -501,7 +559,7 @@ def _audit(root: Path, tables: list[dict[str, str]], figures: list[dict[str, str
         "quantile_uses_pinball_not_rmse_for_tail_scoring": tail.loc[tail["model"].str.startswith("quantile_"), "metric"].eq("pinball_loss").any() and tail.loc[tail["metric"].eq("pinball_loss"), "value"].notna().all(),
         "cre_specification_record_is_present": "Frozen" in (root / "configs" / "model_specs.yaml").read_text(encoding="utf-8") and "cre_interaction_spec" in specs,
         "resume_metrics_match_generated_scope": int(resume["n_banks"]) == int(panel["bank_id"].nunique()) and int(resume["n_observations"]) == len(panel) and int(resume["n_raw_fields"]) == int(mapping["raw_code"].nunique()) and int(resume["stress_universe_banks"]) == int(t4.loc[t4["model"].eq("dynamic_fe"), "bank_id"].nunique()),
-        "final_report_has_ten_pages_and_required_positioning": report_pages == 10 and "AR is the best pooled OOS RMSE mean model." in report_text and "Dynamic FE remains the pre-specified structural stress model." in report_text,
+        "final_report_has_ten_pages_and_required_positioning": report_pages == 10 and "AR is the best pooled OOS RMSE mean model." in report_text and "Dynamic FE remains the pre-specified structural stress model." in report_text and _final_report_metric_semantics(report_text, delivered_t3, resume),
         "readme_states_final_delivery_and_model_positioning": "AR has the lowest pooled OOS RMSE" in readme and "Dynamic-FE remains the pre-specified structural stress model" in readme and "make report" in readme and "reproducibility audit" in readme,
     }
     checks = {name: bool(passed) for name, passed in checks.items()}
