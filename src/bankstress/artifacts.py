@@ -25,6 +25,14 @@ def _git_value(root: Path, *args: str) -> str:
 
 def code_identity(root: Path) -> tuple[str, str]:
     commit = _git_value(root, "rev-parse", "HEAD")
+    untracked = _git_value(
+        root, "ls-files", "--others", "--exclude-standard", "--", "src", "scripts"
+    ).splitlines()
+    if untracked:
+        raise ValueError(
+            "Validated artifacts cannot be written with untracked source files: "
+            + ", ".join(untracked)
+        )
     diff = subprocess.run(
         ["git", "diff", "--binary", "HEAD", "--", "src", "scripts", "metadata/field_mapping.csv"],
         cwd=root, check=True, capture_output=True,

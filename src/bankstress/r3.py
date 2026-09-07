@@ -31,6 +31,11 @@ MACRO_PREFIXES = (
     "lagged_house_price_", "lagged_bbb_", "lagged_short_", "lagged_mortgage_",
 )
 USE_VALUES = {"ALLOWED", "DIAGNOSTIC_ONLY", "UNAVAILABLE"}
+FROZEN_CONTROL_SOURCES = {
+    "lagged_noncurrent_ratio": "npl_rate",
+    "lagged_allowance_coverage": "allowance_coverage_r2",
+    "lagged_tier1_ratio": "tier1_ratio",
+}
 
 
 @dataclass
@@ -250,6 +255,32 @@ def _mean_scores(frame: pd.DataFrame) -> dict[str, Any]:
             "mae": float(np.mean(np.abs(error))), "bias": float(np.mean(error))}
 
 
+def _prepare_jump_off_state(train: pd.DataFrame, train_end: pd.Timestamp) -> tuple[pd.DataFrame, int]:
+    """Build the recursive state from current train-end bank information.
+
+    R2 target rows contain origin predictors that are already shifted once.  A
+    historical forecast beginning in the following quarter must therefore use
+    the current state columns on the train-end row, not those lagged predictors.
+    """
+    train_end = pd.Timestamp(train_end)
+    candidates = train[train.target_period.eq(train_end)].copy()
+    if candidates.duplicated("bank_id").any():
+        raise ValueError(f"Duplicate train-end jump-off rows at {train_end.date()}")
+    candidates["bank_id"] = candidates.bank_id.astype(str)
+    for predictor, current_column in FROZEN_CONTROL_SOURCES.items():
+        candidates[predictor] = candidates[current_column]
+        candidates[f"{predictor}_source_period"] = train_end
+    adjacent = candidates.report_period.eq(train_end - pd.offsets.QuarterEnd())
+    candidates["lagged_loan_growth"] = (
+        candidates.total_loans / candidates.origin_total_loans - 1
+    ).where(adjacent & candidates.origin_total_loans.gt(0))
+    candidates["lagged_loan_growth_source_period"] = train_end
+    candidates["lagged_loan_growth_prior_component_source_period"] = candidates.report_period.where(adjacent)
+    required = ["nco_rate", *FROZEN_CONTROL_SOURCES, "lagged_loan_growth"]
+    valid = candidates[required].notna().all(axis=1)
+    return candidates.loc[valid].copy(), int((~valid).sum())
+
+
 def _historical_grid(panel: pd.DataFrame, segment: str, window: dict[str, str], jump: pd.DataFrame,
                      predictors: list[str]) -> pd.DataFrame:
     dates = quarter_sequence(pd.Timestamp(window["test_start"]), pd.Timestamp(window["test_end"]))
@@ -269,8 +300,13 @@ def _historical_grid(panel: pd.DataFrame, segment: str, window: dict[str, str], 
     latest = jump.set_index(jump.bank_id.astype(str))
     for term in frozen_terms:
         grid[term] = grid.bank_id.map(latest[term])
+        source_column = f"{term}_source_period"
+        if source_column not in latest:
+            raise ValueError(f"Frozen historical control lacks source-period lineage: {term}")
+        grid[source_column] = grid.bank_id.map(latest[source_column])
     balance_column = "origin_exposure" if "origin_exposure" in jump else "exposure"
     grid["frozen_balance"] = grid.bank_id.map(latest[balance_column])
+    grid["frozen_balance_source_period"] = grid.bank_id.map(latest.report_period if balance_column == "origin_exposure" else latest.target_period)
     grid["bank_controls_source_period"] = grid.bank_id.map(latest.target_period)
     grid["bank_controls_frozen"] = True
     return grid
@@ -285,6 +321,10 @@ def _recursive_path(fit: Any, kind: str, grid: pd.DataFrame, jump: pd.DataFrame,
     for target, current in grid.groupby("target_period", sort=True):
         current = current.copy()
         current["lagged_nco_rate"] = current.bank_id.map(state)
+        current["lagged_nco_rate_source_period"] = pd.Timestamp(target) - pd.offsets.QuarterEnd()
+        current["lagged_nco_rate_source_type"] = np.where(
+            pd.Timestamp(target) == grid.target_period.min(), "ACTUAL_JUMP_OFF", "MODELED_RECURSIVE"
+        )
         predicted = _predict_entity_fe(fit, current, "nco_rate") if kind == "mean" else predict_quantile(fit, current)
         # Preserve the full path grid even when a supplied macro-path feature is
         # unavailable.  Such a row is explicitly unavailable, not silently
@@ -315,23 +355,32 @@ def run_historical_validation(panel: pd.DataFrame, spec: dict[str, Any]) -> tupl
             train = data[data.target_period.le(pd.Timestamp(window["train_end"])) & data.evaluation_eligible].copy()
             if train.empty:
                 raise ValueError(f"No historical training support for {window['name']} {segment}")
-            jump = train.sort_values("target_period").groupby("bank_id", as_index=False).tail(1)
-            jump = jump[jump.target_period.eq(pd.Timestamp(window["train_end"]))].copy()
+            jump_candidates = train[train.target_period.eq(pd.Timestamp(window["train_end"]))].copy()
+            jump, jump_control_exclusions = _prepare_jump_off_state(train, pd.Timestamp(window["train_end"]))
             if jump.empty:
                 raise ValueError(f"No valid jump-off state at {window['train_end']} for {window['name']} {segment}")
             grid = _historical_grid(panel, segment, window, jump, predictors)
+            control_source_columns = [f"{term}_source_period" for term in spec["dynamic_fe_spec"]["bank_features"]]
+            source_mismatches = int(sum(
+                (~grid[column].eq(pd.Timestamp(window["train_end"]))).sum()
+                for column in control_source_columns
+            ))
             expected = len(jump) * len(quarter_sequence(pd.Timestamp(window["test_start"]), pd.Timestamp(window["test_end"])))
             support_rows.append({"pseudo_window": window["name"], "segment": segment,
                                  "requested_training_start": pd.Timestamp("2005-01-01"),
                                  "effective_training_start": train.target_period.min(), "training_end": train.target_period.max(),
                                  "training_quarters": train.target_period.nunique(), "training_banks": train.bank_id.nunique(),
                                  "features": len(predictors), "effective_training_samples": len(train),
+                                 "jump_off_candidate_banks": len(jump_candidates),
+                                 "jump_off_current_control_exclusions": jump_control_exclusions,
                                  "jump_off_banks": len(jump), "forecast_quarters": grid.target_period.nunique(),
                                  "expected_path_rows_per_model": expected,
                                  "gfc_2005_start_verified": bool(window["name"] != "GFC" or
                                                                  (panel[panel.segment.eq(segment)].target_period.min().year == 2005
                                                                   and train.target_period.min().year == 2005)),
                                  "bank_controls_frozen": bool(grid.bank_controls_frozen.all()),
+                                 "jump_off_current_controls_verified": source_mismatches == 0,
+                                 "frozen_control_source_mismatch_count": source_mismatches,
                                  "future_control_leakage_count": int((grid.bank_controls_source_period > pd.Timestamp(window["train_end"])).sum())})
             mean_fits = {"ar_mean": (_fit_entity_fe(train, "nco_rate", ["lagged_nco_rate"]), ["lagged_nco_rate"]),
                          "dynamic_fe": (_fit_entity_fe(train, "nco_rate", predictors), predictors)}
@@ -350,6 +399,8 @@ def run_historical_validation(panel: pd.DataFrame, spec: dict[str, Any]) -> tupl
                                     "validation_mode": "RECURSIVE_CONDITIONAL_MEAN", "metric_family": "modeled_rate_error",
                                     "generated_n": len(recursive), "prediction_unavailable_n": int(recursive.prediction.isna().sum()),
                                     "lag_coefficient": lag_coefficient, "recursive_stable": recursive_stable,
+                                    "jump_off_current_controls_verified": source_mismatches == 0,
+                                    "frozen_control_source_mismatch_count": source_mismatches,
                                     "max_abs_prediction": float(recursive.prediction.abs().max()),
                                     "unscored_missing_actual_n": int(recursive.nco_rate.isna().sum()), **_mean_scores(recursive)})
                 scored = recursive.dropna(subset=["nco_rate", "prediction", "frozen_balance"]).copy()
@@ -386,6 +437,8 @@ def build_model_use_registry(one_step_metrics: pd.DataFrame, historical_metrics:
                                      (hist_segment.metric_family.eq("modeled_rate_error"))]
             stable = bool(len(recursive) and recursive.prediction_unavailable_n.fillna(0).eq(0).all()
                           and recursive.recursive_stable.astype("boolean").fillna(False).all()
+                          and recursive.jump_off_current_controls_verified.astype("boolean").fillna(False).all()
+                          and recursive.frozen_control_source_mismatch_count.fillna(1).eq(0).all()
                           and np.isfinite(recursive.max_abs_prediction).all())
             records.append({"model_id": model_id, "segment": segment, "input_run_id": input_run_id,
                             "model_spec_hash": model_spec_hash, "descriptive_use": "ALLOWED",
@@ -394,7 +447,7 @@ def build_model_use_registry(one_step_metrics: pd.DataFrame, historical_metrics:
                             "multi_step_tail_distribution_use": "UNAVAILABLE", "evidence_files": evidence_files,
                             "limitations": ["Conditional macro path only; no claim of exact nonlinear expectation.",
                                             "Dynamic FE improved RMSE in only 1/8 R2 segment-window comparisons."] if model_id == "dynamic_fe" else ["Baseline model; not evidence of incremental macro benefit."],
-                            "status_reason": ("Recursive path is complete and uses frozen pre-window controls; tail-distribution use was not evaluated."
+                            "status_reason": ("Recursive path is complete and uses verified current train-end controls frozen with per-control source-quarter lineage; tail-distribution use was not evaluated."
                                               if stable else "Path rows are preserved, but at least one supplied macro-path feature is unavailable; formal stress use is not authorized.")})
         for family in ["ar_quantile", "dynamic_quantile"]:
             for tau in [0.5, 0.75, 0.9]:

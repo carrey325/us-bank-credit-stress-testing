@@ -4,9 +4,11 @@ import pandas as pd
 import pytest
 
 from bankstress.r3 import (
-    _rearrange, assert_not_cumulative_q90, prediction_target_dictionary,
+    _historical_grid, _prepare_jump_off_state, _rearrange, _recursive_path,
+    assert_not_cumulative_q90, prediction_target_dictionary,
     predict_quantile, quarter_sequence, validate_target_dictionary,
 )
+from bankstress.artifacts import code_identity
 
 
 def test_prediction_targets_and_nominal_labels_are_distinct():
@@ -89,3 +91,54 @@ def test_predict_quantile_does_not_require_realized_target():
     fit = QuantileFit(Result(), ["lagged_nco_rate"], ["1", "2"], "1", 0.9, 1, True, None)
     data = pd.DataFrame({"bank_id": ["1"], "segment": ["CRE"], "lagged_nco_rate": [0.2], "nco_rate": [float("nan")]})
     assert len(predict_quantile(fit, data)) == 1
+
+
+def test_jump_off_uses_current_controls_when_lagged_values_deliberately_differ(monkeypatch):
+    train_end = pd.Timestamp("2019-12-31")
+    train = pd.DataFrame({
+        "bank_id": ["1"], "segment": ["CRE"], "target_period": [train_end],
+        "report_period": [pd.Timestamp("2019-09-30")], "nco_rate": [0.11],
+        "npl_rate": [0.22], "allowance_coverage_r2": [1.33], "tier1_ratio": [0.144],
+        "total_loans": [120.0], "origin_total_loans": [100.0],
+        "lagged_nco_rate": [9.11], "forecast_origin": [pd.Timestamp("2019-11-14")],
+        "lagged_noncurrent_ratio": [9.22], "lagged_allowance_coverage": [9.33],
+        "lagged_tier1_ratio": [9.44], "lagged_loan_growth": [9.55],
+        "origin_exposure": [80.0],
+    })
+    jump, excluded = _prepare_jump_off_state(train, train_end)
+    assert excluded == 0
+    assert jump.iloc[0]["lagged_noncurrent_ratio"] == pytest.approx(0.22)
+    assert jump.iloc[0]["lagged_allowance_coverage"] == pytest.approx(1.33)
+    assert jump.iloc[0]["lagged_tier1_ratio"] == pytest.approx(0.144)
+    assert jump.iloc[0]["lagged_loan_growth"] == pytest.approx(0.20)
+    predictors = ["lagged_nco_rate", "lagged_noncurrent_ratio", "lagged_allowance_coverage",
+                  "lagged_loan_growth", "lagged_tier1_ratio"]
+    grid = _historical_grid(train, "CRE", {"test_start": "2020-01-01", "test_end": "2020-06-30"}, jump, predictors)
+    for term in predictors[1:]:
+        assert grid[term].nunique() == 1
+        assert grid[f"{term}_source_period"].eq(train_end).all()
+    monkeypatch.setattr(
+        "bankstress.r3._predict_entity_fe",
+        lambda fit, current, outcome: current.assign(prediction=current.lagged_nco_rate),
+    )
+    path = _recursive_path({}, "mean", grid, jump, "conditional_mean_recursive_path")
+    assert path.iloc[0].prediction == pytest.approx(0.11)
+    assert path.iloc[0].lagged_nco_rate_source_period == train_end
+    assert path.iloc[0].lagged_nco_rate_source_type == "ACTUAL_JUMP_OFF"
+
+
+def test_artifact_lineage_fails_closed_for_untracked_source_file(tmp_path):
+    import subprocess
+
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "config", "user.name", "Test"], cwd=tmp_path, check=True)
+    (tmp_path / "src").mkdir()
+    (tmp_path / "scripts").mkdir()
+    (tmp_path / "src/tracked.py").write_text("VALUE = 1\n", encoding="utf-8")
+    (tmp_path / "scripts/tracked.py").write_text("VALUE = 1\n", encoding="utf-8")
+    subprocess.run(["git", "add", "src", "scripts"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-m", "checkpoint"], cwd=tmp_path, check=True, capture_output=True)
+    (tmp_path / "src/untracked.py").write_text("VALUE = 2\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="untracked source files.*src/untracked.py"):
+        code_identity(tmp_path)

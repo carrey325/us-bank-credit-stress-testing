@@ -20,7 +20,7 @@ from bankstress.r3 import (
 )
 
 R2_RUN_ID = "r2-20260907T194522Z"
-RUN_ID = "r3-20260907-minimal"
+RUN_ID = "r3-20260907-jumpoff-lineage-repair"
 
 
 def _write_target_dictionary(rows: list[dict]) -> Path:
@@ -68,7 +68,8 @@ def main() -> None:
         "validation_scope": "MINIMAL_R3",
         "macro_path": "supplied realized historical macro path; unavailable features are not imputed",
         "lagged_nco": "recursive modeled state after a valid jump-off",
-        "bank_controls": "last valid pre-window value held fixed",
+        "bank_controls": "current train-end NPL rate, allowance coverage, Tier 1 ratio, and adjacent-quarter loan growth held fixed; incomplete current states are excluded and counted",
+        "bank_control_source_lineage": "one source-period column per frozen control in pseudo_stress.parquet",
         "generation_scoring_separation": True,
         "conditional_mean_path_label": "plug-in conditional-mean recursive path; not asserted exact expectation",
         "fixed_quantile_feedback_label": "recursive_quantile_sensitivity_not_distribution",
@@ -95,6 +96,7 @@ def main() -> None:
         "- One-step quantiles are diagnostic only; zero exceedances are not interpreted as success. Raw and rearranged forecasts are both retained.\n"
         f"- Independently fitted quantiles crossed in {crossing_total} model-family/window/segment row instances before rearrangement; this is retained as instability evidence.\n"
         "- Recursive mean paths condition on realized macro paths and frozen jump-off bank controls. They are plug-in paths, not asserted exact expectations.\n"
+        "- Jump-off controls use current train-end values. Banks lacking a complete current NPL, allowance coverage, Tier 1 ratio, or adjacent-quarter loan-growth state are excluded and counted in `pseudo_stress_training_support.csv`.\n"
         "- Fixed-Q0.90 recursive paths are sensitivity diagnostics only. No cumulative-loss Q0.90 or multi-period tail distribution was computed.\n"
         "- Historical scoring uses available realized outcomes, while generation remains continuous when outcomes are unavailable. GFC training has few independent quarterly time points despite its cross-section.\n"
         f"- One-step post-rearrangement Q0.90 evaluation contains {int(q90.scored_n.sum())} scored bank-quarters across reported segment-windows; window-level exceedance counts and rates are in `tail_metrics.csv`.\n",
@@ -130,6 +132,8 @@ def main() -> None:
         "pseudo_windows": sorted(support.pseudo_window.unique().tolist()),
         "gfc_2005_start_verified": bool(support.gfc_2005_start_verified.all()),
         "future_control_leakage_count": int(support.future_control_leakage_count.sum()),
+        "frozen_control_source_mismatch_count": int(support.frozen_control_source_mismatch_count.sum()),
+        "jump_off_current_control_exclusions": int(support.jump_off_current_control_exclusions.sum()),
         "continuous_path_row_count": len(paths), "expected_continuous_path_row_count": int(quarterly_expected),
         "paths_preserved_with_missing_actual": int(paths.nco_rate.isna().sum()),
         "fixed_q90_feedback_labels_valid": bool(paths[paths.model_id.eq("dynamic_quantile_q90")].target_type.eq("recursive_quantile_sensitivity_not_distribution").all()),
@@ -149,6 +153,7 @@ def main() -> None:
                 "gfc_2005_start_verified", "fixed_q90_feedback_labels_valid"]:
         if not summary[key]: failures.append(key)
     if summary["future_control_leakage_count"]: failures.append("future_control_leakage_count")
+    if summary["frozen_control_source_mismatch_count"]: failures.append("frozen_control_source_mismatch_count")
     if summary["continuous_path_row_count"] != summary["expected_continuous_path_row_count"]: failures.append("continuous_path_row_count")
     if summary["multi_period_tail_distribution_authorizations"]: failures.append("multi_period_tail_distribution_authorizations")
     summary["validation_failures"], summary["validation_status"] = failures, "PASS" if not failures else "FAIL"
@@ -161,7 +166,7 @@ def main() -> None:
         f"- Run: `{RUN_ID}`; R2 input: `{R2_RUN_ID}`.\n"
         f"- Validation: `{summary['validation_status']}`; quantile fits converged: `{summary['all_quantile_fits_converged']}`.\n"
         "- Q0.50/Q0.75/Q0.90 are evaluated one step ahead against same-tau AR quantiles on common scoring keys.\n"
-        "- Historical GFC/COVID/high-rate paths use frozen pre-window bank controls; generation and scoring are separate.\n"
+        "- Historical GFC/COVID/high-rate paths use current train-end bank controls, frozen with per-control source-quarter lineage; generation and scoring are separate.\n"
         "- Recursive Q0.90 is sensitivity only. Multi-period tail distribution, residual calibration, and Bayesian work are not evaluated.\n",
         encoding="utf-8",
     )
