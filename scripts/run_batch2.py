@@ -29,7 +29,8 @@ def main() -> None:
         write_eda(model, ROOT)
         eligible, metrics, _ = run_oos_models(model, ROOT)
         run_split_panel_jackknife(eligible, ROOT)
-        run_cre_interaction(model, ROOT)
+        realized_shock = pd.read_parquet(ROOT / "data" / "derived" / "cre_realized_shock.parquet")
+        run_cre_interaction(model, realized_shock, ROOT)
         (ROOT / "outputs" / "models" / "run_summary.md").write_text(
             "# Batch 2 successful run\n\n"
             f"- Credit-panel rows: {len(credit):,}\n"

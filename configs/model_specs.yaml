@@ -30,6 +30,8 @@ cre_interaction_spec:
   exposure_timing: bank_quarter_lagged_at_forecast_origin
   alternative_exposure: cre_share
   shock: cre_price_growth
+  shock_timing: contemporaneous_target_period
+  shock_information_set: ex_post_final_vintage_not_forecast_origin_information
   entity_effect: bank_fixed_effect
   time_effect: quarter_fixed_effect
   include_time_varying_exposure_main_effect: true

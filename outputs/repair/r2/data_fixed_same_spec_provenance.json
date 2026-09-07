@@ -1,0 +1,25 @@
+{
+  "result_layer": "DATA_FIXED_SAME_SPEC_DIAGNOSTIC",
+  "exact_old_code_commit": "f06531def118ce5cf5063180c21d07bcee5e5fc5",
+  "git_blob_ids": {
+    "scripts/run_batch2.py": "b66e05c1a0f9f90ff7f64f3bc658b25a4e10e636",
+    "src/bankstress/modeling.py": "44f30bf8c5fba3ff58eaa326c3cf12f98ab2df91",
+    "configs/model_specs.yaml": "176698cfe7423de7c964bcb273d17c8346eed5a4"
+  },
+  "replay_command_at_old_code": "python scripts/run_batch2.py",
+  "approved_r1_input_run": "r1-20260907T141500Z",
+  "credit_panel_sha256": "31d8b08ef6723174f759837badf248c71bdcd3d5f61a3a667c6b8ae9a2d61a79",
+  "macro_panel_sha256": "02e810caaac3e20388e10d2ac2a8ac2c50111008101c2459bf557bb6eca2affb",
+  "fdic_noncurrent_panel_sha256": "21aa6e2058074e40a889d0d4d5f83db660fdbc9c18a818cba726bd5fa002a7a9",
+  "diagnostic_artifact_hashes": {
+    "data_fixed_same_spec_ar_metrics.csv": "906bccd5c91a8506705d9777caf65353c3dc47a3fc958110eda1b56a61e18933",
+    "data_fixed_same_spec_fe_metrics.csv": "c5cfa7ae57981865ce4156fe5761d26cd95f1b62f592939a7886bafd47db3cc1",
+    "data_fixed_same_spec_interaction.csv": "aa3d09168d0fa32d8232dd81326a9eededb248770ef3d4a61e9268da57f7d136"
+  },
+  "known_defects_retained": [
+    "ambiguous forecast origin/target timing",
+    "second macro lag in modeling",
+    "complete-case target selection",
+    "CRE interaction implementation predating valid correction"
+  ]
+}

@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -54,7 +55,58 @@ def _attrition(model: pd.DataFrame, eligible: pd.DataFrame) -> pd.DataFrame:
     add(eligible[eligible.prediction_eligible & ~eligible.evaluation_eligible], "evaluation", "target_outcome_unavailable_prediction_retained")
     add(eligible[eligible.target_period.eq(pd.Timestamp("2025-12-31")) & ~eligible.prediction_eligible], "2025Q4_investigation", "2025Q4_target_origin_not_prediction_eligible")
     add(eligible[eligible.report_period.eq(pd.Timestamp("2025-12-31"))], "2025Q4_origin_investigation", "2025Q4_origin_forecast_record")
+    model_spec = yaml.safe_load((ROOT / "configs/model_specs.yaml").read_text(encoding="utf-8"))
+    for window_id, window in enumerate(model_spec["oos_windows"], start=1):
+        for segment in model_spec["primary_segments"]:
+            segment_data = eligible[eligible.segment.eq(segment)]
+            train = segment_data[
+                segment_data.target_period.between(pd.Timestamp(window["train_start"]), pd.Timestamp(window["train_end"]))
+                & segment_data.evaluation_eligible
+            ].copy()
+            test = segment_data[
+                segment_data.target_period.between(pd.Timestamp(window["test_start"]), pd.Timestamp(window["test_end"]))
+                & segment_data.prediction_eligible
+            ].copy()
+            known = set(train.bank_id.astype(str) + "::" + train.segment.astype(str))
+            entity = test.bank_id.astype(str) + "::" + test.segment.astype(str)
+            unseen = test.loc[~entity.isin(known)]
+            rows.append({"bank_id": "__ALL__", "segment": segment, "stage": "fe_prediction", "reason": "unseen_entity_excluded", "rows": len(unseen), "first_target": unseen.target_period.min() if len(unseen) else pd.NaT, "last_target": unseen.target_period.max() if len(unseen) else pd.NaT, "window": window_id, "prediction_candidates": len(test), "unseen_entities": unseen.bank_id.nunique()})
     return pd.DataFrame(rows).sort_values(["segment", "bank_id", "stage", "reason"])
+
+
+def _macro_carry_audit(model: pd.DataFrame, macro: pd.DataFrame) -> dict:
+    source = macro.rename(columns={"report_date": "report_period"})
+    columns = [column for column in ["gdp_growth", "unemployment_rate", "cre_price_growth", "house_price_growth", "bbb_spread", "short_rate", "mortgage_rate"] if column in source]
+    check = model[["report_period", *[f"lagged_{column}" for column in columns]]].merge(source[["report_period", *columns]], on="report_period", how="left", validate="many_to_one")
+    compared = 0
+    mismatches = 0
+    for column in columns:
+        left = pd.to_numeric(check[f"lagged_{column}"], errors="coerce")
+        right = pd.to_numeric(check[column], errors="coerce")
+        valid = left.notna() & right.notna()
+        compared += int(valid.sum())
+        mismatches += int((valid & ~left.eq(right)).sum())
+    return {"macro_carry_comparisons": compared, "macro_double_lag_count": mismatches}
+
+
+def _write_same_spec_provenance() -> Path:
+    path = ROOT / "outputs/repair/r2/data_fixed_same_spec_provenance.json"
+    commit = BASE_COMMIT
+    tracked = ["scripts/run_batch2.py", "src/bankstress/modeling.py", "configs/model_specs.yaml"]
+    provenance = {
+        "result_layer": "DATA_FIXED_SAME_SPEC_DIAGNOSTIC",
+        "exact_old_code_commit": commit,
+        "git_blob_ids": {item: subprocess.run(["git", "rev-parse", f"{commit}:{item}"], cwd=ROOT, check=True, capture_output=True, text=True).stdout.strip() for item in tracked},
+        "replay_command_at_old_code": "python scripts/run_batch2.py",
+        "approved_r1_input_run": R1_RUN_ID,
+        "credit_panel_sha256": R1_PANEL_HASH,
+        "macro_panel_sha256": sha256_file(ROOT / "data/derived/macro_panel.parquet"),
+        "fdic_noncurrent_panel_sha256": sha256_file(ROOT / "data/derived/fdic_noncurrent_panel.parquet"),
+        "diagnostic_artifact_hashes": {item.name: sha256_file(item) for item in [ROOT / "outputs/repair/r2/data_fixed_same_spec_ar_metrics.csv", ROOT / "outputs/repair/r2/data_fixed_same_spec_fe_metrics.csv", ROOT / "outputs/repair/r2/data_fixed_same_spec_interaction.csv"]},
+        "known_defects_retained": ["ambiguous forecast origin/target timing", "second macro lag in modeling", "complete-case target selection", "CRE interaction implementation predating valid correction"],
+    }
+    path.write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
+    return path
 
 
 def _old_metrics(path: str) -> pd.DataFrame:
@@ -105,6 +157,11 @@ def _write_decision(metrics: pd.DataFrame, interaction: pd.DataFrame, attrition:
     q4 = eligible[eligible.target_period.eq(pd.Timestamp("2025-12-31"))].groupby("segment").agg(rows=("bank_id", "size"), prediction_eligible=("prediction_eligible", "sum"), evaluation_eligible=("evaluation_eligible", "sum")).reset_index()
     q4_text = "; ".join(f"{row.segment}: {int(row.prediction_eligible)}/{int(row.rows)} prediction-eligible and {int(row.evaluation_eligible)}/{int(row.rows)} evaluation-eligible" for row in q4.itertuples())
     q4_origins = eligible[eligible.report_period.eq(pd.Timestamp("2025-12-31"))].groupby("segment").prediction_eligible.sum().to_dict()
+    unseen = attrition[attrition.reason.eq("unseen_entity_excluded")]
+    unseen_text = "; ".join(f"window {int(row.window)} {row.segment}: {int(row.rows)} rows / {int(row.unseen_entities)} entities from {int(row.prediction_candidates)} candidates" for row in unseen.itertuples())
+    fixed_audit = pd.read_csv(ROOT / "outputs/models/cre_interaction/pre_2022_exposure_audit.csv")
+    fixed_available = int(fixed_audit.exposure_available.astype(str).str.lower().eq("true").sum())
+    fixed_unavailable = len(fixed_audit) - fixed_available
     text = f"""# R2 research decision
 
 ## Gate result
@@ -121,11 +178,11 @@ Dynamic FE has lower equal-observation RMSE than AR in {wins} of {total} segment
 
 ## Problem windows and segments
 
-The largest observation-level errors and their R1 audit statuses are in `error_contributors.csv`. For the 2025Q4 target, {q4_text}. CRE loses the 2025Q4 target solely because the final-vintage fallback has no origin-known 2025Q3 CRE-price-growth value; it is retained missing rather than filled or replaced. C&I retains 30 prediction candidates, while target absence independently removes one of them from evaluation. At the 2025Q4 origin for the forecast-only 2026Q1 target, prediction-eligible counts are CRE={int(q4_origins.get('CRE', 0))} and C&I={int(q4_origins.get('CI', 0))}; all remain unscored because targets are outside the R1 horizon. Every bank-level reason is enumerated in `sample_attrition.csv`; no target outcome was used to determine prediction eligibility.
+The largest observation-level errors and their R1 audit statuses are in `error_contributors.csv`. For the 2025Q4 target, {q4_text}. CRE loses the 2025Q4 target solely because the final-vintage fallback has no origin-known 2025Q3 CRE-price-growth value; it is retained missing rather than filled or replaced. C&I retains 30 prediction candidates, while target absence independently removes one of them from evaluation. At the 2025Q4 origin for the forecast-only 2026Q1 target, prediction-eligible counts are CRE={int(q4_origins.get('CRE', 0))} and C&I={int(q4_origins.get('CI', 0))}; all remain unscored because targets are outside the R1 horizon. Actual FE unseen-entity attrition is recorded by window/segment: {unseen_text}. Every bank-level reason is enumerated in `sample_attrition.csv`; no target outcome was used to determine prediction eligibility.
 
 ## CRE hypothesis
 
-The primary CRE-growth interaction estimate is {primary.estimate:.8g}, bank-clustered SE {primary.bank_clustered_se:.8g}, and 95% CI [{primary.ci95_low:.8g}, {primary.ci95_high:.8g}]. The interval {'excludes' if supported else 'includes'} zero. With growth positive, a decline-magnitude coefficient has the opposite sign. This is {'limited associational evidence' if supported else 'not stable evidence'} of an additional unit-loss-rate amplification; it is not causal and does not replace the mechanical exposure effect. The time-varying exposure main effect is included. CRE-share and forward-used pre-2022 exposure are the only limited robustness variants, with no significance search.
+The re-estimated primary interaction uses Exposure(t-1) × contemporaneous realized CRE YoY-growth(t), with `shock_period == target_period`. The realized shock is explicitly final-vintage ex-post information and is not used as forecast-origin information. Its estimate is {primary.estimate:.8g}, bank-clustered SE {primary.bank_clustered_se:.8g}, and 95% CI [{primary.ci95_low:.8g}, {primary.ci95_high:.8g}]. The interval {'excludes' if supported else 'includes'} zero. With growth positive, a decline-magnitude coefficient has the opposite sign. This is {'limited associational evidence' if supported else 'not stable evidence'} of an additional unit-loss-rate amplification; it is not causal and does not replace the mechanical exposure effect. The time-varying exposure main effect is included. CRE-share and exact-2021Q4 forward exposure are the only limited robustness variants, with no significance search. The fixed-exposure audit finds {fixed_available} banks with a valid 2021Q4 exposure and excludes/marks {fixed_unavailable} unavailable banks rather than substituting stale pre-gap values.
 
 ## Worth validating next
 
@@ -136,9 +193,12 @@ Only the already-scoped tail/historical checks needed to determine one-step and 
 
 def _write_sidecars(paths: list[Path], r1_metadata: dict) -> None:
     model_spec = ROOT / "configs/model_specs.yaml"
-    inputs = [ROOT / "data/derived/credit_panel.parquet", ROOT / "data/derived/macro_panel.parquet", ROOT / "configs/macro_series.yaml"]
+    inputs = [ROOT / "data/derived/model_panel.parquet"]
     for path in paths:
-        write_artifact_metadata(path, root=ROOT, run_id=RUN_ID, stage="R2", input_artifacts=inputs, raw_manifest=ROOT / "data/manifests/ffiec_manifest.csv", field_mapping=ROOT / "metadata/field_mapping.csv", validation_status="PASS", data_definition_version=r1_metadata["data_definition_version"], model_spec=model_spec)
+        path_inputs = [*inputs]
+        if "cre_interaction" in path.parts:
+            path_inputs.append(ROOT / "data/derived/cre_realized_shock.parquet")
+        write_artifact_metadata(path, root=ROOT, run_id=RUN_ID, stage="R2", input_artifacts=path_inputs, raw_manifest=ROOT / "data/manifests/ffiec_manifest.csv", field_mapping=ROOT / "metadata/field_mapping.csv", validation_status="PASS", data_definition_version=r1_metadata["data_definition_version"], model_spec=model_spec)
 
 
 def main() -> None:
@@ -150,11 +210,17 @@ def main() -> None:
     noncurrent = download_noncurrent_panel(ROOT, credit.cert)
     model = build_model_panel(credit, macro, noncurrent)
     model.to_parquet(ROOT / "data/derived/model_panel.parquet", index=False)
-    write_artifact_metadata(ROOT / "data/derived/macro_panel.parquet", root=ROOT, run_id=RUN_ID, stage="R2", input_artifacts=[ROOT / "data/derived/credit_panel.parquet", ROOT / "configs/macro_series.yaml"], raw_manifest=ROOT / "data/manifests/ffiec_manifest.csv", field_mapping=ROOT / "metadata/field_mapping.csv", validation_status="PASS", data_definition_version=r1_metadata["data_definition_version"], model_spec=ROOT / "configs/model_specs.yaml")
+    macro_manifest = ROOT / "metadata/macro_download_manifest.csv"
+    macro_sources = [ROOT / "data/raw/macro" / name for name in pd.read_csv(macro_manifest).file_name]
+    macro_inputs = [ROOT / "data/derived/credit_panel.parquet", ROOT / "configs/macro_series.yaml", macro_manifest, *macro_sources]
+    for macro_artifact in [ROOT / "data/derived/macro_panel.parquet", ROOT / "data/derived/macro_panel_final.parquet", ROOT / "data/derived/cre_realized_shock.parquet"]:
+        write_artifact_metadata(macro_artifact, root=ROOT, run_id=RUN_ID, stage="R2", input_artifacts=macro_inputs, raw_manifest=ROOT / "data/manifests/ffiec_manifest.csv", field_mapping=ROOT / "metadata/field_mapping.csv", validation_status="PASS", data_definition_version=r1_metadata["data_definition_version"], model_spec=ROOT / "configs/model_specs.yaml")
+    write_artifact_metadata(ROOT / "data/derived/model_panel.parquet", root=ROOT, run_id=RUN_ID, stage="R2", input_artifacts=[ROOT / "data/derived/credit_panel.parquet", ROOT / "data/derived/macro_panel.parquet", ROOT / "data/derived/fdic_noncurrent_panel.parquet", ROOT / "metadata/fdic_noncurrent_manifest.csv", ROOT / "configs/macro_series.yaml"], raw_manifest=ROOT / "data/manifests/ffiec_manifest.csv", field_mapping=ROOT / "metadata/field_mapping.csv", validation_status="PASS", data_definition_version=r1_metadata["data_definition_version"], model_spec=ROOT / "configs/model_specs.yaml")
     write_eda(model[model.observed_credit_row], ROOT)
     eligible, metrics, _ = run_oos_models(model, ROOT)
     run_split_panel_jackknife(eligible, ROOT)
-    interaction = run_cre_interaction(model, ROOT)
+    realized_shock = pd.read_parquet(ROOT / "data/derived/cre_realized_shock.parquet")
+    interaction = run_cre_interaction(model, realized_shock, ROOT)
     contract = model[["report_period", "available_at", "forecast_origin", "target_period"]].drop_duplicates()
     calendar = pd.read_csv(ROOT / "metadata/macro_release_calendar.csv", parse_dates=["observation_date", "release_date", "vintage_date"])
     macro_audit = validate_macro_forecast_alignment(calendar, contract)
@@ -169,19 +235,20 @@ def main() -> None:
     contributors = _error_contributors()
     contributors.to_csv(out / "error_contributors.csv", index=False)
     _write_decision(metrics, interaction, attrition, eligible)
-    summary = {"run_id": RUN_ID, "stage": "R2", "created_at": datetime.now(timezone.utc).isoformat(), "input_run_id": R1_RUN_ID, "credit_panel_hash": R1_PANEL_HASH, "transition_audit_hash": R1_TRANSITION_HASH, "validation_status": "PASS", "model_rows": len(model), "prediction_eligible": int(model.prediction_eligible.sum()), "evaluation_eligible": int(model.evaluation_eligible.sum()), "forecast_only": int(model.forecast_only.sum()), "macro_double_lag_count": 0, "gap_bridge_count": int((model.lagged_nco_rate.notna() & ~model.origin_is_adjacent).sum()), "review_required_rows_preserved": 2, "research_recommendation": "MINIMAL_R3"}
+    same_spec_provenance = _write_same_spec_provenance()
+    macro_carry = _macro_carry_audit(model, macro)
+    summary = {"run_id": RUN_ID, "stage": "R2", "created_at": datetime.now(timezone.utc).isoformat(), "input_run_id": R1_RUN_ID, "credit_panel_hash": R1_PANEL_HASH, "transition_audit_hash": R1_TRANSITION_HASH, "validation_status": "PASS", "model_rows": len(model), "prediction_eligible": int(model.prediction_eligible.sum()), "evaluation_eligible": int(model.evaluation_eligible.sum()), "forecast_only": int(model.forecast_only.sum()), **macro_carry, "gap_bridge_count": int((model.lagged_nco_rate.notna() & ~model.origin_is_adjacent).sum()), "cre_shock_period_mismatch_count": int((pd.to_datetime(realized_shock.shock_period) != pd.to_datetime(realized_shock.target_period)).sum()), "review_required_rows_preserved": 2, "research_recommendation": "MINIMAL_R3"}
     (out / "validation_summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     sidecars = [
-        ROOT / "data/derived/model_panel.parquet",
-        out / "data_fixed_same_spec_ar_metrics.csv", out / "data_fixed_same_spec_fe_metrics.csv", out / "data_fixed_same_spec_interaction.csv",
         ROOT / "outputs/models/ar/predictions.parquet", ROOT / "outputs/models/ar/oos_metrics.csv",
         ROOT / "outputs/models/dynamic_fe/predictions.parquet", ROOT / "outputs/models/dynamic_fe/oos_metrics.csv",
         ROOT / "outputs/models/dynamic_fe/coefficients.csv", ROOT / "outputs/models/dynamic_fe/split_panel_jackknife.csv",
         ROOT / "outputs/models/cre_interaction/interaction_coefficients.csv",
+        ROOT / "outputs/models/cre_interaction/pre_2022_exposure_audit.csv",
         ROOT / "outputs/eda/sample_stats.csv", ROOT / "outputs/eda/segment_descriptive_stats.csv",
         ROOT / "outputs/eda/macro_nco_lead_lag.csv", ROOT / "outputs/eda/cre_terciles.csv", ROOT / "outputs/eda/time_series.png",
         out / "time_alignment_audit.csv", out / "sample_attrition.csv", out / "old_vs_corrected_summary.csv",
-        out / "error_contributors.csv", out / "research_decision.md", out / "validation_summary.json",
+        out / "error_contributors.csv", out / "research_decision.md", out / "validation_summary.json", same_spec_provenance,
     ]
     _write_sidecars(sidecars, r1_metadata)
     (ROOT / "outputs/models/run_summary.md").write_text(f"# R2 valid-corrected run\n\n- Run: `{RUN_ID}`\n- R1 input: `{R1_RUN_ID}` / `{R1_PANEL_HASH}`\n- Model-panel rows: {len(model):,}\n- Prediction-eligible rows: {int(model.prediction_eligible.sum()):,}\n- Evaluation-eligible rows: {int(model.evaluation_eligible.sum()):,}\n- Forecast-only rows retained: {int(model.forecast_only.sum()):,}\n- AR and Dynamic FE use common scoring keys.\n- SPJ is diagnostic only.\n- Downstream tail, stress, model-risk, reporting, and resume artifacts remain `INVALID_PENDING_REBUILD`.\n", encoding="utf-8")

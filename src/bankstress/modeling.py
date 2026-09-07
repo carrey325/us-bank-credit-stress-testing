@@ -246,7 +246,7 @@ def _two_way_demean(frame: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     return out
 
 
-def _prepare_cre_interaction_data(panel: pd.DataFrame, spec: dict, exposure: str | None = None) -> pd.DataFrame:
+def _prepare_cre_interaction_data(panel: pd.DataFrame, spec: dict, realized_shock: pd.DataFrame, exposure: str | None = None) -> pd.DataFrame:
     data, exposure = panel[panel.segment.eq(spec["segment"])].copy(), exposure or spec["exposure"]
     source_column = f"origin_{exposure}"
     if source_column not in data:
@@ -260,7 +260,20 @@ def _prepare_cre_interaction_data(panel: pd.DataFrame, spec: dict, exposure: str
         data["prediction_eligible"] = data.get("eligible_for_model", 0).eq(1)
     data["exposure_as_of_date"] = data.report_period
     data["lagged_exposure"] = data[source_column]
-    data["cre_price_shock_growth"] = data.lagged_cre_price_growth if "lagged_cre_price_growth" in data else data[spec["shock"]]
+    shock = realized_shock.copy()
+    required = {"target_period", "shock_period", "realized_cre_price_growth", "information_set"}
+    if not required.issubset(shock):
+        raise ValueError(f"Realized CRE shock is missing {sorted(required - set(shock))}")
+    shock["target_period"] = pd.to_datetime(shock["target_period"])
+    shock["shock_period"] = pd.to_datetime(shock["shock_period"])
+    if shock.duplicated("target_period").any():
+        raise ValueError("Realized CRE shock has duplicate target periods")
+    if not shock["shock_period"].eq(shock["target_period"]).all():
+        raise ValueError("CRE interaction requires shock_period == target_period")
+    if not shock["information_set"].eq("EX_POST_FINAL_VINTAGE_NOT_FORECAST_ORIGIN_INFORMATION").all():
+        raise ValueError("CRE interaction shock must be explicitly labeled ex-post final-vintage information")
+    data = data.merge(shock, on="target_period", how="left", validate="many_to_one")
+    data["cre_price_shock_growth"] = data["realized_cre_price_growth"]
     data["cre_price_decline"] = -data.cre_price_shock_growth
     data["exposure_x_cre_price_shock"] = data.lagged_exposure * data.cre_price_shock_growth
     return data[data.prediction_eligible].copy()
@@ -275,24 +288,34 @@ def _fit_interaction_variant(data: pd.DataFrame, variant: str, exposure_definiti
     demeaned = _two_way_demean(data, ["nco_rate", *terms])
     x = demeaned[terms].to_numpy(float)
     beta, se, _ = _ols(demeaned.nco_rate.to_numpy(float), x, data.bank_id.astype(str).to_numpy())
-    return pd.DataFrame({"variant": variant, "term": terms, "estimate": beta, "bank_clustered_se": se, "ci95_low": beta - 1.96 * se, "ci95_high": beta + 1.96 * se, "nobs": len(data), "banks": data.bank_id.nunique(), "matrix_rank": int(np.linalg.matrix_rank(x)), "matrix_columns": x.shape[1], "exposure_definition": exposure_definition, "exposure_timing": "report_period_at_or_before_forecast_origin", "shock_definition": "CRE year-over-year price growth; decline magnitude equals negative growth", "interaction_sign_for_decline": -beta, "max_exposure_as_of_date": data.exposure_as_of_date.max(), "exposure_after_forecast_origin_count": 0})
+    return pd.DataFrame({"variant": variant, "term": terms, "estimate": beta, "bank_clustered_se": se, "ci95_low": beta - 1.96 * se, "ci95_high": beta + 1.96 * se, "nobs": len(data), "banks": data.bank_id.nunique(), "matrix_rank": int(np.linalg.matrix_rank(x)), "matrix_columns": x.shape[1], "exposure_definition": exposure_definition, "exposure_timing": "report_period_at_or_before_forecast_origin", "shock_definition": "contemporaneous target-quarter CRE year-over-year price growth", "shock_information_set": "EX_POST_FINAL_VINTAGE_NOT_FORECAST_ORIGIN_INFORMATION", "shock_period_equals_target_period": bool(data.shock_period.eq(data.target_period).all()), "interaction_sign_for_decline": -beta, "max_exposure_as_of_date": data.exposure_as_of_date.max(), "exposure_after_forecast_origin_count": 0})
 
 
-def run_cre_interaction(panel: pd.DataFrame, root: Path) -> pd.DataFrame:
+def run_cre_interaction(panel: pd.DataFrame, realized_shock: pd.DataFrame, root: Path) -> pd.DataFrame:
     spec = load_model_specs(root)["cre_interaction_spec"]
-    frames = [_fit_interaction_variant(_prepare_cre_interaction_data(panel, spec), "primary", spec["exposure"]), _fit_interaction_variant(_prepare_cre_interaction_data(panel, spec, "cre_share"), "cre_share_alternative", "cre_share")]
-    pre = _prepare_cre_interaction_data(panel, spec)
-    fixed = pre[pre.report_period.le(pd.Timestamp("2021-12-31"))].sort_values("report_period").groupby("bank_id").tail(1)[["bank_id", "lagged_exposure", "exposure_as_of_date"]]
-    post = pre[pre.target_period.gt(pd.Timestamp("2021-12-31"))].drop(columns=["lagged_exposure", "exposure_as_of_date"]).merge(fixed, on="bank_id", how="left", validate="many_to_one")
+    path = root / "outputs" / "models" / "cre_interaction"
+    path.mkdir(parents=True, exist_ok=True)
+    primary_data = _prepare_cre_interaction_data(panel, spec, realized_shock)
+    share_data = _prepare_cre_interaction_data(panel, spec, realized_shock, "cre_share")
+    frames = [_fit_interaction_variant(primary_data, "primary", spec["exposure"]), _fit_interaction_variant(share_data, "cre_share_alternative", "cre_share")]
+    pre = primary_data
+    robustness = next(item for item in spec["robustness"] if item["name"] == "pre_2022_exposure_forward")
+    exposure_date = pd.Timestamp(robustness["exposure_as_of"])
+    fixed = pre[pre.exposure_as_of_date.eq(exposure_date)][["bank_id", "lagged_exposure", "exposure_as_of_date"]].dropna(subset=["lagged_exposure"]).drop_duplicates("bank_id")
+    post_base = pre[pre.target_period.gt(exposure_date)].drop(columns=["lagged_exposure", "exposure_as_of_date"])
+    post = post_base.merge(fixed, on="bank_id", how="left", validate="many_to_one")
     post["exposure_x_cre_price_shock"] = post.lagged_exposure * post.cre_price_shock_growth
+    audit = post[["bank_id"]].drop_duplicates().merge(fixed, on="bank_id", how="left", validate="one_to_one")
+    audit["required_exposure_date"] = exposure_date
+    audit["exposure_available"] = audit.lagged_exposure.notna() & audit.exposure_as_of_date.eq(exposure_date)
+    audit["status"] = np.where(audit.exposure_available, "AVAILABLE_EXACT_2021Q4", "UNAVAILABLE_NO_VALID_2021Q4_EXPOSURE")
+    audit.to_csv(root / "outputs" / "models" / "cre_interaction" / "pre_2022_exposure_audit.csv", index=False)
     if not post.dropna(subset=["nco_rate", "lagged_exposure"]).empty:
         # A bank-specific exposure frozen at 2021Q4 is absorbed by bank FE. Its
         # main effect is omitted only in this fixed-exposure robustness variant.
         frames.append(_fit_interaction_variant(post, "pre_2022_exposure_forward", spec["exposure"], include_exposure_main=False))
     result = pd.concat(frames, ignore_index=True)
-    path = root / "outputs" / "models" / "cre_interaction"
-    path.mkdir(parents=True, exist_ok=True)
     result.to_csv(path / "interaction_coefficients.csv", index=False)
     primary = result[(result.variant == "primary") & (result.term == "exposure_x_cre_price_shock")].iloc[0]
-    (path / "result_status.md").write_text("# CRE concentration interaction\n\nThe primary regression includes bank and quarter fixed effects, lagged controls, the time-varying lagged CRE/Tier1 main effect, and its interaction with CRE year-over-year price growth. Quarter FE absorb the national shock main effect; identification is cross-sectional and is not presented as strictly causal. " f"The primary growth interaction estimate is {primary.estimate:.8g} with bank-clustered SE {primary.bank_clustered_se:.8g} and 95% CI [{primary.ci95_low:.8g}, {primary.ci95_high:.8g}]. For a decline-magnitude convention the sign is reversed, not reinterpreted as new evidence. The CRE-share and forward-used pre-2022 exposure variants were pre-authorized; no significance search was performed.\n", encoding="utf-8")
+    (path / "result_status.md").write_text("# CRE concentration interaction\n\nThe primary regression includes bank and quarter fixed effects, lagged controls, the time-varying lagged CRE/Tier1 main effect, and its interaction with contemporaneous realized CRE year-over-year price growth keyed to the target quarter. This shock is explicitly ex-post final-vintage information, not forecast-origin information. Quarter FE absorb the national shock main effect; identification is cross-sectional and is not presented as strictly causal. " f"The primary growth interaction estimate is {primary.estimate:.8g} with bank-clustered SE {primary.bank_clustered_se:.8g} and 95% CI [{primary.ci95_low:.8g}, {primary.ci95_high:.8g}]. For a decline-magnitude convention the sign is reversed, not reinterpreted as new evidence. The CRE-share and exact-2021Q4 forward exposure variants were pre-authorized; banks without a valid 2021Q4 exposure are excluded and audited, and no significance search was performed.\n", encoding="utf-8")
     return result

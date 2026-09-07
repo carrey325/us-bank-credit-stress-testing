@@ -11,7 +11,7 @@ def _root(tmp_path: Path) -> Path:
     (tmp_path / "configs").mkdir()
     spec = {"primary_segments": ["CRE"], "dynamic_fe_spec": {"exclude_merger_recent": True, "bank_features": ["lagged_noncurrent_ratio"], "segment_macro_variables": {"CRE": ["lagged_gdp_growth"]}},
             "oos_windows": [{"train_start": "2005-01-01", "train_end": "2011-12-31", "test_start": "2012-01-01", "test_end": "2013-12-31"}],
-            "cre_interaction_spec": {"segment": "CRE", "exposure": "cre_to_tier1", "exposure_timing": "bank_quarter_lagged_at_forecast_origin", "shock": "cre_price_growth", "include_time_varying_exposure_main_effect": True}}
+            "cre_interaction_spec": {"segment": "CRE", "exposure": "cre_to_tier1", "exposure_timing": "bank_quarter_lagged_at_forecast_origin", "shock": "cre_price_growth", "include_time_varying_exposure_main_effect": True, "robustness": [{"name": "pre_2022_exposure_forward", "exposure_as_of": "2021-12-31"}]}}
     (tmp_path / "configs" / "model_specs.yaml").write_text(yaml.safe_dump(spec), encoding="utf-8")
     return tmp_path
 
@@ -32,6 +32,11 @@ def _panel():
     return build_model_panel(credit, macro, noncurrent)
 
 
+def _realized_shock(panel):
+    periods = pd.DatetimeIndex(panel.target_period.dropna().unique()).sort_values()
+    return pd.DataFrame({"target_period": periods, "shock_period": periods, "realized_cre_price_growth": np.arange(len(periods), dtype=float) + 100.0, "information_set": "EX_POST_FINAL_VINTAGE_NOT_FORECAST_ORIGIN_INFORMATION"})
+
+
 def test_oos_models_use_same_complete_sample_and_write_spj(tmp_path):
     root, panel = _root(tmp_path), _panel()
     assert panel.loc[panel.target_period.eq(pd.Timestamp("2005-06-30")), "lagged_allowance_coverage"].iloc[0] == (5 / 10)
@@ -45,7 +50,7 @@ def test_oos_models_use_same_complete_sample_and_write_spj(tmp_path):
 
 def test_cre_interaction_runs_with_bank_and_quarter_effects(tmp_path):
     root, panel = _root(tmp_path), _panel()
-    result = run_cre_interaction(panel, root)
+    result = run_cre_interaction(panel, _realized_shock(panel), root)
     assert "exposure_x_cre_price_shock" in set(result.term)
     assert "lagged_exposure" in set(result.term)
     assert (root / "outputs" / "models" / "cre_interaction" / "interaction_coefficients.csv").exists()
@@ -55,11 +60,51 @@ def test_cre_interaction_exposure_never_postdates_forecast_origin(tmp_path):
     root, panel = _root(tmp_path), _panel()
     panel = panel.sort_values(["bank_id", "report_date"]).copy()
     panel["origin_cre_to_tier1"] = np.arange(len(panel), dtype=float)
-    prepared = _prepare_cre_interaction_data(panel, load_model_specs(root)["cre_interaction_spec"]).dropna(subset=["lagged_exposure"])
+    prepared = _prepare_cre_interaction_data(panel, load_model_specs(root)["cre_interaction_spec"], _realized_shock(panel)).dropna(subset=["lagged_exposure"])
 
     assert prepared["exposure_as_of_date"].le(prepared["forecast_origin"]).all()
     bank_one = prepared[prepared.bank_id.eq("1")].iloc[0]
     assert bank_one["lagged_exposure"] == bank_one["origin_cre_to_tier1"]
+
+
+def test_cre_interaction_uses_exact_target_period_ex_post_shock_not_lags(tmp_path):
+    root, panel = _root(tmp_path), _panel()
+    shock = _realized_shock(panel)
+    prepared = _prepare_cre_interaction_data(panel, load_model_specs(root)["cre_interaction_spec"], shock)
+    row = prepared.dropna(subset=["cre_price_shock_growth"]).iloc[5]
+    expected = shock.set_index("target_period").loc[row.target_period, "realized_cre_price_growth"]
+    assert row.shock_period == row.target_period
+    assert row.cre_price_shock_growth == expected
+    assert row.cre_price_shock_growth != row.lagged_cre_price_growth
+
+    bad = shock.copy()
+    bad["shock_period"] = bad["shock_period"] - pd.offsets.QuarterEnd()
+    with np.testing.assert_raises_regex(ValueError, "shock_period == target_period"):
+        _prepare_cre_interaction_data(panel, load_model_specs(root)["cre_interaction_spec"], bad)
+
+
+def test_pre_2022_robustness_requires_exact_configured_exposure_date(tmp_path):
+    root, panel = _root(tmp_path), _panel()
+    # Extend two banks through 2022 while only one has a valid exact 2021Q4 exposure.
+    tail = panel[panel.target_period.eq(panel.target_period.max())].copy()
+    additions = []
+    for quarter in pd.date_range("2021-12-31", "2022-06-30", freq="QE"):
+        frame = tail.copy()
+        frame["report_date"] = quarter
+        frame["target_period"] = quarter
+        frame["report_period"] = quarter - pd.offsets.QuarterEnd()
+        frame["forecast_origin"] = frame["report_period"] + pd.Timedelta(days=45)
+        frame["available_at"] = frame["forecast_origin"]
+        frame["prediction_eligible"] = True
+        frame["nco_rate"] = 0.01
+        frame["origin_cre_to_tier1"] = np.where(frame.bank_id.eq("1"), 3.0, np.nan)
+        additions.append(frame)
+    extended = pd.concat([panel, *additions], ignore_index=True)
+    shock = _realized_shock(extended)
+    run_cre_interaction(extended, shock, root)
+    audit = pd.read_csv(root / "outputs/models/cre_interaction/pre_2022_exposure_audit.csv")
+    assert audit.loc[audit.bank_id.astype(str).eq("1"), "status"].eq("AVAILABLE_EXACT_2021Q4").all()
+    assert audit.loc[~audit.bank_id.astype(str).eq("1"), "status"].eq("UNAVAILABLE_NO_VALID_2021Q4_EXPOSURE").all()
 
 
 def test_missing_quarter_gap_does_not_create_lags():

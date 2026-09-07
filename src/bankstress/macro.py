@@ -13,6 +13,7 @@ import yaml
 FRED_GRAPH = "https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
 ALFRED_GRAPH = "https://alfred.stlouisfed.org/graph/alfredgraph.csv?id={series_id}&vintage_date={vintage_date}"
 RELEASE_COLUMNS = ["series_id", "observation_date", "release_date", "vintage_date", "value", "frequency", "aggregation_rule", "transformation", "source"]
+CRE_EX_POST_INFORMATION_SET = "EX_POST_FINAL_VINTAGE_NOT_FORECAST_ORIGIN_INFORMATION"
 
 
 def load_macro_config(root: Path) -> dict:
@@ -162,6 +163,12 @@ def build_macro_panel(root: Path, report_dates: pd.Series, session: requests.ses
     panel["macro_availability_policy"] = config["vintage_policy"]
     panel.to_parquet(derived_dir / "macro_panel.parquet", index=False)
     final_panel.to_parquet(derived_dir / "macro_panel_final.parquet", index=False)
+    realized_cre = final_panel[["report_date", "cre_price_growth"]].rename(
+        columns={"report_date": "target_period", "cre_price_growth": "realized_cre_price_growth"}
+    )
+    realized_cre["shock_period"] = realized_cre["target_period"]
+    realized_cre["information_set"] = CRE_EX_POST_INFORMATION_SET
+    realized_cre.to_parquet(derived_dir / "cre_realized_shock.parquet", index=False)
     calendar = pd.DataFrame(release_rows, columns=RELEASE_COLUMNS).sort_values(["series_id", "release_date", "observation_date"])
     calendar.to_csv(root / "metadata" / "macro_release_calendar.csv", index=False)
     _write_download_manifest(root, config)
