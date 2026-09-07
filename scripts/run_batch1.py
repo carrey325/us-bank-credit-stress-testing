@@ -35,12 +35,14 @@ def main() -> None:
     standard = standardize_archives(config["paths"]["raw_ffiec"], config["paths"]["metadata"] / "field_mapping.csv", config["paths"]["standard"], set(institutions.bank_id))
     institutions = update_sample_coverage(config["paths"]["metadata"], standard, config["sample"]["min_history_quarters"])
     lineage = pd.read_csv(config["paths"]["metadata"] / "institution_lineage.csv")
-    panel = build_credit_panel(standard, institutions, config, lineage)
+    core_institutions = institutions.loc[institutions["core_sample_flag"].eq(1)].copy()
+    core_standard = standard.loc[standard["bank_id"].isin(set(core_institutions["bank_id"].astype(str)))].copy()
+    panel = build_credit_panel(core_standard, core_institutions, config, lineage)
     config["paths"]["derived"].parent.mkdir(parents=True, exist_ok=True)
     panel.to_parquet(config["paths"]["derived"], index=False)
     exception_path = config["paths"]["metadata"] / "nco_reconciliation_exceptions.csv"
     exceptions = pd.read_csv(exception_path) if exception_path.exists() else None
-    write_qa(standard, panel, pd.read_csv(config["paths"]["metadata"] / "field_mapping.csv"), config["paths"]["qa"], exceptions)
+    write_qa(core_standard, panel, pd.read_csv(config["paths"]["metadata"] / "field_mapping.csv"), config["paths"]["qa"], exceptions)
     print(f"manifest rows={len(manifest)} standard rows={len(standard)} panel rows={len(panel)} banks={panel.bank_id.nunique()}")
 
 

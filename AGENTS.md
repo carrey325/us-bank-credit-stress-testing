@@ -2,7 +2,14 @@
 
 ## Project
 
-This repository implements the MF772 project according to the implementation plans under `plan/`.
+This repository implements the MF772 project according to the implementation plans under `workflow/`.
+
+## Repair Cycle
+
+The active incremental repair entry point is
+`workflow/repair/00_Repair_Control.md`. Repair stages R1-R4 may make only the
+cross-module corrections expressly authorized there and must run serially.
+They do not reopen completed Batch 1-5 work unconditionally.
 
 The project must be executed in the following dependency order:
 

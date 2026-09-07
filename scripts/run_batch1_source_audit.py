@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from bankstress.transform.panel import _coalesce_reporting_variants, required_flow_components
+from bankstress.artifacts import write_artifact_metadata
 
 
 CRE_TRANSITION_AUDIT_DATES = pd.to_datetime(["2007-12-31", "2008-03-31", "2008-06-30"])
@@ -222,6 +223,12 @@ def main() -> None:
         audit.to_csv(output, index=False)
     failures = int(audit["reviewer_conclusion"].ne("PASS").sum())
     update_quality_report_with_source_audit(audit)
+    write_artifact_metadata(
+        output, root=ROOT, run_id="r1-20260907T121900Z", stage="R1",
+        input_artifacts=[ROOT / "data" / "standard" / "call_report_standard.parquet", ROOT / "data" / "derived" / "credit_panel.parquet"],
+        raw_manifest=ROOT / "data" / "manifests" / "ffiec_manifest.csv",
+        field_mapping=ROOT / "metadata" / "field_mapping.csv", validation_status="PASS" if failures == 0 else "FAIL",
+    )
     print(f"manual source audit rows={len(audit)} failures={failures} output={output}")
     if failures:
         raise SystemExit(1)

@@ -8,6 +8,9 @@ from zipfile import ZipFile
 import pandas as pd
 
 
+STANDARD_MAPPING_VERSION = "repair-r1-v1"
+
+
 def _parse_call_report_numeric(values: pd.Series) -> pd.Series:
     """Parse CDR numeric cells, normalizing percent-formatted ratios to decimals."""
     text = values.astype("string").str.strip()
@@ -24,6 +27,32 @@ def _report_date(path: Path) -> pd.Timestamp:
     return pd.to_datetime(match.group(1), format="%m%d%Y")
 
 
+def _filing_forms(bundle: ZipFile) -> dict[str, str]:
+    """Read each reporter's actual filing form from the archive POR member."""
+    por_names = [name for name in bundle.namelist() if "bulk por" in name.lower() and name.lower().endswith(".txt")]
+    if len(por_names) != 1:
+        raise ValueError(f"Expected one Call Report POR member, found {len(por_names)}")
+    content = bundle.read(por_names[0]).decode("latin1")
+    por = pd.read_csv(io.StringIO(content), sep="\t", dtype=str)
+    por.columns = [column.replace('"', '') for column in por.columns]
+    required = {"IDRSSD", "Financial Institution Filing Type"}
+    if not required.issubset(por.columns):
+        raise ValueError(f"POR member lacks required filing-form fields: {sorted(required - set(por.columns))}")
+    bank_id = pd.to_numeric(por["IDRSSD"], errors="coerce").astype("Int64").astype(str)
+    form = por["Financial Institution Filing Type"].astype("string").str.strip().str.lstrip("0")
+    return dict(zip(bank_id, form))
+
+
+def _mapping_applies(mapping_form: pd.Series, filing_form: pd.Series) -> pd.Series:
+    allowed = mapping_form.astype("string").str.split("/").map(
+        lambda parts: {str(part).strip().lstrip("0") for part in parts}
+    )
+    return pd.Series(
+        [str(actual).strip().lstrip("0") in parts for parts, actual in zip(allowed, filing_form.astype("string"))],
+        index=mapping_form.index,
+    )
+
+
 def standardize_archives(raw_dir: Path, mapping_path: Path, output_path: Path, bank_ids: set[str] | None = None) -> pd.DataFrame:
     mapping = pd.read_csv(mapping_path, parse_dates=["start_date", "end_date"])
     code_set = set(mapping.raw_code)
@@ -31,6 +60,7 @@ def standardize_archives(raw_dir: Path, mapping_path: Path, output_path: Path, b
     for archive in sorted(raw_dir.glob("*.zip")):
         report_date = _report_date(archive)
         with ZipFile(archive) as bundle:
+            filing_forms = _filing_forms(bundle)
             for name in bundle.namelist():
                 if not name.lower().endswith(".txt") or "readme" in name.lower():
                     continue
@@ -47,19 +77,23 @@ def standardize_archives(raw_dir: Path, mapping_path: Path, output_path: Path, b
                     data = data[data["bank_id"].isin(bank_ids)]
                 if data.empty:
                     continue
-                long = data.melt(id_vars="bank_id", value_vars=selected, var_name="raw_code", value_name="raw_value")
+                data["filing_form"] = data["bank_id"].map(filing_forms).astype("string")
+                long = data.melt(id_vars=["bank_id", "filing_form"], value_vars=selected, var_name="raw_code", value_name="raw_value")
                 long["numeric_value"] = _parse_call_report_numeric(long["raw_value"])
-                long = long.dropna(subset=["numeric_value"])
                 applicable = mapping[(mapping.start_date <= report_date) & (mapping.end_date >= report_date)]
                 long = long.merge(applicable, on="raw_code", how="inner", validate="many_to_many")
+                long = long[_mapping_applies(long["form"], long["filing_form"])]
                 if long.empty:
                     continue
                 long["report_date"] = report_date
                 long["source_file"] = archive.name
                 long["source_version"] = 1
-                long["mapping_version"] = "batch1-v3"
-                long["form"] = long["form"].fillna("unknown")
-                rows.append(long[["bank_id", "report_date", "form", "raw_code", "standard_metric", "segment", "raw_value", "numeric_value", "unit", "source_file", "source_version", "mapping_version", "stock_flow", "ytd_flag", "formula_group"]])
+                long["mapping_version"] = STANDARD_MAPPING_VERSION
+                long["form"] = long["filing_form"]
+                long["raw_presence_status"] = "PRESENT"
+                long.loc[long["numeric_value"].eq(0), "raw_presence_status"] = "REPORTED_ZERO"
+                long.loc[long["numeric_value"].isna(), "raw_presence_status"] = "BLANK"
+                rows.append(long[["bank_id", "report_date", "form", "raw_code", "standard_metric", "segment", "raw_value", "numeric_value", "raw_presence_status", "unit", "source_file", "source_version", "mapping_version", "stock_flow", "ytd_flag", "formula_group"]])
     if not rows:
         raise RuntimeError("No mapped Call Report values found; retain raw files and inspect mapping coverage")
     output = pd.concat(rows, ignore_index=True)

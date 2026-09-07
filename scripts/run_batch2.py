@@ -8,6 +8,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from bankstress.artifacts import validate_artifact_metadata
 from bankstress.eda import write_eda
 from bankstress.io.fdic_financials import download_noncurrent_panel
 from bankstress.macro import build_macro_panel
@@ -15,6 +16,7 @@ from bankstress.modeling import build_model_panel, run_cre_interaction, run_oos_
 
 
 def main() -> None:
+    validate_artifact_metadata(ROOT / "data" / "derived" / "credit_panel.parquet")
     credit_path = ROOT / "data" / "derived" / "credit_panel.parquet"
     try:
         if not credit_path.exists():

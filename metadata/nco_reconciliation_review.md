@@ -1,16 +1,22 @@
-# Open NCO Reconciliation Review Item
+# R1 open NCO reconciliation review
 
-The generated `outputs/qa/reconciliation_summary.csv` retains one `REVIEW_REQUIRED` bank-quarter. It is not recoded as an explained exception because there is no causal YTD downward revision and it is not the separately documented 2012Q4 source-filing exception.
+The repaired core panel leaves 2 of 2,685 evaluable bank-quarters in
+`REVIEW_REQUIRED`. These are isolated reported gross-flow inconsistencies, not
+a form/date-wide mapping failure. They remain visible and are not forced to
+pass or added to the exception allow-list.
 
-| Bank ID | Bank | Quarter | Gross-flow discrepancy | Status |
-|---|---|---|---:|---|
-| 197478 | EAST WEST BANK | 2013Q2 | mapped recoveries exceed reported total recoveries by $120 thousand | REVIEW_REQUIRED |
+| Bank ID | Quarter | Excess gross flow (USD thousands) |
+|---|---|---:|
+| 197478 | 2013Q2 | recovery 638 |
+| 413208 | 2021Q4 | charge-off 506 |
 
-Direct inspection of the retained FFIEC RI-B archive members found the following YTD values (thousands):
+Direct inspection of each current and immediately preceding retained FFIEC
+RI-B archive member confirmed the total and every mapped CRE/C&I/Mortgage YTD
+value used in the comparison. Neither row is caused by a missing required
+component. Because the three mapped portfolios are subsets of all loans, their
+gross flows are tested only as an upper bound against reported totals; no claim
+is made that segment NCO must equal total NCO.
 
-- Reported total recoveries `RIAD4605`: 2,368 at 2013Q1 and 3,611 at 2013Q2, yielding quarterly reported recoveries of 1,243.
-- Mapped CRE recoveries: `RIAD3589` 117→118, `RIADC892` 0→31, `RIADC894` 31→320, `RIADC896` 0→0, and `RIADC898` 257→998, yielding 1,062.
-- Mapped closed-end Mortgage recoveries: `RIADC217` 7→307 and `RIADC218` 2→3, yielding 301.
-- The mapped subtotal is therefore 1,363, or $120 thousand above the reported total. No total- or mapped-flow YTD decrease occurred in this quarter.
-
-The pipeline retains the source values and the visible `REVIEW_REQUIRED` status. This item must not be converted to an explained source-filing exception without additional source evidence.
+One separately documented 2012Q4 source-filing inconsistency remains in
+`metadata/nco_reconciliation_exceptions.csv`. The two rows above are not
+silently promoted to that status without additional independent evidence.

@@ -1,12 +1,12 @@
 # Batch 1 data-quality report
 
-- Standard observations: 93,778
-- Derived observations: 8,145
+- Standard observations: 92,537
+- Derived observations: 8,085
 - Core banks: 33
-- Field-mapping rows: 66
+- Field-mapping rows: 73
 - Duplicate standard bank/date/raw-code keys: 0
-- Negative NCO observations retained: 1838
-- Suppressed incomplete segment gross flows: 40
+- Negative NCO observations retained: 1967
+- Suppressed incomplete segment gross flows: 60
 - FDIC merger quarters flagged: 561
 - Asset-jump quarters flagged: 75
 - Manual formula-audit failures: 0
@@ -28,26 +28,25 @@
 - A directly verified source-filing inconsistency may be explained only when it is listed in `metadata/nco_reconciliation_exceptions.csv`; it remains visible in the reconciliation output.
 - EXPLAINED_SOURCE_FILING_INCONSISTENCY: 1
 - EXPLAINED_YTD_RECLASS_GROSS_FLOW: 1
-- NOT_EVALUABLE_MISSING_FLOW: 1
-- PASS_SUBSET_GROSS_FLOWS: 2,711
-- REVIEW_REQUIRED: 1
-- Open review items: 1; see `metadata/nco_reconciliation_review.md`.
+- NOT_EVALUABLE_MISSING_FLOW: 10
+- PASS_SUBSET_GROSS_FLOWS: 2,681
+- REVIEW_REQUIRED: 2
+- Open review items: 2; see `metadata/nco_reconciliation_review.md`.
 
 ## Capital reconciliation
 
 - Formula: mapped Tier 1 capital / mapped risk-weighted assets versus the separately reported Tier 1 risk-based capital ratio.
 - Absolute tolerance: 1 basis point; ratios carrying a `%` suffix in the CDR files are normalized to decimal fractions before comparison.
-- Evaluable bank-quarters: 2,707/2,715 (99.71%).
-- Within tolerance: 2,707/2,707 (100.00%) when evaluable.
-- NOT_EVALUABLE_MISSING_INPUT: 8
-- PASS_WITHIN_TOLERANCE: 2,707
+- Evaluable bank-quarters: 2,695/2,695 (100.00%).
+- Within tolerance: 2,695/2,695 (100.00%) when evaluable.
+- PASS_WITHIN_TOLERANCE: 2,695
 
 ## Mapped raw-field presence
 
-- 2005-03-31: 36 mapped raw codes
-- 2010-03-31: 43 mapped raw codes
-- 2020-03-31: 50 mapped raw codes
-- 2025-12-31: 50 mapped raw codes
+- 2005-03-31: 41 mapped raw codes
+- 2010-03-31: 47 mapped raw codes
+- 2020-03-31: 58 mapped raw codes
+- 2025-12-31: 58 mapped raw codes
 
 ## Limitations
 

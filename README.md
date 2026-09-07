@@ -1,5 +1,11 @@
 # MF772 Bank Credit Stress Testing
 
+> **Repair-cycle status (2026-09-07): `INVALID_PENDING_REBUILD`.** The committed
+> model, interval, stress, report, and resume-metric outputs predate the R1
+> regulatory-field repair and are retained for audit only. They are not current
+> research results or valid downstream inputs until their owning repair stages
+> regenerate and validate them. See `outputs/repair/artifact_status.json`.
+
 ## Problem
 
 This project is a reproducible, public-data, top-down credit stress-testing framework for U.S. regional banks. It reconstructs quarterly segment-level net charge-off (NCO) rates and uses the approved Federal Reserve 2026 baseline and severely adverse scenarios to produce transparent credit-loss and loss-to-starting-Tier-1-capital estimates. It is not a bank-failure classifier, a trading strategy, a causal CRE study, or a reproduction of confidential FR Y-14 supervisory models.

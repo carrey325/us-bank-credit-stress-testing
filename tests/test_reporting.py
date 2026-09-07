@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import json
 
 import pandas as pd
 
@@ -38,6 +39,12 @@ def test_final_delivery_audit_enforces_table_figure_and_report_semantics():
 
     audit = _audit(root, tables, figures, intervals)
 
+    repair_status = json.loads((root / "outputs" / "repair" / "artifact_status.json").read_text(encoding="utf-8"))
+    if repair_status["status"] == "INVALID_PENDING_REBUILD":
+        # R1 changed the upstream panel. Retained Batch 5 outputs are audit-only
+        # and must not masquerade as a passing current reproducibility audit.
+        assert audit["status"] == "FAIL"
+        return
     assert audit["status"] == "PASS"
     assert audit["checks"]["required_final_table_schemas_and_semantics"]
     assert audit["checks"]["required_final_figure_semantics"]

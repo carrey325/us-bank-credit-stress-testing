@@ -1,0 +1,28 @@
+{
+  "run_id": "r1-20260907T121900Z",
+  "stage": "R1",
+  "data_definition_version": "mf772-r1-definitions-v1",
+  "created_at": "2026-09-07T12:56:00.153002+00:00",
+  "validation_status": "PASS",
+  "checks": {
+    "raw_manifest_rows": 84,
+    "raw_hash_failures": 0,
+    "standard_rows": 369306,
+    "panel_rows": 8085,
+    "banks": 33,
+    "duplicate_standard_keys": 0,
+    "partial_exposure_values_emitted": 0,
+    "scope_mismatch_rates_emitted": 0,
+    "negative_nco_retained": 1967,
+    "nco_reconciliation_review_required": 2,
+    "capital_reconciliation_failures": 0,
+    "formula_audit_failures": 0,
+    "source_audit_rows": 100,
+    "source_audit_failures": 0
+  },
+  "limitations": [
+    "FFIEC 031 CRE and Mortgage exposure rates before 2013Q2 are unavailable because retained inputs lack a verified consolidated detailed stock mapping.",
+    "Total NPL remains a bank-level nonaccrual fallback, not a segment NPL measure.",
+    "Model, tail, stress, and reporting artifacts remain INVALID_PENDING_REBUILD."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "cycle_id": "mf772-repair-v1",
+  "base_commit": "09e036b827463d915990f423941b6bff5c3349b0",
+  "current_stage": "R1",
+  "status": "WAITING_REVIEW",
+  "active_worker_id": null,
+  "input_run_id": "r1-20260907T121900Z",
+  "checkpoint_commit": "SELF",
+  "review_status": "NOT_SUBMITTED_ROUTER_OWNS_REVIEW",
+  "blocker": null,
+  "next_action": "Router submits the completed R1 checkpoint for its single formal web review; do not start R2 before approval."
+}

@@ -10,6 +10,10 @@ def quarterize_ytd(frame: pd.DataFrame, value_column: str = "numeric_value") -> 
     Downward YTD revisions are retained and flagged; recoveries and NCO may be negative.
     """
     keys = ["bank_id", "standard_metric", "segment", "raw_code"]
+    # A filing-form change can change the reporting scope. Do not bridge a YTD
+    # difference across that boundary even when the MDRM mnemonic is unchanged.
+    if "form" in frame.columns:
+        keys.append("form")
     out = frame.sort_values([*keys, "report_date"]).copy()
     date = pd.to_datetime(out["report_date"])
     out["year"] = date.dt.year
