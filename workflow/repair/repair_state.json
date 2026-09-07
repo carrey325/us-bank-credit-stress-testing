@@ -1,12 +1,12 @@
 {
   "cycle_id": "mf772-repair-v1",
   "base_commit": "09e036b827463d915990f423941b6bff5c3349b0",
-  "current_stage": "R1",
+  "current_stage": "R2",
   "status": "WAITING_REVIEW",
   "active_worker_id": null,
-  "input_run_id": "r1-20260907T121900Z",
-  "checkpoint_commit": "SELF",
-  "review_status": "NOT_SUBMITTED_ROUTER_OWNS_REVIEW",
+  "input_run_id": "r2-20260907T194522Z",
+  "checkpoint_commit": "fff63c3608f896e8f74c06de8956956866999273",
+  "review_status": "PENDING_SUBMISSION",
   "blocker": null,
-  "next_action": "Router submits the completed R1 checkpoint for its single formal web review; do not start R2 before approval."
+  "next_action": "Submit Astra Extra High R2 re-review; after approval, conduct the mandatory post-R2 research-scope retrospective and obtain the scope decision. Do not authorize or start R3 or R4 directly."
 }
