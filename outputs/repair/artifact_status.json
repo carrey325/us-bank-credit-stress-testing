@@ -3,15 +3,22 @@
   "status": "INVALID_PENDING_REBUILD",
   "invalidated_at": "2026-09-07T12:19:00Z",
   "base_commit": "09e036b827463d915990f423941b6bff5c3349b0",
-  "reason": "R1 regulatory-field and panel-definition repair changes upstream data semantics.",
+  "reason": "R2 regenerated mean-model and EDA artifacts from the validated R1 input; later-stage artifacts remain invalid.",
   "audit_only_artifact_groups": [
-    "outputs/models",
     "outputs/validation",
     "outputs/stress",
     "outputs/model_risk",
     "outputs/reporting"
   ],
-  "permitted_use": "Audit and old-versus-repaired comparison only; prohibited as validated repair-cycle input.",
+  "regenerated_artifact_groups": [
+    "data/derived/macro_panel.parquet",
+    "data/derived/model_panel.parquet",
+    "outputs/eda",
+    "outputs/models/ar",
+    "outputs/models/dynamic_fe",
+    "outputs/models/cre_interaction"
+  ],
+  "permitted_use": "R2 mean-model and EDA artifacts may be used only for the R2 research gate and, after approval, the explicitly chosen R3 scope. Listed audit-only groups remain prohibited as validated inputs.",
   "baseline_local_snapshot": "tmp/r1_baseline_09e036b",
   "baseline_hashes": {
     "data/manifests/ffiec_manifest.csv": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",

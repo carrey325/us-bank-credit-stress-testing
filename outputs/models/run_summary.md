@@ -1,9 +1,11 @@
-# Batch 2 successful run
+# R2 valid-corrected run
 
-- Credit-panel rows: 8,145
-- Macro rows: 84
-- Model-panel rows: 8,145
-- Unified OOS eligible rows: 3,761
-- FFIEC recovery provenance: `data/manifests/ffiec_recovery_manifest.csv`
-- FDIC noncurrent-loan provenance: `metadata/fdic_noncurrent_manifest.csv`
-- Macro provenance: `metadata/macro_download_manifest.csv`
+- Run: `r2-20260907T162851Z`
+- R1 input: `r1-20260907T141500Z` / `31d8b08ef6723174f759837badf248c71bdcd3d5f61a3a667c6b8ae9a2d61a79`
+- Model-panel rows: 8,244
+- Prediction-eligible rows: 6,205
+- Evaluation-eligible rows: 5,660
+- Forecast-only rows retained: 545
+- AR and Dynamic FE use common scoring keys.
+- SPJ is diagnostic only.
+- Downstream tail, stress, model-risk, reporting, and resume artifacts remain `INVALID_PENDING_REBUILD`.

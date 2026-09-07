@@ -1,0 +1,6 @@
+term,estimate,bank_clustered_se,nobs,banks,exposure_definition,exposure_timing,shock,max_exposure_as_of_date,exposure_after_forecast_origin_count
+lagged_nco_rate,0.17699586845132456,0.0951976045749167,1681,33,cre_to_tier1,bank_quarter_lagged_at_forecast_origin,cre_price_growth,2025-03-31,0
+lagged_noncurrent_ratio,0.06979750153777169,0.07408001110745059,1681,33,cre_to_tier1,bank_quarter_lagged_at_forecast_origin,cre_price_growth,2025-03-31,0
+lagged_allowance_coverage,-2.5988841479323402e-05,2.0885084895183982e-05,1681,33,cre_to_tier1,bank_quarter_lagged_at_forecast_origin,cre_price_growth,2025-03-31,0
+lagged_loan_growth,-0.008739588530637441,0.005097366816309383,1681,33,cre_to_tier1,bank_quarter_lagged_at_forecast_origin,cre_price_growth,2025-03-31,0
+exposure_x_cre_price_shock,-3.243379563402109e-06,1.2920092431587474e-05,1681,33,cre_to_tier1,bank_quarter_lagged_at_forecast_origin,cre_price_growth,2025-03-31,0

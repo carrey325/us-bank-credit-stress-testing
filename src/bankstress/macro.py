@@ -121,11 +121,12 @@ def _vintage_at_origins(cache_dir: Path, definition: dict, origins: pd.DatetimeI
 
 
 def build_macro_panel(root: Path, report_dates: pd.Series, session: requests.sessions.Session | None = None) -> pd.DataFrame:
-    """Create one leak-safe macro row per panel quarter plus a release-calendar audit.
+    """Create one conservative macro-information row per bank report period.
 
-    GDP and unemployment use an ALFRED snapshot at each forecast origin.  The remaining
-    series deliberately use final FRED vintage shifted one full quarter and are explicitly
-    marked as a fallback in both configuration and metadata.
+    GDP and unemployment use an ALFRED snapshot at the report-period quarter
+    end. The model's forecast origin is 45 days later, so this is conservative.
+    Other series use final FRED vintages shifted one full quarter and are
+    explicitly marked as a fallback in configuration and metadata.
     """
     config = load_macro_config(root)
     cache_dir = root / config["cache_dir"]
@@ -165,7 +166,7 @@ def build_macro_panel(root: Path, report_dates: pd.Series, session: requests.ses
     calendar.to_csv(root / "metadata" / "macro_release_calendar.csv", index=False)
     _write_download_manifest(root, config)
     note = root / "metadata" / "macro_vintage_limitation.md"
-    note.write_text("# Macro vintage limitation\n\nGDP and unemployment use ALFRED snapshots at each quarter-end forecast origin. The release-calendar `release_date` field for these series is the snapshot availability date, not a separately sourced first-publication date; ALFRED proves the value was visible at that origin but this pipeline does not claim a complete release-calendar feed. CRE price growth is FRED's already-reported year-over-year percent-change series (`COMREPUSQ159N`), retained without applying a second percentage-change transformation. House price, BBB spread, short rate, and mortgage rate use final FRED vintages lagged one complete quarter because a release-calendar API feed was not available. These fallback variables are labeled in `macro_release_calendar.csv` and must not be described as real-time vintages.\n", encoding="utf-8")
+    note.write_text("# Macro vintage limitation\n\nGDP and unemployment use ALFRED snapshots at each bank report-period quarter end. The bank filing is conservatively treated as available 45 calendar days later, which is the persisted forecast origin. The release-calendar `release_date` for these series is the snapshot availability date, not a separately sourced first-publication date; ALFRED proves visibility by that date but this pipeline does not claim a complete release-calendar feed. CRE price growth is FRED's already-reported year-over-year percent-change series (`COMREPUSQ159N`), retained without a second percentage-change transformation. House price, BBB spread, short rate, and mortgage rate use final FRED vintages lagged one complete quarter because a release-calendar API feed was not available. Those variables remain revision-biased final vintages, are labeled in `macro_release_calendar.csv`, and must not be described as real-time vintages. Modeling carries each origin-known value to its next-quarter target without a second availability lag.\n", encoding="utf-8")
     validate_release_calendar(calendar, origins)
     return panel
 
@@ -178,3 +179,33 @@ def validate_release_calendar(calendar: pd.DataFrame, origins: pd.DatetimeIndex)
     observations = pd.to_datetime(calendar["observation_date"])
     if (dates > origins.max()).any() or (observations > dates).any():
         raise ValueError("Macro release calendar contains future-dated availability")
+
+
+def validate_macro_forecast_alignment(calendar: pd.DataFrame, forecast_contract: pd.DataFrame) -> pd.DataFrame:
+    """Audit that every used macro record was available by its forecast origin.
+
+    The calendar may contain several series per report period.  This routine is
+    deliberately conservative: a record is associated with the first forecast
+    whose report period is on or after the record's stated release date.
+    """
+    required = {"report_period", "available_at", "forecast_origin", "target_period"}
+    if not required.issubset(forecast_contract):
+        raise ValueError(f"Forecast contract is missing {sorted(required - set(forecast_contract))}")
+    contracts = forecast_contract[list(required)].drop_duplicates().dropna().sort_values("report_period")
+    rows = []
+    for item in calendar.itertuples(index=False):
+        release = pd.Timestamp(item.release_date)
+        candidates = contracts[contracts.report_period.ge(release)]
+        if candidates.empty:
+            continue
+        contract = candidates.iloc[0]
+        rows.append({
+            "series_id": item.series_id, "observation_date": pd.Timestamp(item.observation_date),
+            "release_date": release, **contract.to_dict(),
+            "available_by_forecast_origin": release <= contract.forecast_origin,
+            "observation_not_future": pd.Timestamp(item.observation_date) <= release,
+        })
+    audit = pd.DataFrame(rows)
+    if not audit.empty and not audit[["available_by_forecast_origin", "observation_not_future"]].all(axis=None):
+        raise ValueError("Macro value violates the forecast-time contract")
+    return audit

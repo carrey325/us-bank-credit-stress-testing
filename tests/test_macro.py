@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from bankstress.macro import _quarterly, validate_release_calendar
+from bankstress.macro import _quarterly, validate_macro_forecast_alignment, validate_release_calendar
 
 
 def test_monthly_mean_and_growth_transform_are_deterministic():
@@ -24,3 +24,17 @@ def test_release_calendar_rejects_future_observation_or_availability():
     future = valid.assign(observation_date=pd.Timestamp("2010-04-30"))
     with pytest.raises(ValueError, match="future"):
         validate_release_calendar(future, origins)
+
+
+def test_same_quarter_release_must_be_visible_by_forecast_origin():
+    calendar = pd.DataFrame({"series_id": ["X"], "observation_date": [pd.Timestamp("2020-03-31")], "release_date": [pd.Timestamp("2020-04-30")]})
+    contract = pd.DataFrame({"report_period": [pd.Timestamp("2020-06-30")], "available_at": [pd.Timestamp("2020-08-14")], "forecast_origin": [pd.Timestamp("2020-08-14")], "target_period": [pd.Timestamp("2020-09-30")]})
+    audit = validate_macro_forecast_alignment(calendar, contract)
+    assert audit.available_by_forecast_origin.all()
+    assert audit.observation_not_future.all()
+
+
+def test_future_macro_release_is_invisible():
+    calendar = pd.DataFrame({"series_id": ["X"], "observation_date": [pd.Timestamp("2020-09-30")], "release_date": [pd.Timestamp("2020-10-30")]})
+    contract = pd.DataFrame({"report_period": [pd.Timestamp("2020-06-30")], "available_at": [pd.Timestamp("2020-08-14")], "forecast_origin": [pd.Timestamp("2020-08-14")], "target_period": [pd.Timestamp("2020-09-30")]})
+    assert validate_macro_forecast_alignment(calendar, contract).empty

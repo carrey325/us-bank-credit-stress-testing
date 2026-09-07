@@ -1,0 +1,19 @@
+{
+  "run_id": "r2-20260907T162851Z",
+  "stage": "R2",
+  "code_commit": "f06531def118ce5cf5063180c21d07bcee5e5fc5",
+  "code_tree_hash_or_dirty_diff_hash": "1bac55813d79587834a6d7bf6f0a236e79a5bebc71e375eeed2655dbe095983d",
+  "artifact": "outputs/eda/time_series.png",
+  "artifact_hash": "7c575f48b83c34f803a63c7e30aee2cca14a278bf02d29859f11530baad2dbdc",
+  "input_artifact_hashes": {
+    "data/derived/credit_panel.parquet": "31d8b08ef6723174f759837badf248c71bdcd3d5f61a3a667c6b8ae9a2d61a79",
+    "data/derived/macro_panel.parquet": "02e810caaac3e20388e10d2ac2a8ac2c50111008101c2459bf557bb6eca2affb",
+    "configs/macro_series.yaml": "fcfb68229ac9c393e245ade210cd31bfbc091b6381b5a2a72b7a6c97c5fb1762"
+  },
+  "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+  "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+  "data_definition_version": "mf772-r1-definitions-v2",
+  "model_spec_hash": "acd69aa2eb09c12cec095b84019bfaf287169bbc1e24fd5ec73fb02bc5d3e46f",
+  "created_at": "2026-09-07T16:28:55.529193+00:00",
+  "validation_status": "PASS"
+}

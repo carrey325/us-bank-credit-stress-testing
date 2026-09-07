@@ -1,7 +1,13 @@
 # Batch 2 macro inputs.  `fallback_final_lag1` is intentional and is surfaced in
 # metadata/specification outputs: it is never presented as an ALFRED vintage.
 vintage_policy: alfred_gdp_unemployment_final_lag1
-forecast_origin: quarter_end
+# A bank filing is conservatively treated as usable 45 calendar days after its
+# report-period quarter end.  Macro values are selected at the report-period
+# quarter end, which predates that origin.  Final-vintage fallback series are
+# lagged once here for availability and must not be lagged again by modeling.
+bank_filing_availability_days: 45
+macro_as_of: report_period_quarter_end
+forecast_origin: report_period_plus_45_calendar_days
 cache_dir: data/raw/macro
 series:
   gdp:

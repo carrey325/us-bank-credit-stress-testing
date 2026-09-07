@@ -1,10 +1,10 @@
 # MF772 Bank Credit Stress Testing
 
-> **Repair-cycle status (2026-09-07): `INVALID_PENDING_REBUILD`.** The committed
-> model, interval, stress, report, and resume-metric outputs predate the R1
-> regulatory-field repair and are retained for audit only. They are not current
-> research results or valid downstream inputs until their owning repair stages
-> regenerate and validate them. See `outputs/repair/artifact_status.json`.
+> **Repair-cycle status (2026-09-07): R2 mean-model/EDA artifacts regenerated.**
+> The AR, Dynamic FE, SPJ diagnostic, CRE interaction, and EDA outputs now carry
+> R2 lineage. Tail, interval, stress, model-risk, reporting, and resume-metric
+> artifacts remain `INVALID_PENDING_REBUILD`; old versions are audit-only. See
+> `outputs/repair/artifact_status.json`.
 
 ## Problem
 
@@ -22,9 +22,9 @@ The project reconstructs quarterly NCO as charge-offs less recoveries divided by
 
 Batch 5 adds a documented rolling residual-bootstrap 90% interval fallback around out-of-sample Dynamic-FE forecasts. It is a model-risk layer, not a replacement credit-loss model. The adaptive interval uses only earlier OOS residuals; methodology and metrics are written to `outputs/model_risk/`.
 
-## Key Results
+## Historical key results (invalid pending downstream rebuild)
 
-All figures and numbers are generated from the saved pipeline outputs. The 2025Q4 CRE/C&I stress universe has 14 banks. In the committed mean-model comparison, AR has the lowest pooled OOS RMSE. Dynamic-FE remains the pre-specified structural stress model, so its result is not described as an RMSE improvement. Under the Fed severely adverse Dynamic-FE run, the high-minus-low CRE-to-Tier-1 tercile difference in mean capital depletion is 28.41 percentage points.
+The stress, interval, report, and resume figures in this section predate R1/R2 and are retained only to identify invalidated historical claims. They are not permitted downstream results. The R2 research decision and current mean-model evidence are in `outputs/repair/r2/research_decision.md`.
 
 The rolling residual-calibrated intervals achieve 94.4% CI coverage and 92.1% CRE coverage over their post-seed OOS periods, versus 96.9% and 92.8% for the static residual-calibrated comparator. Rolling calibration increases crisis upper misses in this run (CI: 9 to 21; CRE: 27 to 31), so it does not achieve the desired crisis-underprediction reduction. These are empirical calibration results, not guarantees. See the final ten-page draft at `outputs/reporting/MF772_final_report_draft.pdf`.
 

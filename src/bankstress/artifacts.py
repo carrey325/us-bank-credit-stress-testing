@@ -42,6 +42,8 @@ def write_artifact_metadata(
     raw_manifest: Path,
     field_mapping: Path,
     validation_status: str,
+    data_definition_version: str = R1_DEFINITION_VERSION,
+    model_spec: Path | None = None,
 ) -> Path:
     commit, tree_hash = code_identity(root)
     payload = {
@@ -56,8 +58,8 @@ def write_artifact_metadata(
         },
         "raw_manifest_hash": sha256_file(raw_manifest),
         "field_mapping_hash": sha256_file(field_mapping),
-        "data_definition_version": R1_DEFINITION_VERSION,
-        "model_spec_hash": None,
+        "data_definition_version": data_definition_version,
+        "model_spec_hash": sha256_file(model_spec) if model_spec is not None else None,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "validation_status": validation_status,
     }
