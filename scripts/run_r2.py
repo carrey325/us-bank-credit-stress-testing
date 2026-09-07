@@ -32,13 +32,145 @@ def _verify_r1() -> dict:
     if metadata["run_id"] != R1_RUN_ID or sha256_file(credit) != R1_PANEL_HASH:
         raise ValueError("R1 input run or credit-panel hash does not match the approved contract")
     transition = ROOT / "outputs/repair/r1/panel_scope_transition_audit.csv"
+    transition_metadata = validate_artifact_metadata(transition)
     if sha256_file(transition) != R1_TRANSITION_HASH:
         raise ValueError("R1 transition-audit hash does not match the approved contract")
+    if transition_metadata["run_id"] != R1_RUN_ID:
+        raise ValueError("R1 transition-audit run does not match the approved contract")
     review = pd.read_csv(ROOT / "metadata/nco_reconciliation_review.csv")
     review_required = review[review["disposition"].eq("REVIEW_REQUIRED_BOUNDED")]
     if len(review_required) != 2:
         raise ValueError("R1's two bounded REVIEW_REQUIRED rows changed")
     return metadata
+
+
+def _validation_failures(checks: dict) -> list[str]:
+    """Return every mandatory R2 gate failure; an empty list is the only PASS."""
+    failures = []
+    required_true = [
+        "r1_credit_metadata_valid",
+        "r1_input_run_match",
+        "r1_credit_panel_hash_match",
+        "r1_transition_metadata_valid",
+        "r1_transition_run_match",
+        "r1_transition_audit_hash_match",
+        "common_scoring_keys_verified",
+    ]
+    required_zero = [
+        "macro_double_lag_count",
+        "gap_bridge_count",
+        "cre_shock_period_mismatch_count",
+        "cre_shock_duplicate_target_count",
+        "cre_shock_information_set_mismatch_count",
+        "cre_shock_audit_mismatch_count",
+        "time_alignment_invalid_count",
+    ]
+    required_positive = [
+        "model_rows",
+        "prediction_eligible",
+        "evaluation_eligible",
+        "macro_carry_comparisons",
+        "cre_shock_rows",
+    ]
+    for name in required_true:
+        if checks.get(name) is not True:
+            failures.append(f"{name} must be true")
+    for name in required_zero:
+        value = checks.get(name)
+        if not isinstance(value, int) or isinstance(value, bool) or value != 0:
+            failures.append(f"{name} must be integer zero")
+    for name in required_positive:
+        value = checks.get(name)
+        if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
+            failures.append(f"{name} must be a positive integer")
+    if checks.get("review_required_rows_preserved") != 2:
+        failures.append("review_required_rows_preserved must equal 2")
+    if checks.get("credit_panel_hash") != R1_PANEL_HASH:
+        failures.append("credit_panel_hash does not match the approved R1 contract")
+    if checks.get("transition_audit_hash") != R1_TRANSITION_HASH:
+        failures.append("transition_audit_hash does not match the approved R1 contract")
+    if checks.get("input_run_id") != R1_RUN_ID:
+        failures.append("input_run_id does not match the approved R1 contract")
+    return failures
+
+
+def _apply_validation_status(summary: dict) -> bool:
+    failures = _validation_failures(summary)
+    summary["validation_failures"] = failures
+    summary["validation_status"] = "PASS" if not failures else "FAIL"
+    return not failures
+
+
+def _write_cre_shock_audit(realized_shock: pd.DataFrame) -> Path:
+    """Write the canonical, committed interaction shock input and its lineage."""
+    manifest_path = ROOT / "metadata/macro_download_manifest.csv"
+    manifest = pd.read_csv(manifest_path)
+    source = manifest.loc[manifest["series_id"].eq("COMREPUSQ159N")]
+    if len(source) != 1:
+        raise ValueError("CRE shock lineage requires exactly one COMREPUSQ159N source row")
+    source_row = source.iloc[0]
+    source_path = ROOT / "data/raw/macro" / source_row["file_name"]
+    if sha256_file(source_path) != source_row["sha256"]:
+        raise ValueError("CRE shock source hash does not match the macro manifest")
+    audit = realized_shock[
+        ["target_period", "shock_period", "realized_cre_price_growth", "information_set"]
+    ].copy()
+    audit["source_series_id"] = source_row["series_id"]
+    audit["source_file"] = f"data/raw/macro/{source_row['file_name']}"
+    audit["source_file_sha256"] = source_row["sha256"]
+    audit["source_manifest"] = "metadata/macro_download_manifest.csv"
+    audit["source_manifest_sha256"] = sha256_file(manifest_path)
+    audit["transformation"] = "reported_yoy_pct_change"
+    audit = audit.sort_values("target_period")
+    path = ROOT / "outputs/repair/r2/cre_realized_shock_audit.csv"
+    audit.to_csv(path, index=False, date_format="%Y-%m-%d", float_format="%.17g")
+    return path
+
+
+def _read_and_verify_cre_shock_audit(path: Path, realized_shock: pd.DataFrame) -> tuple[pd.DataFrame, int]:
+    columns = ["target_period", "shock_period", "realized_cre_price_growth", "information_set"]
+    audit = pd.read_csv(
+        path,
+        parse_dates=["target_period", "shock_period"],
+        float_precision="round_trip",
+    )
+    actual = audit[columns].sort_values("target_period").reset_index(drop=True)
+    expected = realized_shock[columns].copy()
+    expected["target_period"] = pd.to_datetime(expected["target_period"])
+    expected["shock_period"] = pd.to_datetime(expected["shock_period"])
+    expected = expected.sort_values("target_period").reset_index(drop=True)
+    try:
+        pd.testing.assert_frame_equal(actual, expected, check_exact=True)
+    except AssertionError:
+        return actual, 1
+    return actual, 0
+
+
+def _write_fatal_validation_summary(error: Exception) -> None:
+    """Invalidate a stale PASS when an upstream/operational invariant raises."""
+    out = ROOT / "outputs/repair/r2"
+    out.mkdir(parents=True, exist_ok=True)
+    summary = {
+        "run_id": RUN_ID,
+        "stage": "R2",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "validation_status": "FAIL",
+        "validation_failures": [f"{type(error).__name__}: {error}"],
+    }
+    summary_path = out / "validation_summary.json"
+    summary_path.write_text(
+        json.dumps(summary, indent=2) + "\n", encoding="utf-8"
+    )
+    sidecar_path = summary_path.with_suffix(summary_path.suffix + ".metadata.json")
+    if sidecar_path.exists():
+        sidecar = json.loads(sidecar_path.read_text(encoding="utf-8"))
+        sidecar.update({
+            "run_id": RUN_ID,
+            "artifact_hash": sha256_file(summary_path),
+            "created_at": summary["created_at"],
+            "validation_status": "FAIL",
+        })
+        sidecar_path.write_text(json.dumps(sidecar, indent=2) + "\n", encoding="utf-8")
 
 
 def _attrition(model: pd.DataFrame, eligible: pd.DataFrame) -> pd.DataFrame:
@@ -191,14 +323,19 @@ Only the already-scoped tail/historical checks needed to determine one-step and 
     (ROOT / "outputs/repair/r2/research_decision.md").write_text(text, encoding="utf-8")
 
 
-def _write_sidecars(paths: list[Path], r1_metadata: dict) -> None:
+def _write_sidecars(paths: list[Path], r1_metadata: dict, validation_status: str = "PASS") -> None:
     model_spec = ROOT / "configs/model_specs.yaml"
     inputs = [ROOT / "data/derived/model_panel.parquet"]
     for path in paths:
-        path_inputs = [*inputs]
+        path_inputs = [] if path.name == "cre_realized_shock_audit.csv" else [*inputs]
         if "cre_interaction" in path.parts:
-            path_inputs.append(ROOT / "data/derived/cre_realized_shock.parquet")
-        write_artifact_metadata(path, root=ROOT, run_id=RUN_ID, stage="R2", input_artifacts=path_inputs, raw_manifest=ROOT / "data/manifests/ffiec_manifest.csv", field_mapping=ROOT / "metadata/field_mapping.csv", validation_status="PASS", data_definition_version=r1_metadata["data_definition_version"], model_spec=model_spec)
+            path_inputs.append(ROOT / "outputs/repair/r2/cre_realized_shock_audit.csv")
+        if path.name == "cre_realized_shock_audit.csv":
+            path_inputs.extend([
+                ROOT / "metadata/macro_download_manifest.csv",
+                ROOT / "data/raw/macro/COMREPUSQ159N_final.csv",
+            ])
+        write_artifact_metadata(path, root=ROOT, run_id=RUN_ID, stage="R2", input_artifacts=path_inputs, raw_manifest=ROOT / "data/manifests/ffiec_manifest.csv", field_mapping=ROOT / "metadata/field_mapping.csv", validation_status=validation_status, data_definition_version=r1_metadata["data_definition_version"], model_spec=model_spec)
 
 
 def main() -> None:
@@ -220,7 +357,9 @@ def main() -> None:
     eligible, metrics, _ = run_oos_models(model, ROOT)
     run_split_panel_jackknife(eligible, ROOT)
     realized_shock = pd.read_parquet(ROOT / "data/derived/cre_realized_shock.parquet")
-    interaction = run_cre_interaction(model, realized_shock, ROOT)
+    shock_audit_path = _write_cre_shock_audit(realized_shock)
+    interaction_shock, shock_audit_mismatches = _read_and_verify_cre_shock_audit(shock_audit_path, realized_shock)
+    interaction = run_cre_interaction(model, interaction_shock, ROOT)
     contract = model[["report_period", "available_at", "forecast_origin", "target_period"]].drop_duplicates()
     calendar = pd.read_csv(ROOT / "metadata/macro_release_calendar.csv", parse_dates=["observation_date", "release_date", "vintage_date"])
     macro_audit = validate_macro_forecast_alignment(calendar, contract)
@@ -237,23 +376,30 @@ def main() -> None:
     _write_decision(metrics, interaction, attrition, eligible)
     same_spec_provenance = _write_same_spec_provenance()
     macro_carry = _macro_carry_audit(model, macro)
-    summary = {"run_id": RUN_ID, "stage": "R2", "created_at": datetime.now(timezone.utc).isoformat(), "input_run_id": R1_RUN_ID, "credit_panel_hash": R1_PANEL_HASH, "transition_audit_hash": R1_TRANSITION_HASH, "validation_status": "PASS", "model_rows": len(model), "prediction_eligible": int(model.prediction_eligible.sum()), "evaluation_eligible": int(model.evaluation_eligible.sum()), "forecast_only": int(model.forecast_only.sum()), **macro_carry, "gap_bridge_count": int((model.lagged_nco_rate.notna() & ~model.origin_is_adjacent).sum()), "cre_shock_period_mismatch_count": int((pd.to_datetime(realized_shock.shock_period) != pd.to_datetime(realized_shock.target_period)).sum()), "review_required_rows_preserved": 2, "research_recommendation": "MINIMAL_R3"}
+    summary = {"run_id": RUN_ID, "stage": "R2", "created_at": datetime.now(timezone.utc).isoformat(), "input_run_id": R1_RUN_ID, "credit_panel_hash": R1_PANEL_HASH, "transition_audit_hash": R1_TRANSITION_HASH, "model_rows": len(model), "prediction_eligible": int(model.prediction_eligible.sum()), "evaluation_eligible": int(model.evaluation_eligible.sum()), "forecast_only": int(model.forecast_only.sum()), **macro_carry, "gap_bridge_count": int((model.lagged_nco_rate.notna() & ~model.origin_is_adjacent).sum()), "cre_shock_rows": len(interaction_shock), "cre_shock_period_mismatch_count": int((interaction_shock.shock_period != interaction_shock.target_period).sum()), "cre_shock_duplicate_target_count": int(interaction_shock.duplicated("target_period").sum()), "cre_shock_information_set_mismatch_count": int(interaction_shock.information_set.ne("EX_POST_FINAL_VINTAGE_NOT_FORECAST_ORIGIN_INFORMATION").sum()), "cre_shock_audit_mismatch_count": shock_audit_mismatches, "time_alignment_invalid_count": int((~time_audit.available_by_forecast_origin.astype(bool) | ~time_audit.observation_not_future.astype(bool)).sum()), "common_scoring_keys_verified": bool(metrics.common_scoring_keys_verified.all()), "r1_credit_metadata_valid": True, "r1_input_run_match": r1_metadata["run_id"] == R1_RUN_ID, "r1_credit_panel_hash_match": sha256_file(ROOT / "data/derived/credit_panel.parquet") == R1_PANEL_HASH, "r1_transition_metadata_valid": True, "r1_transition_run_match": validate_artifact_metadata(ROOT / "outputs/repair/r1/panel_scope_transition_audit.csv")["run_id"] == R1_RUN_ID, "r1_transition_audit_hash_match": sha256_file(ROOT / "outputs/repair/r1/panel_scope_transition_audit.csv") == R1_TRANSITION_HASH, "review_required_rows_preserved": 2, "research_recommendation": "MINIMAL_R3"}
+    passed = _apply_validation_status(summary)
     (out / "validation_summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     sidecars = [
         ROOT / "outputs/models/ar/predictions.parquet", ROOT / "outputs/models/ar/oos_metrics.csv",
         ROOT / "outputs/models/dynamic_fe/predictions.parquet", ROOT / "outputs/models/dynamic_fe/oos_metrics.csv",
         ROOT / "outputs/models/dynamic_fe/coefficients.csv", ROOT / "outputs/models/dynamic_fe/split_panel_jackknife.csv",
         ROOT / "outputs/models/cre_interaction/interaction_coefficients.csv",
-        ROOT / "outputs/models/cre_interaction/pre_2022_exposure_audit.csv",
+        ROOT / "outputs/models/cre_interaction/pre_2022_exposure_audit.csv", shock_audit_path,
         ROOT / "outputs/eda/sample_stats.csv", ROOT / "outputs/eda/segment_descriptive_stats.csv",
         ROOT / "outputs/eda/macro_nco_lead_lag.csv", ROOT / "outputs/eda/cre_terciles.csv", ROOT / "outputs/eda/time_series.png",
         out / "time_alignment_audit.csv", out / "sample_attrition.csv", out / "old_vs_corrected_summary.csv",
         out / "error_contributors.csv", out / "research_decision.md", out / "validation_summary.json", same_spec_provenance,
     ]
-    _write_sidecars(sidecars, r1_metadata)
+    _write_sidecars(sidecars, r1_metadata, summary["validation_status"])
     (ROOT / "outputs/models/run_summary.md").write_text(f"# R2 valid-corrected run\n\n- Run: `{RUN_ID}`\n- R1 input: `{R1_RUN_ID}` / `{R1_PANEL_HASH}`\n- Model-panel rows: {len(model):,}\n- Prediction-eligible rows: {int(model.prediction_eligible.sum()):,}\n- Evaluation-eligible rows: {int(model.evaluation_eligible.sum()):,}\n- Forecast-only rows retained: {int(model.forecast_only.sum()):,}\n- AR and Dynamic FE use common scoring keys.\n- SPJ is diagnostic only.\n- Downstream tail, stress, model-risk, reporting, and resume artifacts remain `INVALID_PENDING_REBUILD`.\n", encoding="utf-8")
     print(json.dumps(summary))
+    if not passed:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        _write_fatal_validation_summary(error)
+        raise

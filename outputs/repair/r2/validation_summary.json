@@ -1,7 +1,7 @@
 {
-  "run_id": "r2-20260907T180705Z",
+  "run_id": "r2-20260907T194522Z",
   "stage": "R2",
-  "created_at": "2026-09-07T18:07:08.577838+00:00",
+  "created_at": "2026-09-07T19:45:22.755450+00:00",
   "input_run_id": "r1-20260907T141500Z",
   "credit_panel_hash": "31d8b08ef6723174f759837badf248c71bdcd3d5f61a3a667c6b8ae9a2d61a79",
   "transition_audit_hash": "d1e60dca4a4fc2fa734f88daffecafefcb72c03354cd3b1a6ba4e739ec3ca990",
@@ -15,5 +15,18 @@
   "gap_bridge_count": 0,
   "cre_shock_period_mismatch_count": 0,
   "review_required_rows_preserved": 2,
-  "research_recommendation": "MINIMAL_R3"
+  "research_recommendation": "MINIMAL_R3",
+  "r1_credit_metadata_valid": true,
+  "r1_input_run_match": true,
+  "r1_credit_panel_hash_match": true,
+  "r1_transition_metadata_valid": true,
+  "r1_transition_run_match": true,
+  "r1_transition_audit_hash_match": true,
+  "cre_shock_rows": 84,
+  "cre_shock_duplicate_target_count": 0,
+  "cre_shock_information_set_mismatch_count": 0,
+  "cre_shock_audit_mismatch_count": 0,
+  "time_alignment_invalid_count": 0,
+  "common_scoring_keys_verified": true,
+  "validation_failures": []
 }
