@@ -16,6 +16,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+RUN_ID = "r1-20260907T141500Z"
 
 from bankstress.transform.panel import _coalesce_reporting_variants, required_flow_components
 from bankstress.artifacts import write_artifact_metadata
@@ -205,6 +206,7 @@ def update_quality_report_with_source_audit(audit: pd.DataFrame) -> None:
             f"- Recomputed quarterly NCO to panel matches: {int(audit['derived_to_panel_match'].sum()):,}/{len(audit):,}.\n"
             f"- Source-audit failures: {failures:,}.\n"
             f"- Deliberate CRE taxonomy-transition coverage: {len(transition):,} observations across {transition['report_date'].nunique():,} quarters; {int(transition['reviewer_conclusion'].eq('PASS').sum()):,}/{len(transition):,} passed.\n"
+            "- POR-verified unsupported-form coverage: RSSD 962966 / Golden Pacific Bank, N.A., 20 FFIEC 051 quarters (2017Q1-2021Q4), retained as 60 explicit unavailable segment rows.\n"
             "- This sample is evidence for the audited observations, not exhaustive proof of every reporting-detail change.\n"
         )
         report_path.write_text(report, encoding="utf-8")
@@ -224,8 +226,15 @@ def main() -> None:
     failures = int(audit["reviewer_conclusion"].ne("PASS").sum())
     update_quality_report_with_source_audit(audit)
     write_artifact_metadata(
-        output, root=ROOT, run_id="r1-20260907T121900Z", stage="R1",
+        output, root=ROOT, run_id=RUN_ID, stage="R1",
         input_artifacts=[ROOT / "data" / "standard" / "call_report_standard.parquet", ROOT / "data" / "derived" / "credit_panel.parquet"],
+        raw_manifest=ROOT / "data" / "manifests" / "ffiec_manifest.csv",
+        field_mapping=ROOT / "metadata" / "field_mapping.csv", validation_status="PASS" if failures == 0 else "FAIL",
+    )
+    report_path = ROOT / "outputs" / "qa" / "data_quality_report.md"
+    write_artifact_metadata(
+        report_path, root=ROOT, run_id=RUN_ID, stage="R1",
+        input_artifacts=[ROOT / "data" / "derived" / "credit_panel.parquet", output, ROOT / "metadata" / "nco_reconciliation_review.csv"],
         raw_manifest=ROOT / "data" / "manifests" / "ffiec_manifest.csv",
         field_mapping=ROOT / "metadata" / "field_mapping.csv", validation_status="PASS" if failures == 0 else "FAIL",
     )

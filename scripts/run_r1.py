@@ -13,12 +13,12 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from bankstress.artifacts import R1_DEFINITION_VERSION, sha256_file, write_artifact_metadata
 from bankstress.config import load_config
-from bankstress.qa.report import write_qa
+from bankstress.qa.report import validate_r1_panel_transition_gate, validate_r1_reconciliation_gate, write_qa
 from bankstress.transform.panel import build_credit_panel
 from bankstress.transform.standardize import standardize_archives
 
 
-RUN_ID = "r1-20260907T121900Z"
+RUN_ID = "r1-20260907T141500Z"
 BASE = ROOT / "tmp" / "r1_baseline_09e036b"
 OUT = ROOT / "outputs" / "repair" / "r1"
 
@@ -37,21 +37,28 @@ def verify_raw_manifest(config: dict) -> pd.DataFrame:
     return result
 
 
-def write_change_outputs(old: pd.DataFrame, new: pd.DataFrame) -> None:
+def write_change_outputs(old: pd.DataFrame, new: pd.DataFrame) -> dict[str, int]:
     keys = ["bank_id", "report_date", "segment"]
     fields = ["exposure", "annualized_nco_rate", "cre_share", "cre_to_tier1", "eligible_for_model"]
-    comparison = old[keys + fields].merge(new[keys + fields + ["form", "exposure_status", "flow_complete", "scope_match", "mapping_id", "reason"]],
+    comparison = old[keys + fields].merge(new[keys + fields + ["form", "filing_bank_name", "exposure_status", "flow_complete", "scope_match", "mapping_id", "reason"]],
         on=keys, how="outer", suffixes=("_old", "_new"), indicator=True)
-    comparison["sample_change"] = comparison["_merge"].map({"both":"COMMON", "left_only":"EXITED", "right_only":"NEW"})
+    comparison["sample_change"] = comparison["_merge"].map({"both":"COMMON", "left_only":"EXITED_UNEXPLAINED", "right_only":"NEW"}).astype("string")
+    explicit_unavailable = comparison["_merge"].eq("both") & comparison["reason"].astype("string").str.startswith("unsupported_ffiec_")
+    comparison.loc[explicit_unavailable, "sample_change"] = "RETAINED_EXPLICIT_UNAVAILABLE"
     for field in ["exposure", "annualized_nco_rate", "cre_share", "cre_to_tier1"]:
         comparison[f"{field}_change"] = comparison[f"{field}_new"] - comparison[f"{field}_old"]
-    comparison.groupby(["sample_change", "form", "segment"], observed=True, dropna=False).agg(
+    comparison.groupby(["sample_change", "form", "segment", "reason"], observed=True, dropna=False).agg(
         observations=("bank_id", "size"), banks=("bank_id", "nunique"), first_date=("report_date", "min"), last_date=("report_date", "max"),
         exposure_old_mean=("exposure_old", "mean"), exposure_new_mean=("exposure_new", "mean"), exposure_mean_change=("exposure_change", "mean"),
         annualized_nco_rate_old_mean=("annualized_nco_rate_old", "mean"), annualized_nco_rate_new_mean=("annualized_nco_rate_new", "mean"),
         annualized_nco_rate_mean_change=("annualized_nco_rate_change", "mean"), cre_share_mean_change=("cre_share_change", "mean"),
         cre_to_tier1_mean_change=("cre_to_tier1_change", "mean"), eligible_old=("eligible_for_model_old", "sum"), eligible_new=("eligible_for_model_new", "sum"),
     ).reset_index().to_csv(OUT / "panel_change_summary.csv", index=False)
+    audit_columns = ["bank_id", "report_date", "segment", "form", "filing_bank_name", "sample_change", "exposure_status", "mapping_id", "reason",
+                     "eligible_for_model_old", "eligible_for_model_new"]
+    comparison.loc[comparison["sample_change"].isin(["EXITED_UNEXPLAINED", "RETAINED_EXPLICIT_UNAVAILABLE"]), audit_columns].to_csv(
+        OUT / "panel_scope_transition_audit.csv", index=False
+    )
     date = pd.to_datetime(new["report_date"])
     coverage = new.assign(period_bucket=pd.cut(date.dt.year, [2004, 2007, 2012, 2019, 2025], labels=["2005-2007", "2008-2012", "2013-2019", "2020-2025"]))
     coverage.groupby(["form", "period_bucket", "segment"], observed=True, dropna=False).agg(
@@ -61,7 +68,9 @@ def write_change_outputs(old: pd.DataFrame, new: pd.DataFrame) -> None:
         eligible=("eligible_for_model", "sum"), reported_zero=("exposure_status", lambda x: int(x.eq("REPORTED_ZERO").sum())),
         missing_required=("exposure_status", lambda x: int(x.eq("MISSING_REQUIRED").sum())),
         not_applicable=("exposure_status", lambda x: int(x.eq("NOT_APPLICABLE").sum())),
+        unsupported_form=("reason", lambda x: int(x.astype("string").str.startswith("unsupported_ffiec_").sum())),
     ).reset_index().to_csv(OUT / "coverage_by_form_period.csv", index=False)
+    return validate_r1_panel_transition_gate(comparison)
 
 
 def main() -> None:
@@ -80,7 +89,10 @@ def main() -> None:
     exceptions_path = config["paths"]["metadata"] / "nco_reconciliation_exceptions.csv"
     recon, audit = write_qa(core_standard, panel, pd.read_csv(mapping_path), config["paths"]["qa"], pd.read_csv(exceptions_path))
     old = pd.read_parquet(BASE / "credit_panel.parquet")
-    write_change_outputs(old, panel)
+    transition_checks = write_change_outputs(old, panel)
+    review_register_path = ROOT / "metadata" / "nco_reconciliation_review.csv"
+    review_register = pd.read_csv(review_register_path, dtype={"bank_id": str})
+    reconciliation_checks = validate_r1_reconciliation_gate(recon, review_register)
 
     structural = {
         "raw_manifest_rows": len(inputs), "raw_hash_failures": int((~inputs.hash_match).sum()),
@@ -92,6 +104,10 @@ def main() -> None:
         "nco_reconciliation_review_required": int(recon["nco_reconciliation_status"].eq("REVIEW_REQUIRED").sum()),
         "capital_reconciliation_failures": int(recon["capital_reconciliation_status"].eq("FAIL_OUTSIDE_TOLERANCE").sum()),
         "formula_audit_failures": int(audit["pass_fail"].eq("fail").sum()),
+        **transition_checks,
+        "review_required_rows_validated": reconciliation_checks["review_rows_validated"],
+        "gap_bridge_rate_failures": int((panel.groupby(["bank_id", "segment"])["reason"].shift().astype("string").str.startswith("unsupported_ffiec_") & panel["annualized_nco_rate"].notna()).sum()),
+        "gap_bridge_lagged_nco_failures": int((panel.groupby(["bank_id", "segment"])["reason"].shift().astype("string").str.startswith("unsupported_ffiec_") & panel["lagged_nco"].notna()).sum()),
     }
     source_audit_path = ROOT / "metadata" / "manual_source_audit.csv"
     source_audit = pd.read_csv(source_audit_path) if source_audit_path.exists() else pd.DataFrame()
@@ -99,25 +115,29 @@ def main() -> None:
     structural["source_audit_failures"] = int(source_audit["reviewer_conclusion"].ne("PASS").sum()) if len(source_audit) else None
     pass_checks = (structural["raw_hash_failures"] == 0 and structural["duplicate_standard_keys"] == 0
                    and structural["partial_exposure_values_emitted"] == 0 and structural["scope_mismatch_rates_emitted"] == 0
+                   and structural["unexplained_panel_exit_rows"] == 0 and structural["capital_reconciliation_failures"] == 0
+                   and structural["gap_bridge_rate_failures"] == 0 and structural["gap_bridge_lagged_nco_failures"] == 0
+                   and structural["review_required_rows_validated"] == structural["nco_reconciliation_review_required"]
                    and structural["formula_audit_failures"] == 0 and structural["source_audit_rows"] >= 100
                    and structural["source_audit_failures"] == 0)
     summary = {"run_id": RUN_ID, "stage": "R1", "data_definition_version": R1_DEFINITION_VERSION,
                "created_at": datetime.now(timezone.utc).isoformat(), "validation_status": "PASS" if pass_checks else "FAIL",
                "checks": structural,
                "limitations": ["FFIEC 031 CRE and Mortgage exposure rates before 2013Q2 are unavailable because retained inputs lack a verified consolidated detailed stock mapping.",
+                               "FFIEC 051 filings are retained as explicit unavailable rows because R1 has no independently verified same-scope segment mapping.",
                                "Total NPL remains a bank-level nonaccrual fallback, not a segment NPL measure.",
                                "Model, tail, stress, and reporting artifacts remain INVALID_PENDING_REBUILD."]}
     summary_path = OUT / "validation_summary.json"
     summary_path.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     status = summary["validation_status"]
-    common_inputs = [config["paths"]["manifest"], mapping_path]
+    common_inputs = [config["paths"]["manifest"], mapping_path, review_register_path]
     write_artifact_metadata(config["paths"]["standard"], root=ROOT, run_id=RUN_ID, stage="R1", input_artifacts=common_inputs,
                             raw_manifest=config["paths"]["manifest"], field_mapping=mapping_path, validation_status=status)
     write_artifact_metadata(config["paths"]["derived"], root=ROOT, run_id=RUN_ID, stage="R1", input_artifacts=[config["paths"]["standard"], *common_inputs],
                             raw_manifest=config["paths"]["manifest"], field_mapping=mapping_path, validation_status=status)
     write_artifact_metadata(summary_path, root=ROOT, run_id=RUN_ID, stage="R1", input_artifacts=[config["paths"]["derived"], *common_inputs],
                             raw_manifest=config["paths"]["manifest"], field_mapping=mapping_path, validation_status=status)
-    for artifact in [OUT / "input_manifest_check.csv", OUT / "panel_change_summary.csv", OUT / "coverage_by_form_period.csv",
+    for artifact in [OUT / "input_manifest_check.csv", OUT / "panel_change_summary.csv", OUT / "panel_scope_transition_audit.csv", OUT / "coverage_by_form_period.csv",
                      OUT / "definition_audit.md", config["paths"]["qa"] / "reconciliation_summary.csv",
                      config["paths"]["qa"] / "data_quality_report.md"]:
         write_artifact_metadata(artifact, root=ROOT, run_id=RUN_ID, stage="R1", input_artifacts=[config["paths"]["derived"], *common_inputs],

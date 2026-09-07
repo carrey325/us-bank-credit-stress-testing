@@ -14,6 +14,66 @@ NCO_GROSS_FLOW_TOLERANCE_THOUSANDS = 50.0
 CAPITAL_RATIO_TOLERANCE_BASIS_POINTS = 1.0
 
 
+def validate_r1_panel_transition_gate(comparison: pd.DataFrame) -> dict[str, int]:
+    """Require every old-panel row to remain present or have an explicit reason."""
+    unexplained = comparison.loc[comparison["sample_change"].eq("EXITED_UNEXPLAINED")]
+    if not unexplained.empty:
+        raise ValueError(f"R1 panel comparison has {len(unexplained)} unexplained row exit(s)")
+    explicit = comparison.loc[comparison["sample_change"].eq("RETAINED_EXPLICIT_UNAVAILABLE")]
+    audit_fields = ["bank_id", "report_date", "segment", "form", "filing_bank_name", "exposure_status", "mapping_id", "reason"]
+    if not explicit.empty and (explicit[audit_fields].isna().any(axis=None) or not explicit["reason"].astype("string").str.startswith("unsupported_ffiec_").all()):
+        raise ValueError("Every explicit unavailable transition must retain complete POR and reason fields")
+    return {
+        "unexplained_panel_exit_rows": len(unexplained),
+        "explicit_unavailable_transition_rows": len(explicit),
+        "explicit_unavailable_bank_quarters": int(explicit[["bank_id", "report_date"]].drop_duplicates().shape[0]),
+    }
+
+
+def validate_r1_reconciliation_gate(recon: pd.DataFrame, review_register: pd.DataFrame) -> dict[str, int]:
+    """Fail closed on capital failures and unregistered/unbounded review rows."""
+    capital_failures = recon.loc[recon["capital_reconciliation_status"].eq("FAIL_OUTSIDE_TOLERANCE")]
+    if not capital_failures.empty:
+        raise ValueError(f"R1 capital reconciliation has {len(capital_failures)} failure(s)")
+
+    review = recon.loc[recon["nco_reconciliation_status"].eq("REVIEW_REQUIRED")].copy()
+    required_columns = {
+        "bank_id", "report_date", "excess_flow", "observed_excess_thousands",
+        "max_abs_excess_thousands", "direct_source_review_status", "disposition",
+    }
+    missing_columns = required_columns - set(review_register.columns)
+    if missing_columns:
+        raise ValueError(f"R1 review register lacks columns: {sorted(missing_columns)}")
+    register = review_register.copy()
+    register["bank_id"] = register["bank_id"].astype(str)
+    register["report_date"] = pd.to_datetime(register["report_date"])
+    keys = ["bank_id", "report_date"]
+    if register.duplicated(keys).any():
+        raise ValueError("R1 review register must have unique bank-quarter keys")
+    review["bank_id"] = review["bank_id"].astype(str)
+    review["report_date"] = pd.to_datetime(review["report_date"])
+    actual_keys = set(map(tuple, review[keys].to_numpy()))
+    registered_keys = set(map(tuple, register[keys].to_numpy()))
+    if actual_keys != registered_keys:
+        raise ValueError("Every REVIEW_REQUIRED row must be explicitly and exactly enumerated")
+    checked = review.merge(register, on=keys, how="left", validate="one_to_one")
+    actual_excess = checked.apply(
+        lambda row: row["charge_off_subset_difference"] if row["excess_flow"] == "charge_off" else row["recovery_subset_difference"],
+        axis=1,
+    )
+    registered_excess = pd.to_numeric(checked["observed_excess_thousands"], errors="coerce")
+    bounds = pd.to_numeric(checked["max_abs_excess_thousands"], errors="coerce")
+    if not actual_excess.eq(registered_excess).all():
+        raise ValueError("R1 review register does not match the observed gross-flow excess")
+    if bounds.isna().any() or bounds.le(0).any() or actual_excess.abs().gt(bounds).any():
+        raise ValueError("Every REVIEW_REQUIRED row must have a positive bound covering the observed excess")
+    if not checked["direct_source_review_status"].eq("DIRECT_SOURCE_CONFIRMED").all():
+        raise ValueError("Every REVIEW_REQUIRED row must have completed direct-source review")
+    if not checked["disposition"].eq("REVIEW_REQUIRED_BOUNDED").all():
+        raise ValueError("Every REVIEW_REQUIRED row must retain the bounded review disposition")
+    return {"capital_failures": len(capital_failures), "review_required_rows": len(review), "review_rows_validated": len(checked)}
+
+
 def _flow_reclass_flags(standard: pd.DataFrame) -> pd.DataFrame:
     """Return gross-flow-specific YTD revision flags for causal reconciliation."""
     flows = standard.loc[standard["stock_flow"].eq("flow")].copy()

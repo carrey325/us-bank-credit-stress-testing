@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-R1_DEFINITION_VERSION = "mf772-r1-definitions-v1"
+R1_DEFINITION_VERSION = "mf772-r1-definitions-v2"
 
 
 def sha256_file(path: Path) -> str:

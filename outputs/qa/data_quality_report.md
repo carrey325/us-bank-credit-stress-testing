@@ -1,14 +1,14 @@
 # Batch 1 data-quality report
 
-- Standard observations: 92,537
-- Derived observations: 8,085
+- Standard observations: 95,252
+- Derived observations: 8,145
 - Core banks: 33
 - Field-mapping rows: 73
 - Duplicate standard bank/date/raw-code keys: 0
 - Negative NCO observations retained: 1967
 - Suppressed incomplete segment gross flows: 60
 - FDIC merger quarters flagged: 561
-- Asset-jump quarters flagged: 75
+- Asset-jump quarters flagged: 72
 - Manual formula-audit failures: 0
 
 ## Definitions
@@ -28,7 +28,7 @@
 - A directly verified source-filing inconsistency may be explained only when it is listed in `metadata/nco_reconciliation_exceptions.csv`; it remains visible in the reconciliation output.
 - EXPLAINED_SOURCE_FILING_INCONSISTENCY: 1
 - EXPLAINED_YTD_RECLASS_GROSS_FLOW: 1
-- NOT_EVALUABLE_MISSING_FLOW: 10
+- NOT_EVALUABLE_MISSING_FLOW: 30
 - PASS_SUBSET_GROSS_FLOWS: 2,681
 - REVIEW_REQUIRED: 2
 - Open review items: 2; see `metadata/nco_reconciliation_review.md`.
@@ -37,16 +37,17 @@
 
 - Formula: mapped Tier 1 capital / mapped risk-weighted assets versus the separately reported Tier 1 risk-based capital ratio.
 - Absolute tolerance: 1 basis point; ratios carrying a `%` suffix in the CDR files are normalized to decimal fractions before comparison.
-- Evaluable bank-quarters: 2,695/2,695 (100.00%).
+- Evaluable bank-quarters: 2,695/2,715 (99.26%).
 - Within tolerance: 2,695/2,695 (100.00%) when evaluable.
+- NOT_EVALUABLE_MISSING_INPUT: 20
 - PASS_WITHIN_TOLERANCE: 2,695
 
 ## Mapped raw-field presence
 
-- 2005-03-31: 41 mapped raw codes
-- 2010-03-31: 47 mapped raw codes
-- 2020-03-31: 58 mapped raw codes
-- 2025-12-31: 58 mapped raw codes
+- 2005-03-31: 42 mapped raw codes
+- 2010-03-31: 48 mapped raw codes
+- 2020-03-31: 59 mapped raw codes
+- 2025-12-31: 59 mapped raw codes
 
 ## Limitations
 
@@ -69,4 +70,5 @@
 - Recomputed quarterly NCO to panel matches: 100/100.
 - Source-audit failures: 0.
 - Deliberate CRE taxonomy-transition coverage: 6 observations across 3 quarters; 6/6 passed.
+- POR-verified unsupported-form coverage: RSSD 962966 / Golden Pacific Bank, N.A., 20 FFIEC 051 quarters (2017Q1-2021Q4), retained as 60 explicit unavailable segment rows.
 - This sample is evidence for the audited observations, not exhaustive proof of every reporting-detail change.

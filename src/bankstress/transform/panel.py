@@ -38,6 +38,11 @@ def _scope_for_form(form: object) -> str:
     return "CONSOLIDATED_BANK" if _normalise_form(form) == "31" else "DOMESTIC_ONLY_BANK"
 
 
+def _unsupported_form_reason(form: object) -> str:
+    normalized = _normalise_form(form)
+    return f"unsupported_ffiec_{normalized.zfill(3)}_no_verified_segment_mapping"
+
+
 def _coalesce_reporting_variants(data: pd.DataFrame) -> pd.DataFrame:
     """Coalesce genuine reporting alternatives without mixing different scopes."""
     output = data.copy()
@@ -104,6 +109,8 @@ def required_stock_components(segment: str, report_date: object, form: object) -
 
 def _mapping_id(segment: str, report_date: object, form: object) -> str:
     date, form = pd.Timestamp(report_date), _normalise_form(form)
+    if form not in {"31", "41"}:
+        return f"{segment}_{form.zfill(3)}_unavailable_unsupported_form"
     if segment == "CRE" and form == "41":
         return f"CRE_041_{'legacy' if date < CRE_TAXONOMY_TRANSITION else 'successor'}_secured_re"
     if segment in {"CRE", "Mortgage"} and form == "31" and date < CONSOLIDATED_DETAIL_START:
@@ -130,7 +137,9 @@ def _aggregate_complete_flows(flows: pd.DataFrame) -> pd.DataFrame:
             "missing_prior_ytd_flag": int(usable["missing_prior_ytd_flag"].max()) if len(usable) else 0,
             "component_complete_flag": int(complete), "missing_flow_components": ",".join(missing),
             "flow_scope": _scope_for_form(key[2])})
-    return pd.DataFrame(rows)
+    columns = [*keys, "value", "amendment_or_reclass_flag", "missing_prior_ytd_flag",
+               "component_complete_flag", "missing_flow_components", "flow_scope"]
+    return pd.DataFrame(rows, columns=columns)
 
 
 def _aggregate_complete_stocks(stocks: pd.DataFrame) -> pd.DataFrame:
@@ -165,7 +174,9 @@ def _aggregate_complete_stocks(stocks: pd.DataFrame) -> pd.DataFrame:
         rows.append({**dict(zip(keys, key)), "value": value, "exposure_status": status,
             "exposure_complete": int(complete), "missing_stock_components": ",".join(missing),
             "mapping_id": mapping_id, "exposure_scope": scope, "reason": reason})
-    return pd.DataFrame(rows)
+    columns = [*keys, "value", "exposure_status", "exposure_complete",
+               "missing_stock_components", "mapping_id", "exposure_scope", "reason"]
+    return pd.DataFrame(rows, columns=columns)
 
 
 def build_credit_panel(standard: pd.DataFrame, institutions: pd.DataFrame, config: dict, lineage: pd.DataFrame | None = None) -> pd.DataFrame:
@@ -176,9 +187,17 @@ def build_credit_panel(standard: pd.DataFrame, institutions: pd.DataFrame, confi
     measures = pd.concat([stock_measures[keys + ["value"]], flow_measures[keys + ["value"]]], ignore_index=True)
     index_keys = ["bank_id", "report_date", "form", "segment"]
     segment_index = measures.loc[measures["segment"].isin(["CRE", "CI", "Mortgage"]), index_keys].drop_duplicates()
+    filing_columns = ["bank_id", "report_date", "form"]
+    filings = data.loc[data["standard_metric"].eq("filing_presence"), filing_columns].drop_duplicates()
+    if not filings.empty:
+        filing_spine = filings.merge(pd.DataFrame({"segment": ["CRE", "CI", "Mortgage"]}), how="cross")
+        segment_index = pd.concat([segment_index, filing_spine[index_keys]], ignore_index=True).drop_duplicates()
     segment_values = measures[measures["segment"].isin(["CRE", "CI", "Mortgage"])].pivot_table(
         index=index_keys, columns="standard_metric", values="value", aggfunc="first", dropna=False).reset_index()
     segment = segment_index.merge(segment_values, on=index_keys, how="left")
+    for segment_measure in ["exposure", "charge_off", "recovery"]:
+        if segment_measure not in segment:
+            segment[segment_measure] = np.nan
     stock_quality = stock_measures.loc[stock_measures["standard_metric"].eq("exposure"), index_keys + [
         "exposure_status", "exposure_complete", "missing_stock_components", "mapping_id", "exposure_scope", "reason"]]
     segment = segment.merge(stock_quality, on=index_keys, how="left", validate="one_to_one")
@@ -189,6 +208,9 @@ def build_credit_panel(standard: pd.DataFrame, institutions: pd.DataFrame, confi
 
     controls = measures[measures["segment"].eq("All")].pivot_table(index=["bank_id", "report_date", "form"], columns="standard_metric", values="value", aggfunc="first").reset_index()
     bank = controls.drop_duplicates(["bank_id", "report_date", "form"]).sort_values(["bank_id", "report_date"])
+    if "filing_bank_name" in standard:
+        filing_names = standard.loc[standard["standard_metric"].eq("filing_presence"), ["bank_id", "report_date", "form", "filing_bank_name"]].drop_duplicates()
+        bank = bank.merge(filing_names, on=["bank_id", "report_date", "form"], how="left", validate="one_to_one")
     bank["bank_total_npl"] = _column_or_na(bank, "total_npl")
     bank["bank_total_npl_ratio"] = bank["bank_total_npl"] / _column_or_na(bank, "total_loans").where(_column_or_na(bank, "total_loans") > 0)
     bank["equity_to_assets_ratio"] = _column_or_na(bank, "equity_capital") / _column_or_na(bank, "total_assets").where(_column_or_na(bank, "total_assets") > 0)
@@ -196,6 +218,9 @@ def build_credit_panel(standard: pd.DataFrame, institutions: pd.DataFrame, confi
     bank["computed_tier1_ratio"] = _column_or_na(bank, "tier1_capital") / _column_or_na(bank, "risk_weighted_assets").where(_column_or_na(bank, "risk_weighted_assets") > 0)
     bank["allowance_to_total_npl"] = _column_or_na(bank, "allowance") / bank["bank_total_npl"].where(bank["bank_total_npl"] > 0)
     bank["allowance_coverage"] = bank["allowance_to_total_npl"]
+    for required_control in ["total_loans", "total_assets", "tier1_capital"]:
+        if required_control not in bank:
+            bank[required_control] = np.nan
     bank["loan_growth"] = bank.groupby("bank_id")["total_loans"].pct_change(fill_method=None)
     bank["lagged_npl"] = bank.groupby("bank_id")["bank_total_npl"].shift(1)
     bank["lagged_bank_total_npl_ratio"] = bank.groupby("bank_id")["bank_total_npl_ratio"].shift(1)
@@ -213,6 +238,8 @@ def build_credit_panel(standard: pd.DataFrame, institutions: pd.DataFrame, confi
     panel["exposure_complete"] = panel["exposure_complete"].fillna(0).astype(int)
     panel["mapping_id"] = panel["mapping_id"].fillna(panel.apply(lambda r: _mapping_id(r["segment"], r["report_date"], r["form"]), axis=1))
     panel["exposure_scope"] = panel["exposure_scope"].fillna(panel["form"].map(_scope_for_form))
+    unsupported = ~panel["form"].map(_normalise_form).isin({"31", "41"})
+    panel.loc[unsupported & panel["reason"].isna(), "reason"] = panel.loc[unsupported, "form"].map(_unsupported_form_reason)
     panel["reason"] = panel["reason"].fillna("no_verified_same_scope_stock_mapping")
     panel["flow_scope"] = panel["flow_scope"].fillna(panel["form"].map(_scope_for_form))
     co_complete = _column_or_na(panel, "charge_off_component_complete").fillna(0).eq(1)
@@ -235,6 +262,7 @@ def build_credit_panel(standard: pd.DataFrame, institutions: pd.DataFrame, confi
     panel["segment_npl_rate"] = np.nan
     panel["cre_share"] = np.where(panel["segment"].eq("CRE") & panel["exposure_complete"].eq(1), panel["exposure"] / panel.get("total_loans"), np.nan)
     panel["cre_to_tier1"] = np.where(panel["segment"].eq("CRE") & panel["exposure_complete"].eq(1), panel["exposure"] / panel.get("tier1_capital"), np.nan)
-    panel["lagged_nco"] = panel.groupby(["bank_id", "segment"])["segment_nco"].shift()
+    prior_nco = panel.groupby(["bank_id", "segment"])["segment_nco"].shift()
+    panel["lagged_nco"] = prior_nco.where(prior_date.eq(expected_prior) & panel["segment_nco"].notna())
     panel["eligible_for_model"] = (panel["average_exposure"].ge(config["sample"]["small_exposure_thousands"]) & usable_rate).fillna(False).astype(int)
     return panel.merge(institutions[["bank_id", "cert", "bank_name"]], on="bank_id", how="left", validate="many_to_one")

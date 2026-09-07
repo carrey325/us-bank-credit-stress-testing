@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from bankstress.qa.report import write_qa
+from bankstress.qa.report import validate_r1_panel_transition_gate, validate_r1_reconciliation_gate, write_qa
 
 
 def _standard_with_reclass(revised_metric: str | None = None) -> pd.DataFrame:
@@ -83,3 +83,54 @@ def test_capital_reconciliation_flags_ratio_outside_one_basis_point(tmp_path: Pa
     panel.loc[0, "tier1_ratio"] = 0.1011
     recon, _ = write_qa(_standard_with_reclass(), panel, pd.DataFrame(), tmp_path)
     assert recon.loc[0, "capital_reconciliation_status"] == "FAIL_OUTSIDE_TOLERANCE"
+
+
+def _review_register(bank_id: str = "1", observed: float = 51, bound: float = 60) -> pd.DataFrame:
+    return pd.DataFrame([{
+        "bank_id": bank_id, "report_date": "2025-06-30", "excess_flow": "charge_off",
+        "observed_excess_thousands": observed, "max_abs_excess_thousands": bound,
+        "direct_source_review_status": "DIRECT_SOURCE_CONFIRMED",
+        "disposition": "REVIEW_REQUIRED_BOUNDED",
+    }])
+
+
+def test_r1_gate_fails_closed_on_capital_reconciliation_failure(tmp_path: Path):
+    panel = _panel_with_gross_flows(151, 10)
+    panel.loc[0, "tier1_ratio"] = 0.1011
+    recon, _ = write_qa(_standard_with_reclass(), panel, pd.DataFrame(), tmp_path)
+    try:
+        validate_r1_reconciliation_gate(recon, _review_register())
+    except ValueError as error:
+        assert "capital reconciliation" in str(error)
+    else:
+        raise AssertionError("capital reconciliation failure did not close the R1 gate")
+
+
+def test_r1_gate_requires_exact_enumeration_and_bound_for_review_rows(tmp_path: Path):
+    recon, _ = write_qa(_standard_with_reclass(), _panel_with_gross_flows(151, 10), pd.DataFrame(), tmp_path)
+    assert validate_r1_reconciliation_gate(recon, _review_register())["review_rows_validated"] == 1
+    for invalid in [_review_register(bank_id="2"), _review_register(bound=50)]:
+        try:
+            validate_r1_reconciliation_gate(recon, invalid)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("unregistered or unbounded REVIEW_REQUIRED row passed the R1 gate")
+
+
+def test_r1_panel_gate_rejects_unexplained_exit_and_accepts_audited_unavailable():
+    base = {
+        "bank_id": "962966", "report_date": pd.Timestamp("2020-03-31"), "segment": "CRE",
+        "form": "51", "filing_bank_name": "GOLDEN PACIFIC BANK, NATIONAL ASSOCIATION",
+        "exposure_status": "NOT_APPLICABLE", "mapping_id": "CRE_051_unavailable_unsupported_form",
+        "reason": "unsupported_ffiec_051_no_verified_segment_mapping",
+    }
+    accepted = pd.DataFrame([{**base, "sample_change": "RETAINED_EXPLICIT_UNAVAILABLE"}])
+    assert validate_r1_panel_transition_gate(accepted)["explicit_unavailable_bank_quarters"] == 1
+    rejected = pd.DataFrame([{**base, "sample_change": "EXITED_UNEXPLAINED"}])
+    try:
+        validate_r1_panel_transition_gate(rejected)
+    except ValueError as error:
+        assert "unexplained row exit" in str(error)
+    else:
+        raise AssertionError("unexplained old-panel exit passed the R1 gate")

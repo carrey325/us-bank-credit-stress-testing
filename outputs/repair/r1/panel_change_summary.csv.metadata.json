@@ -1,19 +1,20 @@
 {
-  "run_id": "r1-20260907T121900Z",
+  "run_id": "r1-20260907T141500Z",
   "stage": "R1",
-  "code_commit": "09e036b827463d915990f423941b6bff5c3349b0",
-  "code_tree_hash_or_dirty_diff_hash": "c5f6a37023b7ef72f7fe9ba5e742987f665d47afe85a375fb47c6f61fcec73e6",
+  "code_commit": "9e81ee01f7e1bf0fc9031aff263d5375e7dd0a7a",
+  "code_tree_hash_or_dirty_diff_hash": "5424f791fee7c401c7a72be7c7f98a593b8ca9658b38b55c3b528d0bb33b75e7",
   "artifact": "outputs/repair/r1/panel_change_summary.csv",
-  "artifact_hash": "b06e6b4799f04577498449a8dcd3f354280a3172a608420af3d2d89bbe544127",
+  "artifact_hash": "9ba3d43815a4044675e45f5f083b15fb829aeebe436828d2aaa7adf0d22bbd7b",
   "input_artifact_hashes": {
-    "data/standard/call_report_standard.parquet": "2d6be2da3887af08c5cb54ec3fcd0793babc5f6e6eed649f0f7919ccb0707e45",
+    "data/derived/credit_panel.parquet": "31d8b08ef6723174f759837badf248c71bdcd3d5f61a3a667c6b8ae9a2d61a79",
     "data/manifests/ffiec_manifest.csv": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
-    "metadata/field_mapping.csv": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6"
+    "metadata/field_mapping.csv": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+    "metadata/nco_reconciliation_review.csv": "5a37a34209e6459ada808e994814157d32be2fa1af92ce800248830a6cd6ff07"
   },
   "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
   "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
-  "data_definition_version": "mf772-r1-definitions-v1",
+  "data_definition_version": "mf772-r1-definitions-v2",
   "model_spec_hash": null,
-  "created_at": "2026-09-07T13:00:18.527837+00:00",
+  "created_at": "2026-09-07T14:33:00.267354+00:00",
   "validation_status": "PASS"
 }

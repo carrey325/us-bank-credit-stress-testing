@@ -18,6 +18,12 @@ evidence register is `metadata/field_mapping_evidence.csv`.
   stocks and consolidated RIAD flows.
 - FFIEC 031 C&I requires both 1763 and 1764. FFIEC 041 uses reported aggregate
   1766. Actual form is read independently from each archive's POR member.
+- RSSD 962966 filed as Golden Pacific Bank, N.A. on FFIEC 051 in all 20
+  quarters from 2017Q1 through 2021Q4. R1 has no independently verified 051
+  segment mapping, so those filings remain as 60 explicit segment placeholders
+  with form, date, POR identity, and an unsupported-form reason. No financial
+  value is imputed, and the placeholders prevent lag construction from bridging
+  the five-year reporting-form interval.
 - Mortgage remains closed-end 1-4 family first and junior liens. Revolving/open
   end item 1797 is excluded.
 - Total nonaccrual remains a bank-level fallback, never a segment NPL. Allowance,
@@ -43,3 +49,6 @@ adjacent same-scope quarters and is suppressed at marked merger discontinuities.
 
 The retained raw snapshot cannot support same-scope 031 CRE or Mortgage rates
 before 2013Q2. This range is `UNAVAILABLE`, not zero and not silently replaced.
+FFIEC 051 segment measures are likewise explicitly unavailable pending a
+separate independently evidenced mapping; this R1 repair does not claim 051
+support.

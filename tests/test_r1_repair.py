@@ -77,6 +77,24 @@ def test_nonconsecutive_exposure_and_form_scope_change_block_average_and_rate():
     panel = build_credit_panel(rows, pd.DataFrame([{"bank_id":"1", "cert":"1", "bank_name":"Test"}]), {"sample":{"small_exposure_thousands":1}})
     assert panel["average_exposure"].isna().all()
     assert panel["annualized_nco_rate"].isna().all()
+    assert panel["lagged_nco"].isna().all()
+
+
+def test_unsupported_filing_spine_retains_explicit_segment_placeholders():
+    filing = pd.DataFrame([{
+        "bank_id": "1", "report_date": pd.Timestamp("2020-03-31"), "form": "51",
+        "filing_bank_name": "Test Bank", "standard_metric": "filing_presence", "segment": "All",
+        "raw_code": "POR_FINANCIAL_INSTITUTION_FILING_TYPE", "numeric_value": 1.0,
+        "stock_flow": "stock", "ytd_flag": 0, "formula_group": "filing_presence",
+    }])
+    panel = build_credit_panel(filing, pd.DataFrame([{"bank_id":"1", "cert":"1", "bank_name":"Current Name"}]), {"sample":{"small_exposure_thousands":1}})
+    assert set(panel["segment"]) == {"CRE", "CI", "Mortgage"}
+    assert panel["form"].eq("51").all()
+    assert panel["filing_bank_name"].eq("Test Bank").all()
+    assert panel["exposure_status"].eq("NOT_APPLICABLE").all()
+    assert panel["reason"].eq("unsupported_ffiec_051_no_verified_segment_mapping").all()
+    assert panel["eligible_for_model"].eq(0).all()
+    assert panel["annualized_nco_rate"].isna().all()
 
 
 def test_negative_nco_is_retained_and_decimal_percent_units_are_distinct():

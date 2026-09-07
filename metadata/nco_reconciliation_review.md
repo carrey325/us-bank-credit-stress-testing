@@ -3,7 +3,10 @@
 The repaired core panel leaves 2 of 2,685 evaluable bank-quarters in
 `REVIEW_REQUIRED`. These are isolated reported gross-flow inconsistencies, not
 a form/date-wide mapping failure. They remain visible and are not forced to
-pass or added to the exception allow-list.
+pass or added to the exception allow-list. The machine-readable complete
+enumeration and observation-specific bounds are in
+`metadata/nco_reconciliation_review.csv`; the R1 gate rejects missing, extra,
+unreviewed, mismatched, or out-of-bound rows.
 
 | Bank ID | Quarter | Excess gross flow (USD thousands) |
 |---|---|---:|

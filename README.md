@@ -12,7 +12,7 @@ This project is a reproducible, public-data, top-down credit stress-testing fram
 
 ## Data
 
-The core unit is bank x loan segment x quarter. The generated historical panel contains 33 banks, 3 segments (CRE, C&I, and closed-end Mortgage), 84 quarters, and 8,145 observations. Inputs are official FFIEC Call Report bulk archives, FDIC BankFind records, and documented macroeconomic series. Raw source files are intentionally excluded from Git; manifests preserve source URLs, retrieval timestamps, and SHA-256 hashes.
+The core unit is bank x loan segment x quarter. The generated historical panel contains 33 banks, 3 segments (CRE, C&I, and closed-end Mortgage), 84 quarters, and 8,145 observations. This includes 60 explicit unavailable segment rows for one POR-verified FFIEC 051 interval; they carry no imputed financial values and prevent lags from bridging the reporting gap. Inputs are official FFIEC Call Report bulk archives, FDIC BankFind records, and documented macroeconomic series. Raw source files are intentionally excluded from Git; manifests preserve source URLs, retrieval timestamps, and SHA-256 hashes.
 
 The effective-dated regulatory mapping is in `metadata/field_mapping.csv`. Source and reconciliation caveats are retained in `metadata/` rather than silently repaired.
 
@@ -48,7 +48,7 @@ python -m pytest -q --basetemp .pytest-local
 
 ## Limitations
 
-- One FFIEC source reconciliation item remains `REVIEW_REQUIRED`; it is not reclassified without evidence.
+- Two isolated FFIEC gross-flow rows remain `REVIEW_REQUIRED`; both are directly reviewed, explicitly enumerated, and bounded in `metadata/nco_reconciliation_review.csv` rather than reclassified without evidence.
 - Some macro variables use a documented final-vintage, one-quarter-lag fallback rather than a full real-time vintage feed.
 - Bayesian posterior forecasts are unavailable under the documented environment fallback, so no posterior result is claimed.
 - Recursive CRE Q0.90 is not historically calibrated across all three pre-specified pseudo-stress windows and is not presented as a validated tail forecast.
