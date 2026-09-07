@@ -1,14 +1,16 @@
 {
   "cycle_id": "mf772-repair-v1",
   "status": "INVALID_PENDING_REBUILD",
+  "current_validated_stage": "R3_MINIMAL_PENDING_REVIEW",
   "invalidated_at": "2026-09-07T12:19:00Z",
   "base_commit": "09e036b827463d915990f423941b6bff5c3349b0",
-  "reason": "R2 regenerated mean-model and EDA artifacts from the validated R1 input; later-stage artifacts remain invalid.",
+  "reason": "R2 regenerated mean-model/EDA artifacts and minimal R3 regenerated only the enumerated tail and historical-validation artifacts. R4, model-risk calibration, reporting, and all non-enumerated legacy downstream artifacts remain invalid.",
   "audit_only_artifact_groups": [
-    "outputs/validation",
     "outputs/stress",
     "outputs/model_risk",
-    "outputs/reporting"
+    "outputs/reporting",
+    "outputs/validation/model_comparison.csv",
+    "outputs/validation/figures"
   ],
   "regenerated_artifact_groups": [
     "data/derived/macro_panel.parquet",
@@ -16,9 +18,20 @@
     "outputs/eda",
     "outputs/models/ar",
     "outputs/models/dynamic_fe",
-    "outputs/models/cre_interaction"
+    "outputs/models/cre_interaction",
+    "outputs/models/quantile/specification.yaml",
+    "outputs/validation/oos_predictions.parquet",
+    "outputs/validation/tail_metrics.csv",
+    "outputs/validation/quantile_fit_diagnostics.csv",
+    "outputs/validation/pseudo_stress.parquet",
+    "outputs/validation/pseudo_stress_metrics.csv",
+    "outputs/validation/pseudo_stress_training_support.csv",
+    "outputs/validation/pseudo_stress_methodology.yaml",
+    "outputs/validation/model_use_registry.json",
+    "outputs/validation/run_summary.md",
+    "outputs/repair/r3"
   ],
-  "permitted_use": "R2 mean-model and EDA artifacts may be used only for the R2 research gate and, after approval, the explicitly chosen R3 scope. Listed audit-only groups remain prohibited as validated inputs.",
+  "permitted_use": "R2 artifacts retain their approved R2 uses. Enumerated R3 artifacts support only the per-model, per-segment decisions in model_use_registry.json. R4 remains unauthorized pending Router verification and review; listed audit-only artifacts remain prohibited.",
   "baseline_local_snapshot": "tmp/r1_baseline_09e036b",
   "baseline_hashes": {
     "data/manifests/ffiec_manifest.csv": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",

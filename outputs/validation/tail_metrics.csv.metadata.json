@@ -1,0 +1,18 @@
+{
+  "run_id": "r3-20260907-minimal",
+  "stage": "R3",
+  "code_commit": "6f96d16f8dc6048e25e0e10b139498ffd8dd98bf",
+  "code_tree_hash_or_dirty_diff_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "artifact": "outputs/validation/tail_metrics.csv",
+  "artifact_hash": "8a600e0fded44ff19b2203a772b8d4bbb1a1249e79b1341c88071f3a7d53ee2b",
+  "input_artifact_hashes": {
+    "data/derived/model_panel.parquet": "e704877e9169535f60e46bb365454474ddf9a4a35bcd557613399a9a1b1a002d",
+    "outputs/repair/r2/validation_summary.json": "bd0aec8f5c87952dcb94b1297756e8035ff0a0d188b1613fb795a49248c26150"
+  },
+  "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+  "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+  "data_definition_version": "mf772-r1-definitions-v2",
+  "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+  "created_at": "2026-09-07T21:49:02.462950+00:00",
+  "validation_status": "PASS"
+}

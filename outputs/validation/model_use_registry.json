@@ -1,0 +1,368 @@
+[
+  {
+    "model_id": "ar_mean",
+    "segment": "CI",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "ALLOWED",
+    "one_step_mean_use": "ALLOWED",
+    "one_step_tail_use": "UNAVAILABLE",
+    "conditional_mean_stress_use": "ALLOWED",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Baseline model; not evidence of incremental macro benefit."
+    ],
+    "status_reason": "Recursive path is complete and uses frozen pre-window controls; tail-distribution use was not evaluated."
+  },
+  {
+    "model_id": "dynamic_fe",
+    "segment": "CI",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "ALLOWED",
+    "one_step_mean_use": "DIAGNOSTIC_ONLY",
+    "one_step_tail_use": "UNAVAILABLE",
+    "conditional_mean_stress_use": "ALLOWED",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Conditional macro path only; no claim of exact nonlinear expectation.",
+      "Dynamic FE improved RMSE in only 1/8 R2 segment-window comparisons."
+    ],
+    "status_reason": "Recursive path is complete and uses frozen pre-window controls; tail-distribution use was not evaluated."
+  },
+  {
+    "model_id": "ar_quantile_q50",
+    "segment": "CI",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  },
+  {
+    "model_id": "ar_quantile_q75",
+    "segment": "CI",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  },
+  {
+    "model_id": "ar_quantile_q90",
+    "segment": "CI",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  },
+  {
+    "model_id": "dynamic_quantile_q50",
+    "segment": "CI",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  },
+  {
+    "model_id": "dynamic_quantile_q75",
+    "segment": "CI",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  },
+  {
+    "model_id": "dynamic_quantile_q90",
+    "segment": "CI",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  },
+  {
+    "model_id": "ar_mean",
+    "segment": "CRE",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "ALLOWED",
+    "one_step_mean_use": "ALLOWED",
+    "one_step_tail_use": "UNAVAILABLE",
+    "conditional_mean_stress_use": "ALLOWED",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Baseline model; not evidence of incremental macro benefit."
+    ],
+    "status_reason": "Recursive path is complete and uses frozen pre-window controls; tail-distribution use was not evaluated."
+  },
+  {
+    "model_id": "dynamic_fe",
+    "segment": "CRE",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "ALLOWED",
+    "one_step_mean_use": "DIAGNOSTIC_ONLY",
+    "one_step_tail_use": "UNAVAILABLE",
+    "conditional_mean_stress_use": "DIAGNOSTIC_ONLY",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Conditional macro path only; no claim of exact nonlinear expectation.",
+      "Dynamic FE improved RMSE in only 1/8 R2 segment-window comparisons."
+    ],
+    "status_reason": "Path rows are preserved, but at least one supplied macro-path feature is unavailable; formal stress use is not authorized."
+  },
+  {
+    "model_id": "ar_quantile_q50",
+    "segment": "CRE",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  },
+  {
+    "model_id": "ar_quantile_q75",
+    "segment": "CRE",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  },
+  {
+    "model_id": "ar_quantile_q90",
+    "segment": "CRE",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  },
+  {
+    "model_id": "dynamic_quantile_q50",
+    "segment": "CRE",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  },
+  {
+    "model_id": "dynamic_quantile_q75",
+    "segment": "CRE",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  },
+  {
+    "model_id": "dynamic_quantile_q90",
+    "segment": "CRE",
+    "input_run_id": "r2-20260907T194522Z",
+    "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+    "descriptive_use": "DIAGNOSTIC_ONLY",
+    "one_step_mean_use": "UNAVAILABLE",
+    "one_step_tail_use": "DIAGNOSTIC_ONLY",
+    "conditional_mean_stress_use": "UNAVAILABLE",
+    "multi_step_tail_distribution_use": "UNAVAILABLE",
+    "evidence_files": [
+      "outputs/repair/r2/research_decision.md",
+      "outputs/validation/tail_metrics.csv",
+      "outputs/validation/quantile_fit_diagnostics.csv",
+      "outputs/validation/pseudo_stress_metrics.csv",
+      "outputs/validation/pseudo_stress_training_support.csv"
+    ],
+    "limitations": [
+      "Minimal R3 one-step evaluation only; calibration expansion was not evaluated.",
+      "Fixed-quantile recursive feedback is sensitivity, not a cumulative-loss quantile."
+    ],
+    "status_reason": "One-step fits converged."
+  }
+]
