@@ -1,12 +1,12 @@
 {
   "cycle_id": "mf772-repair-v1",
   "base_commit": "09e036b827463d915990f423941b6bff5c3349b0",
-  "current_stage": "R2",
-  "status": "WAITING_REVIEW",
+  "current_stage": "R3",
+  "status": "PENDING",
   "active_worker_id": null,
   "input_run_id": "r2-20260907T194522Z",
-  "checkpoint_commit": "fff63c3608f896e8f74c06de8956956866999273",
-  "review_status": "PENDING_SUBMISSION",
+  "checkpoint_commit": "ce667cfc5f04a1797b694e763dacb59689c87066",
+  "review_status": "NOT_SUBMITTED",
   "blocker": null,
-  "next_action": "Submit Astra Extra High R2 re-review; after approval, conduct the mandatory post-R2 research-scope retrospective and obtain the scope decision. Do not authorize or start R3 or R4 directly."
+  "next_action": "START_ONE_SOL_MID_MINIMAL_R3_WORKER_FROM_ce667cf; execute only Option A scope. R4 remains conditional and must not start before R3 approval."
 }
