@@ -2,11 +2,11 @@
   "cycle_id": "mf772-repair-v1",
   "base_commit": "09e036b827463d915990f423941b6bff5c3349b0",
   "current_stage": "R3",
-  "status": "PENDING",
+  "status": "WAITING_REVIEW",
   "active_worker_id": null,
-  "input_run_id": "r2-20260907T194522Z",
-  "checkpoint_commit": "ce667cfc5f04a1797b694e763dacb59689c87066",
-  "review_status": "NOT_SUBMITTED",
+  "input_run_id": "r3-20260907-minimal",
+  "checkpoint_commit": "64afaea6bc376ffee07d99d14135132c2f654c5f",
+  "review_status": "PENDING_SUBMISSION",
   "blocker": null,
-  "next_action": "START_ONE_SOL_MID_MINIMAL_R3_WORKER_FROM_ce667cf; execute only Option A scope. R4 remains conditional and must not start before R3 approval."
+  "next_action": "SUBMIT_R3_STAGE_REVIEW_VIA_COMPUTER_USE; use Astra Extra High and commit 64afaea6bc376ffee07d99d14135132c2f654c5f. R4 remains conditional and must not start before R3 approval."
 }
