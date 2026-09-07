@@ -1,7 +1,7 @@
 {
-  "run_id": "r3-20260907-minimal",
+  "run_id": "r3-20260907-jumpoff-lineage-repair",
   "stage": "R3",
-  "code_commit": "6f96d16f8dc6048e25e0e10b139498ffd8dd98bf",
+  "code_commit": "854945c04045af85db7c47579d62374275b2388c",
   "code_tree_hash_or_dirty_diff_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "artifact": "outputs/repair/artifact_status.json",
   "artifact_hash": "579fa7b64c6c797ec525a616aadb5aada4dba863302becec1de5ed46528ccdfe",
@@ -13,6 +13,6 @@
   "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
   "data_definition_version": "mf772-r1-definitions-v2",
   "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
-  "created_at": "2026-09-07T21:49:03.310756+00:00",
+  "created_at": "2026-09-07T23:25:18.032832+00:00",
   "validation_status": "PASS"
 }

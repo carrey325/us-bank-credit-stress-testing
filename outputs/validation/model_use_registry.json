@@ -19,7 +19,7 @@
     "limitations": [
       "Baseline model; not evidence of incremental macro benefit."
     ],
-    "status_reason": "Recursive path is complete and uses frozen pre-window controls; tail-distribution use was not evaluated."
+    "status_reason": "Recursive path is complete and uses verified current train-end controls frozen with per-control source-quarter lineage; tail-distribution use was not evaluated."
   },
   {
     "model_id": "dynamic_fe",
@@ -42,7 +42,7 @@
       "Conditional macro path only; no claim of exact nonlinear expectation.",
       "Dynamic FE improved RMSE in only 1/8 R2 segment-window comparisons."
     ],
-    "status_reason": "Recursive path is complete and uses frozen pre-window controls; tail-distribution use was not evaluated."
+    "status_reason": "Recursive path is complete and uses verified current train-end controls frozen with per-control source-quarter lineage; tail-distribution use was not evaluated."
   },
   {
     "model_id": "ar_quantile_q50",
@@ -202,7 +202,7 @@
     "limitations": [
       "Baseline model; not evidence of incremental macro benefit."
     ],
-    "status_reason": "Recursive path is complete and uses frozen pre-window controls; tail-distribution use was not evaluated."
+    "status_reason": "Recursive path is complete and uses verified current train-end controls frozen with per-control source-quarter lineage; tail-distribution use was not evaluated."
   },
   {
     "model_id": "dynamic_fe",

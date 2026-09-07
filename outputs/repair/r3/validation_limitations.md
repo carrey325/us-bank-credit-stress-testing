@@ -6,6 +6,7 @@
 - One-step quantiles are diagnostic only; zero exceedances are not interpreted as success. Raw and rearranged forecasts are both retained.
 - Independently fitted quantiles crossed in 507 model-family/window/segment row instances before rearrangement; this is retained as instability evidence.
 - Recursive mean paths condition on realized macro paths and frozen jump-off bank controls. They are plug-in paths, not asserted exact expectations.
+- Jump-off controls use current train-end values. Banks lacking a complete current NPL, allowance coverage, Tier 1 ratio, or adjacent-quarter loan-growth state are excluded and counted in `pseudo_stress_training_support.csv`.
 - Fixed-Q0.90 recursive paths are sensitivity diagnostics only. No cumulative-loss Q0.90 or multi-period tail distribution was computed.
 - Historical scoring uses available realized outcomes, while generation remains continuous when outcomes are unavailable. GFC training has few independent quarterly time points despite its cross-section.
 - One-step post-rearrangement Q0.90 evaluation contains 5578 scored bank-quarters across reported segment-windows; window-level exceedance counts and rates are in `tail_metrics.csv`.
