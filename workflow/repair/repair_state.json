@@ -1,12 +1,16 @@
 {
   "cycle_id": "mf772-repair-v1",
   "base_commit": "09e036b827463d915990f423941b6bff5c3349b0",
-  "current_stage": "R3",
-  "status": "WAITING_REVIEW",
+  "current_stage": "R4",
+  "status": "PENDING",
   "active_worker_id": null,
-  "input_run_id": "r3-20260907-minimal",
-  "checkpoint_commit": "64afaea6bc376ffee07d99d14135132c2f654c5f",
-  "review_status": "PENDING_SUBMISSION",
+  "input_run_id": "r3-20260907-recursive-source-lineage-repair",
+  "checkpoint_commit": "daabd4d52f8d2d3039e1ef116197adde5954cacf",
+  "review_status": "NOT_SUBMITTED",
   "blocker": null,
-  "next_action": "SUBMIT_R3_STAGE_REVIEW_VIA_COMPUTER_USE; use Astra Extra High and commit 64afaea6bc376ffee07d99d14135132c2f654c5f. R4 remains conditional and must not start before R3 approval."
+  "reviewer_instruction": "Preserve all repaired jump-off values, model estimates, quantile results, current model-use permissions, and minimal Option-A scope. Persist lagged_loan_growth_prior_component_source_period into every pseudo_stress recursive row; validate that the growth-value source equals train_end and the denominator/prior-component source equals the adjacent prior quarter. Make recursive NCO lineage truthful across unavailable predictions by carrying each bank's last actual recursive state value, source period, and source type unchanged until a new modeled prediction exists. Add an unavailable-middle-quarter regression that verifies the next quarter's value/source/type. Commit code/tests first, regenerate affected historical-validation artifacts and sidecars from that clean checkpoint, rerun R3/full validation, and keep R4 untouched.",
+  "carry_forward_limitations": "The two disclosed incomplete GFC jump-off exclusions, 507 pre-rearrangement quantile crossings, diagnostic-only one-step quantile use, six-quarter GFC training support, residual calibration/Bayesian/multi-period tail distribution NOT_EVALUATED status, R2 negative findings, and existing data-availability limitations may remain.",
+  "r3_review_result": "APPROVED",
+  "r4_scope_path": "workflow/repair/post_r3_r4_scope.md",
+  "next_action": "START_ONE_SOL_MID_LIMITED_R4_WORKER; execute only the registry-authorized conditional R4 scope in workflow/repair/post_r3_r4_scope.md and workflow/repair/R4_Stress_Rebuild_and_Delivery.md."
 }
