@@ -573,7 +573,7 @@ def _audit(root: Path, tables: list[dict[str, str]], figures: list[dict[str, str
     ]}
 
 
-def _run_batch5_legacy(root: Path) -> dict[str, Any]:
+def _build_report_legacy(root: Path) -> dict[str, Any]:
     """Generate every Batch 5 artifact from real prior-batch outputs."""
     model_risk = root / "outputs" / "model_risk"
     reporting = root / "outputs" / "reporting"
@@ -821,7 +821,7 @@ def _write_r4_report(root: Path, resume: dict[str, Any], rq: dict[str, Any]) -> 
     return destination
 
 
-def run_batch5(root: Path) -> dict[str, Any]:
+def build_report(root: Path) -> dict[str, Any]:
     """Build only the reporting artifacts supported by the limited R4 scope."""
     from bankstress.artifacts import write_artifact_metadata
     from bankstress.stress import R4_RUN_ID

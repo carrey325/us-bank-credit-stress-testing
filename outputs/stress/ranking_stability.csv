@@ -1,2 +1,0 @@
-scenario,segment_scope,left_model,right_model,n_banks,spearman_rank_correlation,top_group_n,top_group_overlap,status
-severely_adverse,CI_ONLY_COMMON_BANKS,ar_mean,dynamic_fe,31,0.8225806451612904,8,0.75,LIMITED_CHALLENGER_SENSITIVITY_NOT_FULL_PORTFOLIO_RANKING

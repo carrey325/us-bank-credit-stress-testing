@@ -1,3 +1,0 @@
-model,oos_observations,pooled_oos_rmse,rmse_improvement_vs_ar
-ar,2437.0,0.036353848334301234,0.0
-dynamic_fe,2437.0,0.04730088487576233,-0.3011245588306027

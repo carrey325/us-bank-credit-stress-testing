@@ -1,7 +1,0 @@
-pseudo_window,segment,requested_training_start,effective_training_start,training_end,training_quarters,training_banks,features,effective_training_samples,jump_off_candidate_banks,jump_off_current_control_exclusions,jump_off_banks,forecast_quarters,expected_path_rows_per_model,gfc_2005_start_verified,bank_controls_frozen,jump_off_current_controls_verified,frozen_control_source_mismatch_count,loan_growth_prior_component_source_verified,loan_growth_prior_component_source_mismatch_count,future_control_leakage_count
-GFC,CRE,2005-01-01,2005-09-30,2006-12-31,6,17,9,58,12,1,11,16,176,True,True,True,0,True,0,0
-GFC,CI,2005-01-01,2005-09-30,2006-12-31,6,31,9,135,25,1,24,16,384,True,True,True,0,True,0,0
-COVID,CRE,2005-01-01,2005-09-30,2019-12-31,58,33,9,1031,29,0,29,8,232,True,True,True,0,True,0,0
-COVID,CI,2005-01-01,2005-09-30,2019-12-31,58,32,9,1489,28,0,28,8,224,True,True,True,0,True,0,0
-High_Rate_CRE,CRE,2005-01-01,2005-09-30,2021-12-31,66,33,9,1268,30,0,30,16,480,True,True,True,0,True,0,0
-High_Rate_CRE,CI,2005-01-01,2005-09-30,2021-12-31,66,32,9,1720,29,0,29,16,464,True,True,True,0,True,0,0

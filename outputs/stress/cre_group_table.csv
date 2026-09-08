@@ -1,4 +1,0 @@
-cre_group,n_banks,cre_to_tier1_min,cre_to_tier1_max,mean_modeled_cre_burden,mean_mechanical_equal_rate_burden,mean_modeled_cre_loss_thousands,equal_loss_rate_reference,interpretation
-Low,10,0.027525252481635697,1.4996226878735526,0.0031691877975964762,0.0027701196931060475,42629.82652465628,0.003283905205181449,Exposure/Tier1 decomposition only; no causal concentration effect
-Mid,10,1.7121863484821898,2.758079064669138,0.005153195834653505,0.007323779120445431,57080.862800571056,0.003283905205181449,Exposure/Tier1 decomposition only; no causal concentration effect
-High,11,2.7795314353295884,4.645741730365961,0.013325317952195033,0.011909214989142465,81852.71905553411,0.003283905205181449,Exposure/Tier1 decomposition only; no causal concentration effect

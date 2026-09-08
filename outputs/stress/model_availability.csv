@@ -1,7 +1,0 @@
-model,segment,formal_status,reporting_role
-ar_mean,CI,ALLOWED,formal baseline
-ar_mean,CRE,ALLOWED,formal baseline
-dynamic_fe,CI,ALLOWED,limited challenger; improved RMSE in 1/8 R2 comparisons
-dynamic_fe,CRE,DIAGNOSTIC_ONLY,excluded from formal R4 paths and rankings
-all_quantile_models,CI/CRE,UNAVAILABLE,one-step diagnostic only; no recursive stress or tail ranking
-bayesian,CI/CRE,NOT_EVALUATED,deferred

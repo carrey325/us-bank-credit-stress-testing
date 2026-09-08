@@ -1,6 +1,12 @@
 .venv/
 __pycache__/
 .pytest_cache/
+.pytest*/
+/tmp/
+/outputs/
+/data/external/
+*.metadata.json
+!metadata/manual_source_audit.csv.metadata.json
 .pytest-tmp-*/
 *.egg-info/
 # Raw/standard/derived data are local reproducibility inputs, never Git assets.
@@ -37,15 +43,9 @@ secrets*.json
 .ruff_cache/
 .hypothesis/
 
-# Generated outputs: retain intentionally tracked, small model summaries only.
-outputs/qa/*.csv
-outputs/qa/*.md
-outputs/batch1_recovery/
-outputs/models/*_stdout.log
-outputs/models/*_stderr.log
-outputs/models/run_failures.log
-outputs/**/*.pkl
-outputs/**/*.pickle
-outputs/**/*.joblib
-outputs/**/*.h5
-outputs/**/*.hdf5
+# Publish selected evidence under results/; model binaries remain local.
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.hdf5

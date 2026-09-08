@@ -1,5 +1,0 @@
-model,segment_scope,formal_use,banks,baseline_loss_thousands,severe_loss_thousands,mean_severe_modeled_credit_loss_burden,capital_depletion,capital_depletion_reason,mortgage_loss,mortgage_loss_reason
-ar_mean,CI,FORMAL_BASELINE,31,5401896.149640466,5401896.149640466,0.017223798724480276,,Unavailable: no capital roll-forward; burden is loss / starting Tier1,,Unavailable: no approved Mortgage stress model
-ar_mean,CRE,FORMAL_BASELINE,31,1897486.8028631487,1897486.8028631487,0.007412978509569149,,Unavailable: no capital roll-forward; burden is loss / starting Tier1,,Unavailable: no approved Mortgage stress model
-dynamic_fe,CI,LIMITED_CHALLENGER,31,2278916.3360929247,12286838.751239799,0.03957829456298816,,Unavailable: no capital roll-forward; burden is loss / starting Tier1,,Unavailable: no approved Mortgage stress model
-ar_mean,CRE+CI,FORMAL_BASELINE,31,7299382.952503614,7299382.952503614,0.024636777234049525,,Unavailable: no capital roll-forward; burden is loss / starting Tier1,,Unavailable: no approved Mortgage stress model

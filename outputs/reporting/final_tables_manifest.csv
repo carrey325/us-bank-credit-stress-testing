@@ -1,6 +1,0 @@
-table_id,path,description,status
-T1,outputs/reporting/tables/sample_coverage.csv,"Historical, scoring, and stress universes",generated
-T2,outputs/reporting/tables/data_quality.csv,Data definitions and QA,generated
-T3,outputs/reporting/tables/model_comparison.csv,"Same-target, same-key mean comparisons",generated
-T4,outputs/reporting/tables/fed_stress_results.csv,Authorized conditional-mean stress,generated
-T5,outputs/reporting/tables/robustness_model_risk.csv,Bounded sensitivities and unavailable model-risk items,generated

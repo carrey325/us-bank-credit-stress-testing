@@ -494,7 +494,7 @@ def committed_mean_model_oos_comparison(root: Path) -> tuple[pd.DataFrame, str, 
     return comparison, str(best["model"]), float(best["rmse_improvement_vs_ar"])
 
 
-def _run_batch4_legacy(root: Path, session: requests.sessions.Session | None = None) -> dict[str, Any]:
+def _run_stress_legacy(root: Path, session: requests.sessions.Session | None = None) -> dict[str, Any]:
     panel_path = root / "data" / "derived" / "model_panel.parquet"
     if not panel_path.exists():
         raise FileNotFoundError("Batch 4 requires the real Batch 1--3 model panel")
@@ -861,7 +861,7 @@ def _write_r4_sidecars(root: Path, paths: list[Path], gate: dict[str, Any]) -> N
         )
 
 
-def run_batch4(root: Path, session: requests.sessions.Session | None = None) -> dict[str, Any]:
+def run_stress(root: Path, session: requests.sessions.Session | None = None) -> dict[str, Any]:
     """Run the bounded, registry-gated R4 conditional-mean stress rebuild."""
     gate = validate_formal_r4_inputs(root)
     panel = pd.read_parquet(root / "data/derived/model_panel.parquet")

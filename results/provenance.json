@@ -1,0 +1,230 @@
+{
+  "description": "Recorded analytical evidence; copied without refitting or editing source rows",
+  "source_checkout": "ca6c88bfed58cd8cc5570a06364b8e391830e55c",
+  "field_mapping_sha256": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+  "files": [
+    {
+      "file": "evidence/sample.csv",
+      "source_path": "outputs/eda/sample_stats.csv",
+      "sha256": "17e84d610bc469951c67cae5617a8810b057100771778ce04dd47de6c053d9c0",
+      "original_lineage": {
+        "run_id": "r2-20260907T180705Z",
+        "stage": "R2",
+        "code_commit": "dd6a4969a5fd9b87331e7f6728aaa2acf2c83273",
+        "code_tree_hash_or_dirty_diff_hash": "c5809055b3f8c4de22db9ba68b0a6257adc6d570caf66e471856e53f341e6398",
+        "artifact": "outputs/eda/sample_stats.csv",
+        "artifact_hash": "17e84d610bc469951c67cae5617a8810b057100771778ce04dd47de6c053d9c0",
+        "input_artifact_hashes": {
+          "data/derived/model_panel.parquet": "e704877e9169535f60e46bb365454474ddf9a4a35bcd557613399a9a1b1a002d"
+        },
+        "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+        "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+        "data_definition_version": "mf772-r1-definitions-v2",
+        "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+        "created_at": "2026-09-07T18:07:09.466545+00:00",
+        "validation_status": "PASS"
+      }
+    },
+    {
+      "file": "evidence/mean_model_comparison.csv",
+      "source_path": "outputs/reporting/tables/model_comparison.csv",
+      "sha256": "0b029d70bc16909fa418bf99ceae99243b5682744ba38b8c8d1751a129926df3",
+      "original_lineage": {
+        "run_id": "r4-20260908-limited-delivery",
+        "stage": "R4",
+        "code_commit": "c5b1b1989fc39c0bcd7ff462f3543cadc616470e",
+        "code_tree_hash_or_dirty_diff_hash": "094080b1b03d012f9fa9700958dfb3d379545b5482f03c18b8308c7ed265cada",
+        "artifact": "outputs/reporting/tables/model_comparison.csv",
+        "artifact_hash": "0b029d70bc16909fa418bf99ceae99243b5682744ba38b8c8d1751a129926df3",
+        "input_artifact_hashes": {
+          "outputs/stress/stress_paths.parquet": "4f20d837b320047d96b63bf56afb6912340dc74d553ee5f2016a47637b117195",
+          "outputs/stress/t4_fed_stress_results.csv": "fc79395365b291bb70016f54e6576968c415f4e067aae00223d387053e4240f6",
+          "outputs/validation/model_use_registry.json": "b347089eb3ab0a98dcef52a13654305953f2f55a7689818b8a9530e72e854afb",
+          "outputs/repair/r3/validation_summary.json": "4b048a119fe2644f296fd3d3385ea1d24843e59682a5ea9d40f244db5cb3d9ad"
+        },
+        "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+        "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+        "data_definition_version": "mf772-r1-definitions-v2",
+        "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+        "created_at": "2026-09-08T02:54:24.721156+00:00",
+        "validation_status": "PASS"
+      }
+    },
+    {
+      "file": "evidence/tail_metrics.csv",
+      "source_path": "outputs/validation/tail_metrics.csv",
+      "sha256": "8a600e0fded44ff19b2203a772b8d4bbb1a1249e79b1341c88071f3a7d53ee2b",
+      "original_lineage": {
+        "run_id": "r3-20260907-jumpoff-lineage-repair",
+        "stage": "R3",
+        "code_commit": "854945c04045af85db7c47579d62374275b2388c",
+        "code_tree_hash_or_dirty_diff_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifact": "outputs/validation/tail_metrics.csv",
+        "artifact_hash": "8a600e0fded44ff19b2203a772b8d4bbb1a1249e79b1341c88071f3a7d53ee2b",
+        "input_artifact_hashes": {
+          "data/derived/model_panel.parquet": "e704877e9169535f60e46bb365454474ddf9a4a35bcd557613399a9a1b1a002d",
+          "outputs/repair/r2/validation_summary.json": "bd0aec8f5c87952dcb94b1297756e8035ff0a0d188b1613fb795a49248c26150"
+        },
+        "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+        "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+        "data_definition_version": "mf772-r1-definitions-v2",
+        "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+        "created_at": "2026-09-07T23:25:16.679233+00:00",
+        "validation_status": "PASS"
+      }
+    },
+    {
+      "file": "evidence/stress_by_bank.csv",
+      "source_path": "outputs/stress/conditional_mean_summary.csv",
+      "sha256": "6a4691564213292f2a7fd906c94c38f25c47ebf4243a7892476978e11a4c916f",
+      "original_lineage": {
+        "run_id": "r4-20260908-limited-delivery",
+        "stage": "R4",
+        "code_commit": "c5b1b1989fc39c0bcd7ff462f3543cadc616470e",
+        "code_tree_hash_or_dirty_diff_hash": "094080b1b03d012f9fa9700958dfb3d379545b5482f03c18b8308c7ed265cada",
+        "artifact": "outputs/stress/conditional_mean_summary.csv",
+        "artifact_hash": "6a4691564213292f2a7fd906c94c38f25c47ebf4243a7892476978e11a4c916f",
+        "input_artifact_hashes": {
+          "data/derived/model_panel.parquet": "e704877e9169535f60e46bb365454474ddf9a4a35bcd557613399a9a1b1a002d",
+          "outputs/validation/model_use_registry.json": "b347089eb3ab0a98dcef52a13654305953f2f55a7689818b8a9530e72e854afb",
+          "outputs/repair/r2/validation_summary.json": "bd0aec8f5c87952dcb94b1297756e8035ff0a0d188b1613fb795a49248c26150",
+          "outputs/repair/r3/validation_summary.json": "4b048a119fe2644f296fd3d3385ea1d24843e59682a5ea9d40f244db5cb3d9ad",
+          "metadata/fed_2026_scenario_manifest.csv": "cf0ee44abf516e27668018b46640fa830b930a7b682b5b7402906e8e75047cc9",
+          "configs/stress_specs.yaml": "63deb5ab4f155d7be1bbe59fdfa3706c918f83c7334b221d045528eaadd33dde",
+          "configs/macro_series.yaml": "fcfb68229ac9c393e245ade210cd31bfbc091b6381b5a2a72b7a6c97c5fb1762"
+        },
+        "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+        "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+        "data_definition_version": "mf772-r1-definitions-v2",
+        "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+        "created_at": "2026-09-08T02:54:20.669167+00:00",
+        "validation_status": "PASS"
+      }
+    },
+    {
+      "file": "evidence/stress_results.csv",
+      "source_path": "outputs/reporting/tables/fed_stress_results.csv",
+      "sha256": "35a4e515a9f38abd703c5339e300a02546c24c5840fcf9af70e0cbd345db335e",
+      "original_lineage": {
+        "run_id": "r4-20260908-limited-delivery",
+        "stage": "R4",
+        "code_commit": "c5b1b1989fc39c0bcd7ff462f3543cadc616470e",
+        "code_tree_hash_or_dirty_diff_hash": "094080b1b03d012f9fa9700958dfb3d379545b5482f03c18b8308c7ed265cada",
+        "artifact": "outputs/reporting/tables/fed_stress_results.csv",
+        "artifact_hash": "35a4e515a9f38abd703c5339e300a02546c24c5840fcf9af70e0cbd345db335e",
+        "input_artifact_hashes": {
+          "outputs/stress/stress_paths.parquet": "4f20d837b320047d96b63bf56afb6912340dc74d553ee5f2016a47637b117195",
+          "outputs/stress/t4_fed_stress_results.csv": "fc79395365b291bb70016f54e6576968c415f4e067aae00223d387053e4240f6",
+          "outputs/validation/model_use_registry.json": "b347089eb3ab0a98dcef52a13654305953f2f55a7689818b8a9530e72e854afb",
+          "outputs/repair/r3/validation_summary.json": "4b048a119fe2644f296fd3d3385ea1d24843e59682a5ea9d40f244db5cb3d9ad"
+        },
+        "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+        "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+        "data_definition_version": "mf772-r1-definitions-v2",
+        "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+        "created_at": "2026-09-08T02:54:24.846398+00:00",
+        "validation_status": "PASS"
+      }
+    },
+    {
+      "file": "evidence/cre_interaction.csv",
+      "source_path": "outputs/models/cre_interaction/interaction_coefficients.csv",
+      "sha256": "7295cd4dd437840b3cefaa7e6f9f5c499bcdedf476e449e26df7676287451465",
+      "original_lineage": {
+        "run_id": "r2-20260907T194522Z",
+        "stage": "R2",
+        "code_commit": "8a65cc875dd9996faf19fca5e4b5356dfc34df63",
+        "code_tree_hash_or_dirty_diff_hash": "0368e7c26fbf3106813192efebd5c3f75c36a95ea02adac05c2b61c67ffe7f3a",
+        "artifact": "outputs/models/cre_interaction/interaction_coefficients.csv",
+        "artifact_hash": "7295cd4dd437840b3cefaa7e6f9f5c499bcdedf476e449e26df7676287451465",
+        "input_artifact_hashes": {
+          "data/derived/model_panel.parquet": "e704877e9169535f60e46bb365454474ddf9a4a35bcd557613399a9a1b1a002d",
+          "outputs/repair/r2/cre_realized_shock_audit.csv": "4e6a7213e689b0e9340c3ae6196c62dc758b3587295ae4fca61046151e0d7a46"
+        },
+        "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+        "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+        "data_definition_version": "mf772-r1-definitions-v2",
+        "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+        "created_at": "2026-09-07T19:45:22.946389+00:00",
+        "validation_status": "PASS"
+      }
+    },
+    {
+      "file": "evidence/cre_price_shock.csv",
+      "source_path": "outputs/repair/r2/cre_realized_shock_audit.csv",
+      "sha256": "4e6a7213e689b0e9340c3ae6196c62dc758b3587295ae4fca61046151e0d7a46",
+      "original_lineage": {
+        "run_id": "r2-20260907T194522Z",
+        "stage": "R2",
+        "code_commit": "8a65cc875dd9996faf19fca5e4b5356dfc34df63",
+        "code_tree_hash_or_dirty_diff_hash": "0368e7c26fbf3106813192efebd5c3f75c36a95ea02adac05c2b61c67ffe7f3a",
+        "artifact": "outputs/repair/r2/cre_realized_shock_audit.csv",
+        "artifact_hash": "4e6a7213e689b0e9340c3ae6196c62dc758b3587295ae4fca61046151e0d7a46",
+        "input_artifact_hashes": {
+          "metadata/macro_download_manifest.csv": "79254beae3f49c0053896a4bd891079f151c8148ce50af92ddd8f6e2fa6a86dd",
+          "data/raw/macro/COMREPUSQ159N_final.csv": "d412cb53132a62a4d4326cd1d9029535d43369311a621f4162c525d0210858f9"
+        },
+        "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+        "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+        "data_definition_version": "mf772-r1-definitions-v2",
+        "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+        "created_at": "2026-09-07T19:45:22.852143+00:00",
+        "validation_status": "PASS"
+      }
+    },
+    {
+      "file": "evidence/bayesian_diagnostics.csv",
+      "source_path": "outputs/models/bayesian/diagnostics.csv",
+      "sha256": "461f42dbd01a8d4b4454b1423607022445a7a26ad76ffe3de1ac119fe13b9681",
+      "original_lineage": null
+    },
+    {
+      "file": "evidence/validation.json",
+      "source_path": "outputs/repair/r3/validation_summary.json",
+      "sha256": "4b048a119fe2644f296fd3d3385ea1d24843e59682a5ea9d40f244db5cb3d9ad",
+      "original_lineage": {
+        "run_id": "r3-20260907-jumpoff-lineage-repair",
+        "stage": "R3",
+        "code_commit": "acb7efc158bca0dfce423e89db0aee29ffae94e1",
+        "code_tree_hash_or_dirty_diff_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifact": "outputs/repair/r3/validation_summary.json",
+        "artifact_hash": "4b048a119fe2644f296fd3d3385ea1d24843e59682a5ea9d40f244db5cb3d9ad",
+        "input_artifact_hashes": {
+          "data/derived/model_panel.parquet": "e704877e9169535f60e46bb365454474ddf9a4a35bcd557613399a9a1b1a002d",
+          "outputs/repair/r2/validation_summary.json": "bd0aec8f5c87952dcb94b1297756e8035ff0a0d188b1613fb795a49248c26150"
+        },
+        "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+        "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+        "data_definition_version": "mf772-r1-definitions-v2",
+        "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+        "created_at": "2026-09-08T00:59:08.964122+00:00",
+        "validation_status": "PASS"
+      }
+    },
+    {
+      "file": "evidence/reproducibility.json",
+      "source_path": "outputs/reporting/reproducibility_audit.json",
+      "sha256": "c684971be2b19fa0fa8c9cf0da372cb68b29cc1292a1fc7a5da08599ed13c91a",
+      "original_lineage": {
+        "run_id": "r4-20260908-limited-delivery",
+        "stage": "R4",
+        "code_commit": "c5b1b1989fc39c0bcd7ff462f3543cadc616470e",
+        "code_tree_hash_or_dirty_diff_hash": "094080b1b03d012f9fa9700958dfb3d379545b5482f03c18b8308c7ed265cada",
+        "artifact": "outputs/reporting/reproducibility_audit.json",
+        "artifact_hash": "c684971be2b19fa0fa8c9cf0da372cb68b29cc1292a1fc7a5da08599ed13c91a",
+        "input_artifact_hashes": {
+          "outputs/stress/stress_paths.parquet": "4f20d837b320047d96b63bf56afb6912340dc74d553ee5f2016a47637b117195",
+          "outputs/stress/t4_fed_stress_results.csv": "fc79395365b291bb70016f54e6576968c415f4e067aae00223d387053e4240f6",
+          "outputs/validation/model_use_registry.json": "b347089eb3ab0a98dcef52a13654305953f2f55a7689818b8a9530e72e854afb",
+          "outputs/repair/r3/validation_summary.json": "4b048a119fe2644f296fd3d3385ea1d24843e59682a5ea9d40f244db5cb3d9ad"
+        },
+        "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+        "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+        "data_definition_version": "mf772-r1-definitions-v2",
+        "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+        "created_at": "2026-09-08T02:54:26.165772+00:00",
+        "validation_status": "PASS"
+      }
+    }
+  ]
+}

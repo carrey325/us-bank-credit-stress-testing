@@ -1,103 +1,144 @@
-# MF772 Bank Credit Stress Testing
+# US Bank Credit Stress Testing
 
-> **Repair-cycle status (limited R4, 2026-09-07): complete pending Router review.**
-> Formal delivery artifacts use the repaired R1-R3 chain and the manifest-hash-verified
-> Federal Reserve 2026 scenario inputs. Legacy stress, interval, report, and resume
-> outputs are audit-only unless they carry the current R4 metadata.
+**Call Report data engineering · Panel econometrics · Tail-risk evaluation · Federal Reserve stress scenarios**
 
-## Problem
+## Abstract
 
-MF772 is a reproducible public-data framework for segment-level credit analysis of
-U.S. regional banks. It reconstructs quarterly net charge-off (NCO) rates and
-translates the Federal Reserve 2026 baseline and severely adverse macro paths into
-static-exposure conditional-mean credit-loss estimates. It is not a bank-failure
-classifier, a causal CRE study, a confidential FR Y-14 model, or a CET1 forecast.
+How much do bank fundamentals and macroeconomic conditions add to persistent credit-loss dynamics, and how can those estimates inform portfolio risk under stress? I built a bank–segment–quarter panel from public regulatory filings, compared dynamic fixed-effects and quantile models with autoregressive benchmarks, and translated official scenarios into nine-quarter C&I loss projections. A hierarchical Bayesian Student-t model is implemented as an extension; validated posterior results are not part of the reported findings.
 
-## Data
+The historical panel contains **8,145 observations across 33 banks, three loan segments, and 84 quarters (2005–2025)**, supported by **73 distinct mapped Call Report codes**. Pooled out-of-sample CRE Q90 pinball loss is **5.38% lower** than the AR quantile benchmark after quantile rearrangement. The C&I stress exercise covers **31 banks over 2026Q1–2028Q1**.
 
-The repaired historical panel contains 33 banks, three segments (CRE, C&I, and
-closed-end Mortgage), 84 quarters, and 8,145 rows. It retains 60 explicit
-unavailable segment rows for a POR-verified FFIEC 051 interval and does not impute
-their financial values. Effective-dated mappings and source/reconciliation caveats
-are documented under `metadata/`.
+[Data definitions](docs/data.md) · [Numerical evidence](results/summary.json) · [Reproduction guide](docs/reproduction.md) · [Source code](src/bankstress)
 
-The common 2025Q4 R4 stress universe contains 31 banks with complete eligible C&I
-and CRE jump-off states. Mortgage is historical-panel evidence only: no Mortgage
-stress loss is reported because no approved Mortgage stress model exists.
+## 1. Economic rationale and research questions
 
-## Method
+Credit losses connect borrower repayment capacity, collateral values, and portfolio composition. GDP, unemployment, financing spreads, and rates are candidate predictors of C&I losses; CRE prices are a candidate collateral-cycle indicator. Lagged losses capture persistence, while bank effects capture stable differences in lending portfolios and underwriting. These mechanisms motivate testable predictors; regression coefficients alone do not establish causality.
 
-Formal R4 paths cover 2026Q1-2028Q1 and include only registry-authorized pairs:
+I separate three questions:
 
-- AR mean for C&I and CRE as the formal comparison baseline.
-- Dynamic FE for C&I as a limited challenger/sensitivity. R2 found lower
-  equal-observation RMSE in only 1 of 8 segment-window comparisons.
+1. **Expected loss:** do lagged bank controls and macro variables improve out-of-sample mean forecasts beyond an AR model with bank effects?
+2. **Tail risk:** does a dynamic quantile model improve prediction of unusually high quarterly loss rates against an AR model at the same quantile?
+3. **Stress exposure:** what losses follow if the modeled relationship is applied recursively to baseline and severely adverse macro paths?
 
-Dynamic FE CRE, every quantile model, and Bayesian outputs are excluded from formal
-stress paths and rankings. Quantiles retain one-step diagnostic use only; there is
-no cumulative-loss quantile or multi-period tail-distribution result.
+Quantile regression estimates conditional quantiles rather than only the mean, motivating a separate tail-error objective. See [Koenker and Hallock (2001)](https://pubs.aeaweb.org/doi/10.1257/jep.15.4.143). The stress exercise uses the [Federal Reserve's final 2026 scenarios](https://www.federalreserve.gov/publications/2026-stress-test-scenarios.htm) as conditional macroeconomic inputs, not as forecasts or probabilities.
 
-Quarterly modeled loss is calculated as:
+## 2. Data collection and panel construction
+
+| Component | What I constructed | Inspect the work |
+| --- | --- | --- |
+| Regulatory collection | Quarterly FFIEC archives, download manifests, SHA-256 checks, source-file lineage | [Downloader](src/bankstress/io/ffiec.py), [84-quarter manifest](data/manifests/ffiec_manifest.csv) |
+| Field harmonization | 73 raw codes with effective dates, filing forms, stock/flow types, units, source references | [Field mapping](metadata/field_mapping.csv), [evidence](metadata/field_mapping_evidence.csv) |
+| Bank sample | Regulatory identifiers, parent names, business-model exclusions, merger history | [Institutions](metadata/institutions.csv), [lineage](metadata/institution_lineage.csv) |
+| Portfolio panel | CRE, C&I, and closed-end mortgage exposures and quarterly charge-offs/recoveries | [Standardization](src/bankstress/transform/standardize.py), [panel](src/bankstress/transform/panel.py) |
+| Macro alignment | FRED/ALFRED series and FDIC noncurrent-loan controls aligned to the forecast information set | [Macro pipeline](src/bankstress/macro.py), [configuration](configs/macro_series.yaml) |
+| Quality assurance | Gross-flow reconciliation, capital-ratio checks, 100-observation archive-to-panel audit | [QA](src/bankstress/qa/report.py), [source audit](metadata/manual_source_audit.csv) |
+
+The engineering challenge is maintaining comparable definitions across time. I map the CRE reporting taxonomy change, distinguish domestic and consolidated filings, and require complete component sets before publishing segment totals. Missing or unsupported disclosures remain missing. YTD charge-offs and recoveries are differenced only within a calendar year and across adjacent quarters with the same reporting scope; Q1 starts the annual flow sequence.
+
+The modeled target is the **annualized net charge-off rate**, in decimal units:
+
+$$
+y_{i,s,t}=4\frac{\mathrm{ChargeOff}_{i,s,t}-\mathrm{Recovery}_{i,s,t}}{(\mathrm{Loans}_{i,s,t}+\mathrm{Loans}_{i,s,t-1})/2}.
+$$
+
+Negative observed net charge-offs are retained. Historical coverage and model eligibility are separate: 8,145 panel rows do not imply 8,145 scored forecasts. The unit is the reporting bank, not a consolidated bank holding company. [Full definitions and limitations →](docs/data.md)
+
+## 3. Empirical design
+
+### Models and estimands
+
+The dynamic mean specification adds origin-known controls to an AR benchmark:
+
+$$
+y_{i,s,t}=\alpha_{i,s}+\rho_s y_{i,s,t-1}+\beta_s^{\prime}X_{i,t-1}+\gamma_s^{\prime}M^{\mathrm{available}}_{t-1}+\varepsilon_{i,s,t}.
+$$
+
+Bank controls include noncurrent loans, allowance coverage, loan growth, and the Tier 1 ratio. Macro predictors vary by segment. The implementation treats data availability explicitly; the lag notation above summarizes the information set.
+
+| Method | Research role | Evaluation / status |
+| --- | --- | --- |
+| AR with bank effects | Persistence benchmark | RMSE, MAE, bias on common scoring keys |
+| Dynamic fixed effects | Incremental bank and macro information | Bank-clustered uncertainty; split-panel jackknife diagnostic; C&I stress challenger |
+| Dynamic quantile regression, Q50/Q75/Q90 | Conditional loss-rate tail | Pinball loss, exceedance rates, crossing; AR quantile benchmark |
+| Hierarchical Bayesian Student-t | Partial pooling across bank–segment intercepts, segment-specific slopes, heavy-tailed errors | PyMC implementation; sampling skipped in the retained run; no validated posterior claim |
+
+The Bayesian specification uses non-centered varying intercepts and explicit priors, seeds, and convergence thresholds. The code demonstrates the method; the [diagnostic record](results/evidence/bayesian_diagnostics.csv) states why no posterior estimates enter the result tables.
+
+### Time-based evaluation
+
+| Training period | Held-out period | Context |
+| --- | --- | --- |
+| 2005–2011 | 2012–2016 | Post-crisis recovery |
+| 2005–2016 | 2017–2019 | Pre-pandemic expansion |
+| 2005–2019 | 2020–2021 | Pandemic period |
+| 2005–2021 | 2022–2025 | Higher-rate / CRE adjustment |
+
+I use expanding training windows rather than random splits. Comparisons share bank, segment, forecast-origin, and target-quarter keys. Unavailable targets affect scoring, not whether a forecast can be generated. Separate historical stress checks freeze bank controls at the jump-off quarter and use realized macro paths to diagnose recursive behavior.
+
+For Q90, error is pinball loss with $\rho_{0.9}(u)=u(0.9-\mathbf{1}\{u<0\})$; underprediction receives greater weight. Independently fitted quantiles are rearranged into order, with original and rearranged scores retained. The headline comparison uses the latter for **both** models. [Model specifications →](configs/model_specs.yaml)
+
+## 4. Results
+
+![Tail forecast comparison and C&I stress projections](results/figures/research_summary.png)
+
+### Tail forecasting: approximately 5% improvement, with a precise scope
+
+| Pooled OOS Q90, 2012–2025 | Scored bank-quarters | AR quantile pinball loss | Dynamic quantile pinball loss | Relative reduction |
+| --- | ---: | ---: | ---: | ---: |
+| **CRE** | **1,264** | **0.000617234** | **0.000584014** | **5.38%** |
+| C&I | 1,525 | 0.001393469 | 0.001357524 | 2.58% |
+
+Reduction is $1-\mathrm{Loss}_{dynamic}/\mathrm{Loss}_{AR}$, computed from pooled observation-level errors, not an unweighted average of window improvements. [Exact scores, counts, and all windows →](results/evidence/tail_metrics.csv)
+
+CRE improvement ranges from **−2.78% to +9.81%** across the four windows. Pooled CRE Q90 exceedance is **8.62%**, versus nominal 10%; independently fitted quantiles crossed in **507** instances across model families and windows before rearrangement. These are point estimates and calibration diagnostics; no statistical-significance claim is made for the gain. This is a **one-quarter CRE tail-rate result**, not a nine-quarter cumulative-loss quantile.
+
+### Mean forecasting: complexity does not consistently beat persistence
+
+Dynamic FE lowers equal-observation RMSE in **1 of 8** segment–window comparisons. I retain AR as the mean benchmark and use dynamic FE C&I as a limited stress challenger. Tail-score improvement does not establish mean-model superiority. [Complete comparison →](results/evidence/mean_model_comparison.csv)
+
+### Nine-quarter C&I stress projections
+
+Starting from 2025Q4 exposures, I recursively project annualized loss rates for 2026Q1–2028Q1, hold exposures and bank controls fixed, and accumulate quarterly dollar losses as $\max(\widehat y_t,0)\times\mathrm{Loans}_{2025Q4}/4$.
+
+| C&I only; 31 banks; USD billions | Baseline | Severely adverse |
+| --- | ---: | ---: |
+| AR mean benchmark | 5.402 | 5.402 |
+| Dynamic FE limited challenger | 2.279 | 12.287 |
+
+AR has no macro-scenario predictors, so its identical scenario totals are a model limitation. The dynamic FE difference illustrates modeled sensitivity under a static balance sheet; it does not validate those projections as future realized losses. Dollar totals use the retained unrounded bank-level summary. [Bank-level evidence →](results/evidence/stress_by_bank.csv)
+
+## 5. Credit-risk interpretation and conclusions
+
+The contribution is a traceable path from public filings to comparable credit outcomes, defensible out-of-sample comparisons, and interpretable scenario losses. The tail model adds modest predictive information for CRE, while mean-model results show why a risk framework needs a strong persistence benchmark and model-use limits.
+
+**Exposure concentration and loss-rate amplification are different mechanisms.** A larger CRE book produces more dollar losses at the same loss rate. A separate bank- and quarter-effects interaction study tests whether CRE exposure amplifies the per-dollar loss response to contemporaneous CRE price growth. Its estimate is −5.99e−6, with a 95% interval of [−3.17e−5, 1.97e−5]; this does not establish an additional amplification effect. The shock is explicitly ex-post information in this explanatory analysis. [Coefficients →](results/evidence/cre_interaction.csv)
+
+**Credit-loss burden is not capital depletion.** Cumulative modeled losses divided by starting Tier 1 provide an exposure-to-capital comparison. A capital forecast would additionally require earnings, provisions, taxes, distributions, and RWA dynamics. Mortgage stress, validated Bayesian stress, and multi-period tail-loss distributions are outside the reported evidence.
+
+Other limitations include a selected regional-bank sample, unsupported historical filing detail, two bounded gross-flow reconciliation review items, and some final-vintage macro fallbacks. These constrain real-time and population-wide interpretation; see [data notes](docs/data.md).
+
+## 6. Reproduce and inspect
+
+Python 3.11 or newer:
+
+```bash
+python -m venv .venv
+# Activate .venv for your shell, then:
+python -m pip install -e ".[test]"
+python scripts/export_results.py --verify
+python scripts/plot_results.py
+python -m pytest -q -p no:cacheprovider
+```
+
+This verifies committed evidence and recalculates the display without downloading data or refitting models. Full analytical replay requires additional manifest-backed inputs; see the [reproduction guide](docs/reproduction.md).
 
 ```text
-quarter_loss_thousands
-  = annualized_nco_rate_decimal / 4 * exposure_thousands
+configs/        Data, model, and scenario specifications
+data/manifests/ Download provenance; bulk data stay local and ignored
+metadata/       Field definitions, sample, lineage, source audits
+src/bankstress/ Collection, transformations, models, validation, stress
+scripts/        Function-named entry points and result verification
+tests/          Data, timing, scoring, and model-use regression checks
+results/        Selected evidence, provenance, summary, figure
+docs/           Data definitions and reproduction instructions
 ```
-
-The reported ratio is cumulative modeled credit loss divided by starting Tier1.
-It is a credit-loss burden measure, not capital depletion, CET1 change, or a full
-capital roll-forward.
-
-## Key Results
-
-- The AR C&I-plus-CRE aggregate is 7,299,383 thousand under both official paths.
-  AR contains no macro scenario variables, so scenario invariance is expected and
-  is a baseline-model limitation—not evidence that baseline and severe are equally
-  stressful.
-- Dynamic FE C&I is published only as a limited challenger. Its severely adverse
-  conditional-mean aggregate is 12,286,840 thousand; it is not a full-portfolio
-  result and not evidence of model superiority.
-- Higher CRE-to-Tier1 mechanically produces higher loss-to-Tier1 under the
-  equal-loss-rate exposure decomposition. The repaired R2 interaction does not
-  support an additional per-dollar CRE amplification effect; its 95% interval
-  includes zero.
-- Baseline/severe conditional-mean paths are publishable with these scope labels.
-  Capital depletion, Mortgage stress, cumulative tail loss, Bayesian stress, and
-  market external validation are unavailable or not evaluated.
-
-## Reproducibility
-
-Install dependencies and run the bounded downstream chain:
-
-```powershell
-python -m pip install -r requirements.txt
-make stress
-make report
-python -m pytest -q --basetemp .pytest-local
-```
-
-`make stress` re-fetches the three retained Federal Reserve files and requires
-their bytes to match `metadata/fed_2026_scenario_manifest.csv`. The formal entry
-then validates R1/R2/R3 mapping, manifest, model-panel, specification, registry,
-and artifact hashes. `make report` creates only the supported T1-T5 tables,
-figures, errata, resume metrics, and ten-page report.
-
-The reproducibility audit distinguishes unit, integration, artifact-consistency,
-and limited R4-chain evidence. It does not claim that R1-R3 were rerun during the
-R4 invocation.
-
-## Limitations
-
-- Two bounded FFIEC gross-flow rows remain `REVIEW_REQUIRED` and explicitly listed.
-- Some historical macro inputs use documented final-vintage fallbacks.
-- AR cannot distinguish the official scenarios because it has no macro predictors.
-- Dynamic FE C&I is weak as an incremental mean challenger; Dynamic FE CRE is
-  diagnostic-only because a required path feature is unavailable.
-- Quantile crossing occurred in 507 one-step diagnostic rows before rearrangement.
-  Multi-period tail distributions and residual-calibration expansion were not
-  evaluated.
-- No full capital roll-forward, Mortgage stress model, Bayesian result, market
-  validation, machine-learning challenger, or new sample expansion is included.
-
-See `outputs/reporting/errata.md` and
-`outputs/reporting/reproducibility_audit.md` for the formal delivery boundaries.

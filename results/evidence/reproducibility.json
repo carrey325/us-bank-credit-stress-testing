@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "evidence_classes": {
+    "unit": {
+      "status": "PASS",
+      "evidence": "focused stress/reporting tests, including rate / 4 * exposure"
+    },
+    "integration": {
+      "status": "PASS",
+      "evidence": "R4 stress runner plus formal reporting runner completed"
+    },
+    "artifact_consistency": {
+      "status": "PASS",
+      "evidence": "R1-R4 metadata, mapping, model spec, registry, and artifact hashes validated"
+    },
+    "r4_manifest_backed_delivery_chain": {
+      "status": "PASS",
+      "evidence": "Manifest-hash-verified Fed downloads -> validated R2 panel/model refit -> R4 paths -> T1-T5/PDF"
+    },
+    "end_to_end": {
+      "status": "NOT_RUN",
+      "evidence": "The complete raw FFIEC -> R1 -> R2 -> R3 -> R4 repair chain was not rerun in this invocation; upstream R1-R3 were hash-validated inputs"
+    }
+  },
+  "checks": {
+    "formal_pairs_exact": true,
+    "quantile_paths_absent": true,
+    "dynamic_fe_cre_absent": true,
+    "null_reason_fields_present": true,
+    "report_pages": 10
+  },
+  "limitations": [
+    "AR remains a baseline, not proof of stable structural predictability",
+    "Arithmetic/descriptive relationship only; not causal",
+    "No incremental unit-loss-rate amplification claim",
+    "No multi-period distribution, Bayesian result, or calibrated cumulative-tail comparison"
+  ]
+}

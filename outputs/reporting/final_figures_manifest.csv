@@ -1,5 +1,0 @@
-figure_id,path,description,status
-F1,outputs/reporting/figures/segment_nco_history.png,Validated historical segment NCO rates,generated
-F2,outputs/reporting/figures/exposure_loss_heatmap.png,2025Q4 exposures and AR conditional-mean losses,generated
-F3,outputs/stress/figures/baseline_vs_severe_system_loss.png,AR baseline and severe conditional-mean paths; scenario-invariant by construction,generated
-F4,outputs/stress/figures/cre_to_tier1_vs_modeled_burden.png,"CRE exposure and modeled CRE loss burden; descriptive, not causal",generated

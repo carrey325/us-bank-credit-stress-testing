@@ -117,6 +117,8 @@ def test_future_macro_predictors_preserve_batch2_availability_and_lag_semantics(
 
 def test_current_formal_r4_gate_accepts_only_registry_authorized_pairs():
     root = Path(__file__).resolve().parents[1]
+    if not (root / "data/derived/credit_panel.parquet").exists():
+        pytest.skip("Full analytical artifacts are local inputs; see docs/reproduction.md")
     gate = validate_formal_r4_inputs(root)
     registry = {(item["model_id"], item["segment"]): item for item in gate["registry"]}
     assert set(R4_FORMAL_PAIRS) == {("ar_mean", "CI"), ("ar_mean", "CRE"), ("dynamic_fe", "CI")}
@@ -134,6 +136,8 @@ def test_formal_r4_gate_rejects_legacy_residual_input():
 @pytest.mark.parametrize("stale_kind", ["r1_mapping", "r2_model", "r3_registry"])
 def test_formal_r4_gate_rejects_stale_upstream_lineage(monkeypatch, stale_kind):
     root = Path(__file__).resolve().parents[1]
+    if not (root / "data/derived/credit_panel.parquet").exists():
+        pytest.skip("Full analytical artifacts are local inputs; see docs/reproduction.md")
     real_metadata = stress_module.validate_artifact_metadata
     real_json = stress_module._read_json
 
@@ -159,6 +163,8 @@ def test_formal_r4_gate_rejects_stale_upstream_lineage(monkeypatch, stale_kind):
 
 def test_generated_r4_paths_have_exact_scope_horizon_formula_and_lineage():
     root = Path(__file__).resolve().parents[1]
+    if not (root / "outputs/stress/stress_paths.parquet").exists():
+        pytest.skip("Full analytical artifacts are local inputs; see docs/reproduction.md")
     paths = pd.read_parquet(root / "outputs/stress/stress_paths.parquet")
     assert set(zip(paths.model, paths.segment)) == set(R4_FORMAL_PAIRS)
     assert set(paths.horizon) == set(range(1, 10))

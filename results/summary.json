@@ -1,0 +1,108 @@
+{
+  "historical_banks": 33,
+  "bank_segment_quarters": 8145,
+  "segments": 3,
+  "quarters": 84,
+  "mapped_call_report_codes": 73,
+  "stress_banks": 31,
+  "stress_quarters": 9,
+  "dynamic_fe_rmse_wins": 1,
+  "mean_comparisons": 8,
+  "q90_pinball_comparison": [
+    {
+      "window": 0,
+      "segment": "CI",
+      "ar_quantile": 0.0013934689815262,
+      "dynamic_quantile": 0.0013575242954668,
+      "improvement_pct": 2.5795110286582434
+    },
+    {
+      "window": 0,
+      "segment": "CRE",
+      "ar_quantile": 0.0006172338248446,
+      "dynamic_quantile": 0.0005840135820808,
+      "improvement_pct": 5.382116375777657
+    },
+    {
+      "window": 1,
+      "segment": "CI",
+      "ar_quantile": 0.001940992378643,
+      "dynamic_quantile": 0.0019032857691194,
+      "improvement_pct": 1.9426459340330826
+    },
+    {
+      "window": 1,
+      "segment": "CRE",
+      "ar_quantile": 0.0007015028981642,
+      "dynamic_quantile": 0.0007210005752695,
+      "improvement_pct": -2.779415046798017
+    },
+    {
+      "window": 2,
+      "segment": "CI",
+      "ar_quantile": 0.0011229145596669,
+      "dynamic_quantile": 0.001199820375023,
+      "improvement_pct": -6.8487682071655565
+    },
+    {
+      "window": 2,
+      "segment": "CRE",
+      "ar_quantile": 0.0005366537142955,
+      "dynamic_quantile": 0.0005165610484971,
+      "improvement_pct": 3.7440653559580706
+    },
+    {
+      "window": 3,
+      "segment": "CI",
+      "ar_quantile": 0.0010336572250022,
+      "dynamic_quantile": 0.0009624057894595,
+      "improvement_pct": 6.893139603658094
+    },
+    {
+      "window": 3,
+      "segment": "CRE",
+      "ar_quantile": 0.0005097309211173,
+      "dynamic_quantile": 0.0004641093847857,
+      "improvement_pct": 8.950121415353863
+    },
+    {
+      "window": 4,
+      "segment": "CI",
+      "ar_quantile": 0.0011328297572639,
+      "dynamic_quantile": 0.0010398321248821,
+      "improvement_pct": 8.209321108090872
+    },
+    {
+      "window": 4,
+      "segment": "CRE",
+      "ar_quantile": 0.0006842229556305,
+      "dynamic_quantile": 0.0006170955175457,
+      "improvement_pct": 9.810755037141838
+    }
+  ],
+  "ci_cumulative_loss_usd_billions": [
+    {
+      "model": "ar_mean",
+      "scenario": "baseline",
+      "loss": 5.401896149640466
+    },
+    {
+      "model": "ar_mean",
+      "scenario": "severely_adverse",
+      "loss": 5.401896149640466
+    },
+    {
+      "model": "dynamic_fe",
+      "scenario": "baseline",
+      "loss": 2.2789163360929248
+    },
+    {
+      "model": "dynamic_fe",
+      "scenario": "severely_adverse",
+      "loss": 12.286838751239799
+    }
+  ],
+  "quantile_crossings_before_rearrangement": 507,
+  "bayesian_validation": "NOT_EVALUATED",
+  "five_percent_tail_improvement": "CRE pooled one-step Q90 pinball loss vs AR quantile, after rearrangement; not a cumulative stress-loss metric"
+}

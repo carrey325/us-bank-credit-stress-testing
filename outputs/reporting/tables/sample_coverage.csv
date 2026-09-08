@@ -1,4 +1,0 @@
-scope,banks,segments,quarters,observations,status,reason
-historical_panel,33,3,84,8145,VALIDATED,R1 repaired credit panel; includes explicit unavailable rows
-mean_model_evaluation,33,2,82,5660,VALIDATED,Prediction eligibility and target availability are separate
-fed_2026_common_stress,31,2,9,558,LIMITED,Common C&I/CRE AR universe; 2 candidate banks excluded

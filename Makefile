@@ -1,33 +1,24 @@
-.DEFAULT_GOAL := test
+.DEFAULT_GOAL := verify
+.PHONY: verify test figures download pilot stress report
+
+verify:
+	python scripts/export_results.py --verify
 
 test:
-	python -m pytest -q
+	python -m pytest -q -p no:cacheprovider
+
+figures:
+	python scripts/plot_results.py
+
+download:
+	python scripts/download_call_reports.py
 
 pilot:
-	python scripts/run_batch1.py --pilot
+	python scripts/collect_data.py --pilot
 
-full:
-	python scripts/run_batch1.py --full
-
-# Reproducible end-to-end checkpoints. Raw FFIEC files remain manifest-backed
-# local inputs and are intentionally not committed.
-raw:
-	python scripts/run_batch1.py --full
-
-standard:
-	python scripts/run_batch1.py --full
-
-panel:
-	python scripts/run_batch2.py
-
-qa:
-	python -m pytest -q tests/test_flows.py tests/test_panel.py tests/test_qa.py
-
-models:
-	python scripts/run_batch3.py
-
+# Require validated historical inputs; see docs/reproduction.md.
 stress:
-	python scripts/run_batch4.py
+	python scripts/run_stress.py
 
 report:
-	python scripts/run_batch5.py
+	python scripts/build_report.py

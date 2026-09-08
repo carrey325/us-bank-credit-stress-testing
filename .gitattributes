@@ -1,0 +1,7 @@
+# Keep ordinary source/documentation portable, but never rewrite hashed evidence.
+* text=auto eol=lf
+*.csv -text
+configs/*.yaml -text
+results/evidence/*.json -text
+metadata/*.json -text
+*.png binary

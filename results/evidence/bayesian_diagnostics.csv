@@ -1,0 +1,5 @@
+window,status,reason
+1,environment_fallback,Bayesian sampling explicitly skipped by BANKSTRESS_SKIP_BAYESIAN=1; no posterior results are used.
+2,environment_fallback,Bayesian sampling explicitly skipped by BANKSTRESS_SKIP_BAYESIAN=1; no posterior results are used.
+3,environment_fallback,Bayesian sampling explicitly skipped by BANKSTRESS_SKIP_BAYESIAN=1; no posterior results are used.
+4,environment_fallback,Bayesian sampling explicitly skipped by BANKSTRESS_SKIP_BAYESIAN=1; no posterior results are used.

@@ -1,1 +1,1 @@
--e .[test,bayesian]
+-e .[test]
