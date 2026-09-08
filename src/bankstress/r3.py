@@ -304,6 +304,11 @@ def _historical_grid(panel: pd.DataFrame, segment: str, window: dict[str, str], 
         if source_column not in latest:
             raise ValueError(f"Frozen historical control lacks source-period lineage: {term}")
         grid[source_column] = grid.bank_id.map(latest[source_column])
+        if term == "lagged_loan_growth":
+            prior_source_column = "lagged_loan_growth_prior_component_source_period"
+            if prior_source_column not in latest:
+                raise ValueError("Frozen loan growth lacks prior-component source-period lineage")
+            grid[prior_source_column] = grid.bank_id.map(latest[prior_source_column])
     balance_column = "origin_exposure" if "origin_exposure" in jump else "exposure"
     grid["frozen_balance"] = grid.bank_id.map(latest[balance_column])
     grid["frozen_balance_source_period"] = grid.bank_id.map(latest.report_period if balance_column == "origin_exposure" else latest.target_period)
@@ -316,15 +321,16 @@ def _recursive_path(fit: Any, kind: str, grid: pd.DataFrame, jump: pd.DataFrame,
                     target_type: str) -> pd.DataFrame:
     if kind == "quantile":
         assert_not_cumulative_q90(target_type)
-    state = dict(zip(jump.bank_id.astype(str), jump.nco_rate, strict=True))
+    bank_ids = jump.bank_id.astype(str)
+    state = dict(zip(bank_ids, jump.nco_rate, strict=True))
+    state_source_period = dict(zip(bank_ids, jump.target_period.map(pd.Timestamp), strict=True))
+    state_source_type = dict.fromkeys(bank_ids, "ACTUAL_JUMP_OFF")
     pieces = []
     for target, current in grid.groupby("target_period", sort=True):
         current = current.copy()
         current["lagged_nco_rate"] = current.bank_id.map(state)
-        current["lagged_nco_rate_source_period"] = pd.Timestamp(target) - pd.offsets.QuarterEnd()
-        current["lagged_nco_rate_source_type"] = np.where(
-            pd.Timestamp(target) == grid.target_period.min(), "ACTUAL_JUMP_OFF", "MODELED_RECURSIVE"
-        )
+        current["lagged_nco_rate_source_period"] = current.bank_id.map(state_source_period)
+        current["lagged_nco_rate_source_type"] = current.bank_id.map(state_source_type)
         predicted = _predict_entity_fe(fit, current, "nco_rate") if kind == "mean" else predict_quantile(fit, current)
         # Preserve the full path grid even when a supplied macro-path feature is
         # unavailable.  Such a row is explicitly unavailable, not silently
@@ -339,6 +345,8 @@ def _recursive_path(fit: Any, kind: str, grid: pd.DataFrame, jump: pd.DataFrame,
         )
         available = current[current.prediction_available]
         state.update(dict(zip(available.bank_id, available.prediction, strict=True)))
+        state_source_period.update(dict.fromkeys(available.bank_id, pd.Timestamp(target)))
+        state_source_type.update(dict.fromkeys(available.bank_id, "MODELED_RECURSIVE"))
         pieces.append(current)
     result = pd.concat(pieces, ignore_index=True)
     result["target_type"] = target_type
@@ -365,6 +373,10 @@ def run_historical_validation(panel: pd.DataFrame, spec: dict[str, Any]) -> tupl
                 (~grid[column].eq(pd.Timestamp(window["train_end"]))).sum()
                 for column in control_source_columns
             ))
+            growth_prior_expected = pd.Timestamp(window["train_end"]) - pd.offsets.QuarterEnd()
+            growth_prior_mismatches = int((
+                ~grid.lagged_loan_growth_prior_component_source_period.eq(growth_prior_expected)
+            ).sum())
             expected = len(jump) * len(quarter_sequence(pd.Timestamp(window["test_start"]), pd.Timestamp(window["test_end"])))
             support_rows.append({"pseudo_window": window["name"], "segment": segment,
                                  "requested_training_start": pd.Timestamp("2005-01-01"),
@@ -381,6 +393,8 @@ def run_historical_validation(panel: pd.DataFrame, spec: dict[str, Any]) -> tupl
                                  "bank_controls_frozen": bool(grid.bank_controls_frozen.all()),
                                  "jump_off_current_controls_verified": source_mismatches == 0,
                                  "frozen_control_source_mismatch_count": source_mismatches,
+                                 "loan_growth_prior_component_source_verified": growth_prior_mismatches == 0,
+                                 "loan_growth_prior_component_source_mismatch_count": growth_prior_mismatches,
                                  "future_control_leakage_count": int((grid.bank_controls_source_period > pd.Timestamp(window["train_end"])).sum())})
             mean_fits = {"ar_mean": (_fit_entity_fe(train, "nco_rate", ["lagged_nco_rate"]), ["lagged_nco_rate"]),
                          "dynamic_fe": (_fit_entity_fe(train, "nco_rate", predictors), predictors)}
@@ -399,9 +413,11 @@ def run_historical_validation(panel: pd.DataFrame, spec: dict[str, Any]) -> tupl
                                     "validation_mode": "RECURSIVE_CONDITIONAL_MEAN", "metric_family": "modeled_rate_error",
                                     "generated_n": len(recursive), "prediction_unavailable_n": int(recursive.prediction.isna().sum()),
                                     "lag_coefficient": lag_coefficient, "recursive_stable": recursive_stable,
-                                    "jump_off_current_controls_verified": source_mismatches == 0,
-                                    "frozen_control_source_mismatch_count": source_mismatches,
-                                    "max_abs_prediction": float(recursive.prediction.abs().max()),
+                                     "jump_off_current_controls_verified": source_mismatches == 0,
+                                     "frozen_control_source_mismatch_count": source_mismatches,
+                                     "loan_growth_prior_component_source_verified": growth_prior_mismatches == 0,
+                                     "loan_growth_prior_component_source_mismatch_count": growth_prior_mismatches,
+                                     "max_abs_prediction": float(recursive.prediction.abs().max()),
                                     "unscored_missing_actual_n": int(recursive.nco_rate.isna().sum()), **_mean_scores(recursive)})
                 scored = recursive.dropna(subset=["nco_rate", "prediction", "frozen_balance"]).copy()
                 scored["modeled_loss"] = scored.prediction * scored.frozen_balance / 4
@@ -437,9 +453,11 @@ def build_model_use_registry(one_step_metrics: pd.DataFrame, historical_metrics:
                                      (hist_segment.metric_family.eq("modeled_rate_error"))]
             stable = bool(len(recursive) and recursive.prediction_unavailable_n.fillna(0).eq(0).all()
                           and recursive.recursive_stable.astype("boolean").fillna(False).all()
-                          and recursive.jump_off_current_controls_verified.astype("boolean").fillna(False).all()
-                          and recursive.frozen_control_source_mismatch_count.fillna(1).eq(0).all()
-                          and np.isfinite(recursive.max_abs_prediction).all())
+                           and recursive.jump_off_current_controls_verified.astype("boolean").fillna(False).all()
+                           and recursive.frozen_control_source_mismatch_count.fillna(1).eq(0).all()
+                           and recursive.loan_growth_prior_component_source_verified.astype("boolean").fillna(False).all()
+                           and recursive.loan_growth_prior_component_source_mismatch_count.fillna(1).eq(0).all()
+                           and np.isfinite(recursive.max_abs_prediction).all())
             records.append({"model_id": model_id, "segment": segment, "input_run_id": input_run_id,
                             "model_spec_hash": model_spec_hash, "descriptive_use": "ALLOWED",
                             "one_step_mean_use": "ALLOWED" if model_id == "ar_mean" else "DIAGNOSTIC_ONLY",

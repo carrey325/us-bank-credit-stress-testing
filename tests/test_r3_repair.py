@@ -65,6 +65,8 @@ def test_generated_artifacts_preserve_paths_when_realized_values_are_missing():
     window_end = {"GFC": "2006-12-31", "COVID": "2019-12-31", "High_Rate_CRE": "2021-12-31"}
     ends = paths.pseudo_window.map(window_end).map(pd.Timestamp)
     assert paths.bank_controls_source_period.le(ends).all()
+    assert paths.lagged_loan_growth_source_period.eq(ends).all()
+    assert paths.lagged_loan_growth_prior_component_source_period.eq(ends - pd.offsets.QuarterEnd()).all()
 
 
 def test_reported_exceedance_count_matches_saved_actual_predictions():
@@ -117,6 +119,7 @@ def test_jump_off_uses_current_controls_when_lagged_values_deliberately_differ(m
     for term in predictors[1:]:
         assert grid[term].nunique() == 1
         assert grid[f"{term}_source_period"].eq(train_end).all()
+    assert grid["lagged_loan_growth_prior_component_source_period"].eq(pd.Timestamp("2019-09-30")).all()
     monkeypatch.setattr(
         "bankstress.r3._predict_entity_fe",
         lambda fit, current, outcome: current.assign(prediction=current.lagged_nco_rate),
@@ -125,6 +128,35 @@ def test_jump_off_uses_current_controls_when_lagged_values_deliberately_differ(m
     assert path.iloc[0].prediction == pytest.approx(0.11)
     assert path.iloc[0].lagged_nco_rate_source_period == train_end
     assert path.iloc[0].lagged_nco_rate_source_type == "ACTUAL_JUMP_OFF"
+
+
+def test_recursive_nco_lineage_carries_last_modeled_state_across_unavailable_middle_quarter(monkeypatch):
+    train_end = pd.Timestamp("2019-12-31")
+    jump = pd.DataFrame({
+        "bank_id": ["1"], "target_period": [train_end], "nco_rate": [0.11],
+    })
+    dates = pd.to_datetime(["2020-03-31", "2020-06-30", "2020-09-30"])
+    grid = pd.DataFrame({"bank_id": ["1"] * 3, "target_period": dates})
+
+    def predict_with_middle_gap(fit, current, outcome):
+        if current.target_period.iloc[0] == pd.Timestamp("2020-06-30"):
+            return current.iloc[0:0].assign(prediction=pd.Series(dtype=float))
+        return current.assign(prediction=current.lagged_nco_rate + 0.09)
+
+    monkeypatch.setattr("bankstress.r3._predict_entity_fe", predict_with_middle_gap)
+    path = _recursive_path({}, "mean", grid, jump, "conditional_mean_recursive_path")
+
+    first, middle, following = (path[path.target_period.eq(date)].iloc[0] for date in dates)
+    assert first.lagged_nco_rate == pytest.approx(0.11)
+    assert first.lagged_nco_rate_source_period == train_end
+    assert first.lagged_nco_rate_source_type == "ACTUAL_JUMP_OFF"
+    assert middle.lagged_nco_rate == pytest.approx(0.20)
+    assert middle.lagged_nco_rate_source_period == pd.Timestamp("2020-03-31")
+    assert middle.lagged_nco_rate_source_type == "MODELED_RECURSIVE"
+    assert not middle.prediction_available
+    assert following.lagged_nco_rate == pytest.approx(0.20)
+    assert following.lagged_nco_rate_source_period == pd.Timestamp("2020-03-31")
+    assert following.lagged_nco_rate_source_type == "MODELED_RECURSIVE"
 
 
 def test_artifact_lineage_fails_closed_for_untracked_source_file(tmp_path):

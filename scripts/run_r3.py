@@ -69,7 +69,7 @@ def main() -> None:
         "macro_path": "supplied realized historical macro path; unavailable features are not imputed",
         "lagged_nco": "recursive modeled state after a valid jump-off",
         "bank_controls": "current train-end NPL rate, allowance coverage, Tier 1 ratio, and adjacent-quarter loan growth held fixed; incomplete current states are excluded and counted",
-        "bank_control_source_lineage": "one source-period column per frozen control in pseudo_stress.parquet",
+        "bank_control_source_lineage": "one source-period column per frozen control in pseudo_stress.parquet; loan growth also records its adjacent-prior-quarter denominator component",
         "generation_scoring_separation": True,
         "conditional_mean_path_label": "plug-in conditional-mean recursive path; not asserted exact expectation",
         "fixed_quantile_feedback_label": "recursive_quantile_sensitivity_not_distribution",
@@ -133,6 +133,7 @@ def main() -> None:
         "gfc_2005_start_verified": bool(support.gfc_2005_start_verified.all()),
         "future_control_leakage_count": int(support.future_control_leakage_count.sum()),
         "frozen_control_source_mismatch_count": int(support.frozen_control_source_mismatch_count.sum()),
+        "loan_growth_prior_component_source_mismatch_count": int(support.loan_growth_prior_component_source_mismatch_count.sum()),
         "jump_off_current_control_exclusions": int(support.jump_off_current_control_exclusions.sum()),
         "continuous_path_row_count": len(paths), "expected_continuous_path_row_count": int(quarterly_expected),
         "paths_preserved_with_missing_actual": int(paths.nco_rate.isna().sum()),
@@ -154,6 +155,7 @@ def main() -> None:
         if not summary[key]: failures.append(key)
     if summary["future_control_leakage_count"]: failures.append("future_control_leakage_count")
     if summary["frozen_control_source_mismatch_count"]: failures.append("frozen_control_source_mismatch_count")
+    if summary["loan_growth_prior_component_source_mismatch_count"]: failures.append("loan_growth_prior_component_source_mismatch_count")
     if summary["continuous_path_row_count"] != summary["expected_continuous_path_row_count"]: failures.append("continuous_path_row_count")
     if summary["multi_period_tail_distribution_authorizations"]: failures.append("multi_period_tail_distribution_authorizations")
     summary["validation_failures"], summary["validation_status"] = failures, "PASS" if not failures else "FAIL"
