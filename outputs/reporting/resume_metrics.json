@@ -1,13 +1,24 @@
 {
-  "n_banks": 33,
-  "n_observations": 8145,
-  "n_raw_fields": 66,
-  "reconciliation_rate": 0.9996315401621223,
+  "run_id": "r4-20260908-limited-delivery",
+  "historical_panel_banks": 33,
+  "historical_panel_observations": 8145,
+  "stress_universe_banks": 31,
+  "formal_model_segment_pairs": [
+    "ar_mean/CI",
+    "ar_mean/CRE",
+    "dynamic_fe/CI (limited challenger)"
+  ],
+  "dynamic_fe_rmse_improved_comparisons": 1,
+  "dynamic_fe_rmse_comparisons": 8,
+  "best_model_name": "AR",
   "best_oos_rmse_improvement_vs_ar": 0.0,
-  "best_model_name": "ar",
-  "high_cre_capital_depletion_difference": 0.28413368835117503,
-  "high_cre_group_definition": "2025Q4 CRE-to-Tier1 terciles among the final stress universe",
-  "stress_scenario": "Fed 2026 severely adverse",
-  "stress_universe_banks": 14,
-  "resume_metric_scope": "n_banks is the final historical panel; stress_universe_banks is the 2025Q4 CRE/C&I stress universe."
+  "baseline_ar_loss_thousands": 7299382.952503614,
+  "severe_ar_loss_thousands": 7299382.952503614,
+  "high_minus_low_modeled_cre_burden": 0.0101561301545986,
+  "capital_depletion": null,
+  "capital_depletion_reason": "Unavailable: no full capital roll-forward; reported metric is modeled credit-loss burden / starting Tier1",
+  "multi_step_tail_loss": null,
+  "multi_step_tail_loss_reason": "Unavailable: quantile models are authorized only for one-step diagnostics",
+  "mortgage_stress_loss": null,
+  "mortgage_stress_loss_reason": "Unavailable: no approved Mortgage stress model"
 }

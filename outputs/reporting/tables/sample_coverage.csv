@@ -1,2 +1,4 @@
-banks,quarters,observations,segments,mapped_raw_fields,model_eligible_observations,excluded_candidate_entities,exclusion_reason_categories,exclusion_reason_counts,stress_universe_excluded_bank_segment_rows,stress_universe_excluded_banks
-33,84,8145,3,66,7925,110,5,auto_finance_dominant=1; credit_card_dominant=5; custody_asset_servicing_dominant=1; insufficient_report_history=2; primary_source_review_required=101,38,19
+scope,banks,segments,quarters,observations,status,reason
+historical_panel,33,3,84,8145,VALIDATED,R1 repaired credit panel; includes explicit unavailable rows
+mean_model_evaluation,33,2,82,5660,VALIDATED,Prediction eligibility and target availability are separate
+fed_2026_common_stress,31,2,9,558,LIMITED,Common C&I/CRE AR universe; 2 candidate banks excluded

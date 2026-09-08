@@ -1,8 +1,17 @@
-model,metric_family,evaluation_metric,oos_observations,score,pooled_oos_mae,mean_bias,availability
-AR,mean,pooled_oos_rmse,2437,0.036353848334301234,0.019526822345325552,-0.018451394285225887,included
-Bias-corrected FE,mean,pooled_oos_rmse,2437,0.10726690675580718,0.06068835622963404,-0.032819158650250195,included
-Dynamic FE,mean,pooled_oos_rmse,2437,0.04730088487576233,0.03012479293615535,-0.013140653784869743,included
-Quantile 0.50,quantile,pooled_oos_pinball_loss,2437,0.0018176758889945682,,,"included; quantile forecasts are scored by pinball loss, not RMSE"
-Quantile 0.75,quantile,pooled_oos_pinball_loss,2437,0.0016863511903602193,,,"included; quantile forecasts are scored by pinball loss, not RMSE"
-Quantile 0.90,quantile,pooled_oos_pinball_loss,2437,0.0018167055144512657,,,"included; quantile forecasts are scored by pinball loss, not RMSE"
-Bayesian,bayesian,unavailable,0,,,,unavailable: documented Batch 3 environment fallback; no posterior forecast results
+window,segment,model,train_start,train_end,test_start,test_end,n,rmse,mae,bias,sse_improvement_vs_ar,common_scoring_keys_verified,use_status,interpretation
+1,CRE,ar,2005-01-01,2011-12-31,2012-01-01,2016-12-31,260,0.0044974982578456,0.0032734709805432,-0.0025173347581346,0.0,True,FORMAL_BASELINE,AR comparison baseline
+1,CI,ar,2005-01-01,2011-12-31,2012-01-01,2016-12-31,524,0.0090673204582014,0.0064989314620451,-0.0054328781174648,0.0,True,FORMAL_BASELINE,AR comparison baseline
+2,CRE,ar,2005-01-01,2016-12-31,2017-01-01,2019-12-31,324,0.0036679559919549,0.0019241544674466,-0.0010243562687059,0.0,True,FORMAL_BASELINE,AR comparison baseline
+2,CI,ar,2005-01-01,2016-12-31,2017-01-01,2019-12-31,312,0.0053833406979403,0.0038770551698789,-0.0024243445030452,0.0,True,FORMAL_BASELINE,AR comparison baseline
+3,CRE,ar,2005-01-01,2019-12-31,2020-01-01,2021-12-31,237,0.0030003813449492,0.0017884645275511,-0.0006197460363674,0.0,True,FORMAL_BASELINE,AR comparison baseline
+3,CI,ar,2005-01-01,2019-12-31,2020-01-01,2021-12-31,231,0.0050086924295256,0.0037726287839153,-0.0019664194378635,0.0,True,FORMAL_BASELINE,AR comparison baseline
+4,CRE,ar,2005-01-01,2021-12-31,2022-01-01,2025-12-31,443,0.0040761793061615,0.0019986266399658,0.0001956829988709,0.0,True,FORMAL_BASELINE,AR comparison baseline
+4,CI,ar,2005-01-01,2021-12-31,2022-01-01,2025-12-31,458,0.004862817291585,0.0035793996853007,-0.0011756328157913,0.0,True,FORMAL_BASELINE,AR comparison baseline
+1,CRE,dynamic_fe,2005-01-01,2011-12-31,2012-01-01,2016-12-31,260,0.0052864181960187,0.004350194187387,-0.0023310371721399,-0.3815958649741584,True,DIAGNOSTIC_ONLY_FOR_R4,Dynamic FE improved equal-observation RMSE in only 1/8 segment-window comparisons
+1,CI,dynamic_fe,2005-01-01,2011-12-31,2012-01-01,2016-12-31,524,0.0096660926187707,0.006860589561241,-0.0057078209853793,-0.1364333615491555,True,LIMITED_CHALLENGER,Dynamic FE improved equal-observation RMSE in only 1/8 segment-window comparisons
+2,CRE,dynamic_fe,2005-01-01,2016-12-31,2017-01-01,2019-12-31,324,0.0039398840555844,0.0022452267179096,-0.0007879155031988,-0.1537684265770824,True,DIAGNOSTIC_ONLY_FOR_R4,Dynamic FE improved equal-observation RMSE in only 1/8 segment-window comparisons
+2,CI,dynamic_fe,2005-01-01,2016-12-31,2017-01-01,2019-12-31,312,0.0077769867850778,0.0056898354125108,0.0049700373511926,-1.0869833766704429,True,LIMITED_CHALLENGER,Dynamic FE improved equal-observation RMSE in only 1/8 segment-window comparisons
+3,CRE,dynamic_fe,2005-01-01,2019-12-31,2020-01-01,2021-12-31,237,0.003095801035043,0.0019367887938947,-0.0003423375350354,-0.0646164419038806,True,DIAGNOSTIC_ONLY_FOR_R4,Dynamic FE improved equal-observation RMSE in only 1/8 segment-window comparisons
+3,CI,dynamic_fe,2005-01-01,2019-12-31,2020-01-01,2021-12-31,231,0.0056992989399599,0.004138520029843,0.0004014367236057,-0.2947745285047871,True,LIMITED_CHALLENGER,Dynamic FE improved equal-observation RMSE in only 1/8 segment-window comparisons
+4,CRE,dynamic_fe,2005-01-01,2021-12-31,2022-01-01,2025-12-31,443,0.0042235464431595,0.0026908877427623,-0.000654167814345,-0.0736135612972412,True,DIAGNOSTIC_ONLY_FOR_R4,Dynamic FE improved equal-observation RMSE in only 1/8 segment-window comparisons
+4,CI,dynamic_fe,2005-01-01,2021-12-31,2022-01-01,2025-12-31,458,0.0048279716131693,0.0034525149950724,0.0003866912092282,0.0142801297351864,True,LIMITED_CHALLENGER,Dynamic FE improved equal-observation RMSE in only 1/8 segment-window comparisons

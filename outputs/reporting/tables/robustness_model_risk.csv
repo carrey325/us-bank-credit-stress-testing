@@ -1,60 +1,39 @@
-section,model,scenario,metric,value,unit,status,notes
-cre_exposure_definition,Dynamic FE,approved_CRE_interaction,exposure_definition,,text,FROZEN,cre_to_tier1; bank_quarter_lagged_at_forecast_origin; exposure dates after origin=0.
-scenario_sensitivity,Dynamic FE,baseline,aggregate_cumulative_loss,6506847.8802569,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Dynamic FE,baseline,mean_capital_depletion,0.0660513979044939,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Quantile 0.90,baseline,aggregate_cumulative_loss,38571476.05731127,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Quantile 0.90,baseline,mean_capital_depletion,0.4580115094930569,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Dynamic FE,researcher_cre_only,aggregate_cumulative_loss,7793234.131164056,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Dynamic FE,researcher_cre_only,mean_capital_depletion,0.0801115641053642,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Quantile 0.90,researcher_cre_only,aggregate_cumulative_loss,36585880.35470826,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Quantile 0.90,researcher_cre_only,mean_capital_depletion,0.4357207417568594,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Dynamic FE,researcher_high_for_longer_rates,aggregate_cumulative_loss,7285127.09029314,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Dynamic FE,researcher_high_for_longer_rates,mean_capital_depletion,0.074482638731184,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Quantile 0.90,researcher_high_for_longer_rates,aggregate_cumulative_loss,39876336.41319634,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Quantile 0.90,researcher_high_for_longer_rates,mean_capital_depletion,0.472681547998539,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Dynamic FE,researcher_lambda_0.5,aggregate_cumulative_loss,16251206.39509842,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Dynamic FE,researcher_lambda_0.5,mean_capital_depletion,0.1753026416069602,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Quantile 0.90,researcher_lambda_0.5,aggregate_cumulative_loss,57960943.95488255,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Quantile 0.90,researcher_lambda_0.5,mean_capital_depletion,0.6759787042227857,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Dynamic FE,researcher_lambda_1,aggregate_cumulative_loss,27589008.62092679,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Dynamic FE,researcher_lambda_1,mean_capital_depletion,0.3044184357811506,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Quantile 0.90,researcher_lambda_1,aggregate_cumulative_loss,77333260.21197791,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Quantile 0.90,researcher_lambda_1,mean_capital_depletion,0.893763318818907,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Dynamic FE,researcher_lambda_1.25,aggregate_cumulative_loss,33557519.98705014,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Dynamic FE,researcher_lambda_1.25,mean_capital_depletion,0.3716610871368859,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Quantile 0.90,researcher_lambda_1.25,aggregate_cumulative_loss,87008421.26597835,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-lambda_sensitivity,Quantile 0.90,researcher_lambda_1.25,mean_capital_depletion,1.0025322418848714,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Dynamic FE,researcher_unemployment_only,aggregate_cumulative_loss,6770123.162642393,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Dynamic FE,researcher_unemployment_only,mean_capital_depletion,0.0689073547892609,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Quantile 0.90,researcher_unemployment_only,aggregate_cumulative_loss,38488738.25237321,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Quantile 0.90,researcher_unemployment_only,mean_capital_depletion,0.4570692042994905,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Dynamic FE,severely_adverse,aggregate_cumulative_loss,27589008.62092679,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Dynamic FE,severely_adverse,mean_capital_depletion,0.3044184357811506,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Quantile 0.90,severely_adverse,aggregate_cumulative_loss,77333260.21197791,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-scenario_sensitivity,Quantile 0.90,severely_adverse,mean_capital_depletion,0.893763318818907,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-exposure_sensitivity,Dynamic FE,exposure_-5%,aggregate_cumulative_loss,26209558.18988045,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-exposure_sensitivity,Dynamic FE,exposure_-5%,mean_capital_depletion,0.2891975139920931,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-exposure_sensitivity,Dynamic FE,exposure_+5%,aggregate_cumulative_loss,28968459.05197313,thousands,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-exposure_sensitivity,Dynamic FE,exposure_+5%,mean_capital_depletion,0.3196393575702081,share of starting Tier 1 capital,generated,Researcher sensitivity where labelled; not an official Federal Reserve scenario.
-model_ranking_stability,dynamic_fe vs quantile_0.9,severely_adverse,spearman_rank_correlation,0.7538461538461538,correlation,generated,n_banks=14; top_quartile_n=4.
-model_ranking_stability,dynamic_fe vs quantile_0.9,severely_adverse,top_quartile_overlap,0.5,share,generated,n_banks=14; top_quartile_n=4.
-conformal,Dynamic FE residual-bootstrap fallback,rolling_adaptive_residual_bootstrap,empirical_coverage,0.9435825105782792,rate_or_score,generated,segment=CI; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,rolling_adaptive_residual_bootstrap,mean_interval_width,0.025426150654491286,rate_or_score,generated,segment=CI; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,rolling_adaptive_residual_bootstrap,winkler_score,0.035099047829611416,rate_or_score,generated,segment=CI; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,rolling_adaptive_residual_bootstrap,crisis_underprediction_count,21.0,count,generated,segment=CI; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,rolling_adaptive_residual_bootstrap,crisis_underprediction_change_vs_static,12.0,rate_or_score,generated,segment=CI; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,rolling_adaptive_residual_bootstrap,empirical_coverage,0.9209770114942529,rate_or_score,generated,segment=CRE; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,rolling_adaptive_residual_bootstrap,mean_interval_width,0.2132590533372587,rate_or_score,generated,segment=CRE; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,rolling_adaptive_residual_bootstrap,winkler_score,0.2707860071125826,rate_or_score,generated,segment=CRE; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,rolling_adaptive_residual_bootstrap,crisis_underprediction_count,31.0,count,generated,segment=CRE; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,rolling_adaptive_residual_bootstrap,crisis_underprediction_change_vs_static,4.0,rate_or_score,generated,segment=CRE; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,static_residual_bootstrap,empirical_coverage,0.9689703808180536,rate_or_score,generated,segment=CI; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,static_residual_bootstrap,mean_interval_width,0.03726078202371851,rate_or_score,generated,segment=CI; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,static_residual_bootstrap,winkler_score,0.04241229300827895,rate_or_score,generated,segment=CI; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,static_residual_bootstrap,crisis_underprediction_count,9.0,count,generated,segment=CI; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,static_residual_bootstrap,crisis_underprediction_change_vs_static,0.0,rate_or_score,generated,segment=CI; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,static_residual_bootstrap,empirical_coverage,0.9281609195402298,rate_or_score,generated,segment=CRE; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,static_residual_bootstrap,mean_interval_width,0.22124464665564417,rate_or_score,generated,segment=CRE; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,static_residual_bootstrap,winkler_score,0.2672533864900906,rate_or_score,generated,segment=CRE; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,static_residual_bootstrap,crisis_underprediction_count,27.0,count,generated,segment=CRE; target_coverage=90%.
-conformal,Dynamic FE residual-bootstrap fallback,static_residual_bootstrap,crisis_underprediction_change_vs_static,0.0,rate_or_score,generated,segment=CRE; target_coverage=90%.
+section,model,segment_scope,scenario,metric,value,status,reason
+scenario_and_exposure_sensitivity,ar_mean,CI,baseline,aggregate_cumulative_loss_thousands,5401896.149640466,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CRE,baseline,aggregate_cumulative_loss_thousands,1897486.8028631487,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,dynamic_fe,CI,baseline,aggregate_cumulative_loss_thousands,2278916.3360929247,LIMITED_CHALLENGER,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CI,researcher_cre_only,aggregate_cumulative_loss_thousands,5401896.149640466,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CRE,researcher_cre_only,aggregate_cumulative_loss_thousands,1897486.8028631487,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,dynamic_fe,CI,researcher_cre_only,aggregate_cumulative_loss_thousands,2278916.3360929247,LIMITED_CHALLENGER,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CI,researcher_high_for_longer_rates,aggregate_cumulative_loss_thousands,5401896.149640466,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CRE,researcher_high_for_longer_rates,aggregate_cumulative_loss_thousands,1897486.8028631487,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,dynamic_fe,CI,researcher_high_for_longer_rates,aggregate_cumulative_loss_thousands,2618310.2797789364,LIMITED_CHALLENGER,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CI,researcher_lambda_0.5,aggregate_cumulative_loss_thousands,5401896.149640466,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CRE,researcher_lambda_0.5,aggregate_cumulative_loss_thousands,1897486.8028631487,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,dynamic_fe,CI,researcher_lambda_0.5,aggregate_cumulative_loss_thousands,7169602.3300076695,LIMITED_CHALLENGER,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CI,researcher_lambda_1,aggregate_cumulative_loss_thousands,5401896.149640466,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CRE,researcher_lambda_1,aggregate_cumulative_loss_thousands,1897486.8028631487,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,dynamic_fe,CI,researcher_lambda_1,aggregate_cumulative_loss_thousands,12286838.7512398,LIMITED_CHALLENGER,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CI,researcher_lambda_1.25,aggregate_cumulative_loss_thousands,5401896.149640466,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CRE,researcher_lambda_1.25,aggregate_cumulative_loss_thousands,1897486.8028631487,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,dynamic_fe,CI,researcher_lambda_1.25,aggregate_cumulative_loss_thousands,14845190.53242528,LIMITED_CHALLENGER,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CI,researcher_unemployment_only,aggregate_cumulative_loss_thousands,5401896.149640466,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CRE,researcher_unemployment_only,aggregate_cumulative_loss_thousands,1897486.8028631487,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,dynamic_fe,CI,researcher_unemployment_only,aggregate_cumulative_loss_thousands,2992532.1778355096,LIMITED_CHALLENGER,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CI,severely_adverse,aggregate_cumulative_loss_thousands,5401896.149640466,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CRE,severely_adverse,aggregate_cumulative_loss_thousands,1897486.8028631487,FORMAL_BASELINE,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,dynamic_fe,CI,severely_adverse,aggregate_cumulative_loss_thousands,12286838.7512398,LIMITED_CHALLENGER,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CRE+CI,exposure_-5%,aggregate_cumulative_loss_thousands,6934413.804878433,RESEARCHER_SENSITIVITY,Researcher sensitivity when not an official baseline/severely adverse scenario
+scenario_and_exposure_sensitivity,ar_mean,CRE+CI,exposure_+5%,aggregate_cumulative_loss_thousands,7664352.100128795,RESEARCHER_SENSITIVITY,Researcher sensitivity when not an official baseline/severely adverse scenario
+negative_nco_floor,ar_mean,CI,baseline,floor_effect_thousands,0.0,SENSITIVITY,Nonnegative aggregation floor applied to 0/279 quarterly bank paths; raw recursive state retained
+negative_nco_floor,ar_mean,CRE,baseline,floor_effect_thousands,11021.920761663234,SENSITIVITY,Nonnegative aggregation floor applied to 19/279 quarterly bank paths; raw recursive state retained
+negative_nco_floor,dynamic_fe,CI,baseline,floor_effect_thousands,227375.57766362908,SENSITIVITY,Nonnegative aggregation floor applied to 84/279 quarterly bank paths; raw recursive state retained
+negative_nco_floor,ar_mean,CI,severely_adverse,floor_effect_thousands,0.0,SENSITIVITY,Nonnegative aggregation floor applied to 0/279 quarterly bank paths; raw recursive state retained
+negative_nco_floor,ar_mean,CRE,severely_adverse,floor_effect_thousands,11021.920761663234,SENSITIVITY,Nonnegative aggregation floor applied to 19/279 quarterly bank paths; raw recursive state retained
+negative_nco_floor,dynamic_fe,CI,severely_adverse,floor_effect_thousands,117.8972790017724,SENSITIVITY,Nonnegative aggregation floor applied to 4/279 quarterly bank paths; raw recursive state retained
+cre_mechanical_decomposition,ar_mean,CRE,severely_adverse,Low_mean_mechanical_equal_rate_burden,0.002770119693106,DESCRIPTIVE_NOT_CAUSAL,Exposure/Tier1 decomposition only; no causal concentration effect
+cre_mechanical_decomposition,ar_mean,CRE,severely_adverse,Mid_mean_mechanical_equal_rate_burden,0.0073237791204454,DESCRIPTIVE_NOT_CAUSAL,Exposure/Tier1 decomposition only; no causal concentration effect
+cre_mechanical_decomposition,ar_mean,CRE,severely_adverse,High_mean_mechanical_equal_rate_burden,0.0119092149891424,DESCRIPTIVE_NOT_CAUSAL,Exposure/Tier1 decomposition only; no causal concentration effect
+limited_ranking_sensitivity,ar_mean_vs_dynamic_fe,CI_ONLY_COMMON_BANKS,severely_adverse,spearman_rank_correlation,0.8225806451612904,LIMITED_CHALLENGER_SENSITIVITY_NOT_FULL_PORTFOLIO_RANKING,n=31
+tail_model_use,all_quantile_models,CI/CRE,not_applicable,multi_step_tail_distribution,,UNAVAILABLE,One-step diagnostic use only; no cumulative tail loss or tail ranking
+bayesian,bayesian,CI/CRE,not_applicable,posterior_stress_path,,NOT_EVALUATED,Deferred by limited R4 scope

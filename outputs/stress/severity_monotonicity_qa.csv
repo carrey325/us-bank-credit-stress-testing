@@ -1,4 +1,4 @@
-comparison,aggregate_loss,nondecreasing_vs_prior
-lambda_0.5,16251206.395098422,True
-lambda_1.0,27589008.620926794,True
-lambda_1.25,33557519.98705014,True
+model,segment,baseline_loss_thousands,severe_loss_thousands,severe_ge_baseline,status
+ar_mean,CI,5401896.149640466,5401896.149640466,True,DIAGNOSTIC_NOT_ENFORCED
+ar_mean,CRE,1897486.8028631485,1897486.8028631485,True,DIAGNOSTIC_NOT_ENFORCED
+dynamic_fe,CI,2278916.3360929247,12286838.751239799,True,DIAGNOSTIC_NOT_ENFORCED

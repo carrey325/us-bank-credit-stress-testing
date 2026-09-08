@@ -1,16 +1,20 @@
 from pathlib import Path
+import copy
 
 import numpy as np
 import pandas as pd
 import pytest
+import bankstress.stress as stress_module
 
 from bankstress.stress import (
+    R4_FORMAL_PAIRS,
     _annualized_to_qoq_percent,
     _freeze_controls,
     _normalise_fed_frame,
     construct_stress_macro_predictors,
     make_sensitivity_scenarios,
     recursive_stress_paths,
+    validate_formal_r4_inputs,
     summarize_stress,
     StressFit,
 )
@@ -109,3 +113,61 @@ def test_future_macro_predictors_preserve_batch2_availability_and_lag_semantics(
     assert prepared.loc[2, fallback].tolist() == [100.0] * len(fallback)
     assert prepared.loc[0, "lagged_gdp_growth_source_quarter"] == pd.Timestamp("2025-12-31")
     assert prepared.loc[0, "lagged_cre_price_growth_source_quarter"] == pd.Timestamp("2025-09-30")
+
+
+def test_current_formal_r4_gate_accepts_only_registry_authorized_pairs():
+    root = Path(__file__).resolve().parents[1]
+    gate = validate_formal_r4_inputs(root)
+    registry = {(item["model_id"], item["segment"]): item for item in gate["registry"]}
+    assert set(R4_FORMAL_PAIRS) == {("ar_mean", "CI"), ("ar_mean", "CRE"), ("dynamic_fe", "CI")}
+    assert all(registry[pair]["conditional_mean_stress_use"] == "ALLOWED" for pair in R4_FORMAL_PAIRS)
+    assert registry[("dynamic_fe", "CRE")]["conditional_mean_stress_use"] == "DIAGNOSTIC_ONLY"
+
+
+def test_formal_r4_gate_rejects_legacy_residual_input():
+    root = Path(__file__).resolve().parents[1]
+    residual = root / "outputs/model_risk/rolling_residual_intervals.parquet"
+    with pytest.raises(ValueError, match="does not authorize residual/extra formal inputs"):
+        validate_formal_r4_inputs(root, additional_formal_artifacts=[residual])
+
+
+@pytest.mark.parametrize("stale_kind", ["r1_mapping", "r2_model", "r3_registry"])
+def test_formal_r4_gate_rejects_stale_upstream_lineage(monkeypatch, stale_kind):
+    root = Path(__file__).resolve().parents[1]
+    real_metadata = stress_module.validate_artifact_metadata
+    real_json = stress_module._read_json
+
+    def fake_metadata(path, **kwargs):
+        payload = copy.deepcopy(real_metadata(path, **kwargs))
+        if stale_kind == "r1_mapping" and path.name == "credit_panel.parquet":
+            payload["field_mapping_hash"] = "stale-r1-mapping"
+        if stale_kind == "r2_model" and path.name == "coefficients.csv":
+            payload["input_artifact_hashes"]["data/derived/model_panel.parquet"] = "stale-r2-model-panel"
+        return payload
+
+    def fake_json(path):
+        payload = copy.deepcopy(real_json(path))
+        if stale_kind == "r3_registry" and path.name == "model_use_registry.json":
+            payload[0]["input_run_id"] = "stale-r2-run"
+        return payload
+
+    monkeypatch.setattr(stress_module, "validate_artifact_metadata", fake_metadata)
+    monkeypatch.setattr(stress_module, "_read_json", fake_json)
+    with pytest.raises(ValueError, match="Formal R4 lineage gate failed"):
+        validate_formal_r4_inputs(root)
+
+
+def test_generated_r4_paths_have_exact_scope_horizon_formula_and_lineage():
+    root = Path(__file__).resolve().parents[1]
+    paths = pd.read_parquet(root / "outputs/stress/stress_paths.parquet")
+    assert set(zip(paths.model, paths.segment)) == set(R4_FORMAL_PAIRS)
+    assert set(paths.horizon) == set(range(1, 10))
+    assert set(paths.loc[paths.scenario.isin(["baseline", "severely_adverse"]), "scenario"]) == {"baseline", "severely_adverse"}
+    expected = paths.loss_rate_for_aggregation_decimal_annualized / 4 * paths.exposure_thousands
+    assert np.allclose(paths.quarter_loss_thousands, expected)
+    required_lineage = {
+        "lagged_nco_rate_source_quarter", "lagged_nco_rate_source_type",
+        "exposure_source_quarter", "exposure_assumption",
+    }
+    assert required_lineage.issubset(paths.columns)
+    assert paths[list(required_lineage)].notna().all().all()

@@ -1,0 +1,22 @@
+{
+  "RQ1": {
+    "status": "INCONCLUSIVE",
+    "evidence": "Dynamic FE improved RMSE in 1/8 R2 comparisons; Mortgage stress is not evaluated",
+    "limitation": "AR remains a baseline, not proof of stable structural predictability"
+  },
+  "RQ2": {
+    "status": "SUPPORTED",
+    "evidence": "Mechanical equal-loss-rate exposure/Tier1 decomposition rises from low to high CRE group",
+    "limitation": "Arithmetic/descriptive relationship only; not causal"
+  },
+  "RQ3": {
+    "status": "NOT_SUPPORTED",
+    "evidence": "R2 CRE interaction 95% interval includes zero",
+    "limitation": "No incremental unit-loss-rate amplification claim"
+  },
+  "RQ4": {
+    "status": "INCONCLUSIVE",
+    "evidence": "One-step quantile diagnostics exist, with 507 pre-rearrangement crossings",
+    "limitation": "No multi-period distribution, Bayesian result, or calibrated cumulative-tail comparison"
+  }
+}

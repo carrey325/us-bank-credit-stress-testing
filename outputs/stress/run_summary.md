@@ -1,9 +1,7 @@
-# Batch 4 Fed stress results
+# R4 limited conditional-mean stress rebuild
 
-- Final stress universe: 14 banks, each with complete CRE and C&I 2025Q4 states.
-- Official scenarios are the Federal Reserve's 2026 final baseline and severely adverse domestic CSVs; lambda and partial shocks are clearly labelled researcher sensitivities.
-- Primary capital result is cumulative credit loss / starting Tier 1 capital, not a Federal Reserve CET1 projection. Annualized NCO rates are divided by four; the non-negative floor applies only to dollar-loss aggregation and not to the recursive NCO state.
-- Reviewer-mandated CRE definition correction: the historical FRED input is its reported YoY CRE-price growth, and Fed CRE index levels are transformed to the same YoY percent-growth units using historical boundary levels.
-- 2026Q1 bank controls use the actual 2025Q4 current state and remain static. GDP/unemployment scenario features first affect 2026Q2, while final-vintage fallback features first affect 2026Q3 because Batch 2 applies their documented availability lag and the model then applies its own lag; `macro_predictor_timing.csv` records all sources.
-- Dollar-loss floor use: 596 of 4032 path observations; see `loss_rate_floor_qa.csv`. Mortgage attribution is unavailable, not zero-filled, because no approved mortgage stress model exists.
-- Bayesian ranking is unavailable because Batch 3 recorded no usable posterior forecasts; it is not imputed.
+- Run: `r4-20260908-limited-delivery`; common stress universe: 31 banks.
+- Formal baseline: AR mean for C&I and CRE. Limited sensitivity: Dynamic FE for C&I only. Dynamic FE CRE, all quantiles, Bayesian, Mortgage expansion, and multi-period tail claims are excluded.
+- Paths cover 2026Q1--2028Q1 and retain recursive state, scenario predictors, source quarters, source types, static 2025Q4 exposure, and starting Tier1.
+- `quarter_loss_thousands = annualized_nco_rate_decimal / 4 * exposure_thousands`. Reported ratios are modeled credit-loss burdens relative to starting Tier1, not capital depletion or CET1 changes.
+- Severity monotonicity is diagnostic and is not forced. See `severity_monotonicity_qa.csv`.

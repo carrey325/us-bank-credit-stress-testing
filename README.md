@@ -1,56 +1,103 @@
 # MF772 Bank Credit Stress Testing
 
-> **Repair-cycle status (2026-09-07): R2 mean-model/EDA artifacts regenerated.**
-> The AR, Dynamic FE, SPJ diagnostic, CRE interaction, and EDA outputs now carry
-> R2 lineage. Tail, interval, stress, model-risk, reporting, and resume-metric
-> artifacts remain `INVALID_PENDING_REBUILD`; old versions are audit-only. See
-> `outputs/repair/artifact_status.json`.
+> **Repair-cycle status (limited R4, 2026-09-07): complete pending Router review.**
+> Formal delivery artifacts use the repaired R1-R3 chain and the manifest-hash-verified
+> Federal Reserve 2026 scenario inputs. Legacy stress, interval, report, and resume
+> outputs are audit-only unless they carry the current R4 metadata.
 
 ## Problem
 
-This project is a reproducible, public-data, top-down credit stress-testing framework for U.S. regional banks. It reconstructs quarterly segment-level net charge-off (NCO) rates and uses the approved Federal Reserve 2026 baseline and severely adverse scenarios to produce transparent credit-loss and loss-to-starting-Tier-1-capital estimates. It is not a bank-failure classifier, a trading strategy, a causal CRE study, or a reproduction of confidential FR Y-14 supervisory models.
+MF772 is a reproducible public-data framework for segment-level credit analysis of
+U.S. regional banks. It reconstructs quarterly net charge-off (NCO) rates and
+translates the Federal Reserve 2026 baseline and severely adverse macro paths into
+static-exposure conditional-mean credit-loss estimates. It is not a bank-failure
+classifier, a causal CRE study, a confidential FR Y-14 model, or a CET1 forecast.
 
 ## Data
 
-The core unit is bank x loan segment x quarter. The generated historical panel contains 33 banks, 3 segments (CRE, C&I, and closed-end Mortgage), 84 quarters, and 8,145 observations. This includes 60 explicit unavailable segment rows for one POR-verified FFIEC 051 interval; they carry no imputed financial values and prevent lags from bridging the reporting gap. Inputs are official FFIEC Call Report bulk archives, FDIC BankFind records, and documented macroeconomic series. Raw source files are intentionally excluded from Git; manifests preserve source URLs, retrieval timestamps, and SHA-256 hashes.
+The repaired historical panel contains 33 banks, three segments (CRE, C&I, and
+closed-end Mortgage), 84 quarters, and 8,145 rows. It retains 60 explicit
+unavailable segment rows for a POR-verified FFIEC 051 interval and does not impute
+their financial values. Effective-dated mappings and source/reconciliation caveats
+are documented under `metadata/`.
 
-The effective-dated regulatory mapping is in `metadata/field_mapping.csv`. Source and reconciliation caveats are retained in `metadata/` rather than silently repaired.
+The common 2025Q4 R4 stress universe contains 31 banks with complete eligible C&I
+and CRE jump-off states. Mortgage is historical-panel evidence only: no Mortgage
+stress loss is reported because no approved Mortgage stress model exists.
 
 ## Method
 
-The project reconstructs quarterly NCO as charge-offs less recoveries divided by average segment exposure. It uses AR and dynamic fixed-effects mean models, split-panel-jackknife comparison, Q0.50/Q0.75/Q0.90 quantile models, historical pseudo-stress tests, and Fed 2026 scenario recursion. Primary capital output is cumulative credit loss divided by starting Tier 1 capital.
+Formal R4 paths cover 2026Q1-2028Q1 and include only registry-authorized pairs:
 
-Batch 5 adds a documented rolling residual-bootstrap 90% interval fallback around out-of-sample Dynamic-FE forecasts. It is a model-risk layer, not a replacement credit-loss model. The adaptive interval uses only earlier OOS residuals; methodology and metrics are written to `outputs/model_risk/`.
+- AR mean for C&I and CRE as the formal comparison baseline.
+- Dynamic FE for C&I as a limited challenger/sensitivity. R2 found lower
+  equal-observation RMSE in only 1 of 8 segment-window comparisons.
 
-## Historical key results (invalid pending downstream rebuild)
+Dynamic FE CRE, every quantile model, and Bayesian outputs are excluded from formal
+stress paths and rankings. Quantiles retain one-step diagnostic use only; there is
+no cumulative-loss quantile or multi-period tail-distribution result.
 
-The stress, interval, report, and resume figures in this section predate R1/R2 and are retained only to identify invalidated historical claims. They are not permitted downstream results. The R2 research decision and current mean-model evidence are in `outputs/repair/r2/research_decision.md`.
+Quarterly modeled loss is calculated as:
 
-The rolling residual-calibrated intervals achieve 94.4% CI coverage and 92.1% CRE coverage over their post-seed OOS periods, versus 96.9% and 92.8% for the static residual-calibrated comparator. Rolling calibration increases crisis upper misses in this run (CI: 9 to 21; CRE: 27 to 31), so it does not achieve the desired crisis-underprediction reduction. These are empirical calibration results, not guarantees. See the final ten-page draft at `outputs/reporting/MF772_final_report_draft.pdf`.
+```text
+quarter_loss_thousands
+  = annualized_nco_rate_decimal / 4 * exposure_thousands
+```
+
+The reported ratio is cumulative modeled credit loss divided by starting Tier1.
+It is a credit-loss burden measure, not capital depletion, CET1 change, or a full
+capital roll-forward.
+
+## Key Results
+
+- The AR C&I-plus-CRE aggregate is 7,299,383 thousand under both official paths.
+  AR contains no macro scenario variables, so scenario invariance is expected and
+  is a baseline-model limitation—not evidence that baseline and severe are equally
+  stressful.
+- Dynamic FE C&I is published only as a limited challenger. Its severely adverse
+  conditional-mean aggregate is 12,286,840 thousand; it is not a full-portfolio
+  result and not evidence of model superiority.
+- Higher CRE-to-Tier1 mechanically produces higher loss-to-Tier1 under the
+  equal-loss-rate exposure decomposition. The repaired R2 interaction does not
+  support an additional per-dollar CRE amplification effect; its 95% interval
+  includes zero.
+- Baseline/severe conditional-mean paths are publishable with these scope labels.
+  Capital depletion, Mortgage stress, cumulative tail loss, Bayesian stress, and
+  market external validation are unavailable or not evaluated.
 
 ## Reproducibility
 
-Install the project dependencies, restore the manifest-backed raw inputs when needed, and run the checkpoints in order:
+Install dependencies and run the bounded downstream chain:
 
 ```powershell
 python -m pip install -r requirements.txt
-make raw
-make standard
-make panel
-make qa
-make models
 make stress
 make report
 python -m pytest -q --basetemp .pytest-local
 ```
 
-`make report` runs `scripts/run_batch5.py`, which regenerates final tables, figures, the report draft, resume metrics, and the reproducibility audit. The audit must report `PASS`; its detailed output is `outputs/reporting/reproducibility_audit.md`.
+`make stress` re-fetches the three retained Federal Reserve files and requires
+their bytes to match `metadata/fed_2026_scenario_manifest.csv`. The formal entry
+then validates R1/R2/R3 mapping, manifest, model-panel, specification, registry,
+and artifact hashes. `make report` creates only the supported T1-T5 tables,
+figures, errata, resume metrics, and ten-page report.
+
+The reproducibility audit distinguishes unit, integration, artifact-consistency,
+and limited R4-chain evidence. It does not claim that R1-R3 were rerun during the
+R4 invocation.
 
 ## Limitations
 
-- Two isolated FFIEC gross-flow rows remain `REVIEW_REQUIRED`; both are directly reviewed, explicitly enumerated, and bounded in `metadata/nco_reconciliation_review.csv` rather than reclassified without evidence.
-- Some macro variables use a documented final-vintage, one-quarter-lag fallback rather than a full real-time vintage feed.
-- Bayesian posterior forecasts are unavailable under the documented environment fallback, so no posterior result is claimed.
-- Recursive CRE Q0.90 is not historically calibrated across all three pre-specified pseudo-stress windows and is not presented as a validated tail forecast.
-- Mortgage stress attribution is unavailable because no approved Mortgage stress model exists; it is never filled with zero.
-- Market external validation is not completed because this checkout does not contain a verified bank legal entity -> BHC/parent -> listed ticker mapping. No name-based ticker match or market-validation claim was made.
+- Two bounded FFIEC gross-flow rows remain `REVIEW_REQUIRED` and explicitly listed.
+- Some historical macro inputs use documented final-vintage fallbacks.
+- AR cannot distinguish the official scenarios because it has no macro predictors.
+- Dynamic FE C&I is weak as an incremental mean challenger; Dynamic FE CRE is
+  diagnostic-only because a required path feature is unavailable.
+- Quantile crossing occurred in 507 one-step diagnostic rows before rearrangement.
+  Multi-period tail distributions and residual-calibration expansion were not
+  evaluated.
+- No full capital roll-forward, Mortgage stress model, Bayesian result, market
+  validation, machine-learning challenger, or new sample expansion is included.
+
+See `outputs/reporting/errata.md` and
+`outputs/reporting/reproducibility_audit.md` for the formal delivery boundaries.

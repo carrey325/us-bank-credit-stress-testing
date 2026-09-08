@@ -1,0 +1,6 @@
+check,value,status,detail
+manifest_artifacts,3,PASS,"baseline, severely_adverse, historic_domestic hashes matched retained manifest"
+official_horizon_rows,18,PASS,2 scenarios x 9 quarters
+annualized_nco_rate_unit,1,PASS,decimal annualized; quarterly loss = rate / 4 * exposure_thousands
+cre_boundary_definition,4,PASS,Fed CRE level YoY transformation uses t-4 historical/scenario level
+house_boundary_definition,1,PASS,Fed house-price QoQ transformation uses t-1 historical/scenario level

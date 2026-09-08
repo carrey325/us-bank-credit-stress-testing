@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-import json
-
 import pandas as pd
+import pytest
 
-from bankstress.reporting import _audit, _final_report_metric_semantics, _mean_model_rmse_improvement_vs_ar, conformal_metrics, rolling_residual_intervals
+from bankstress.reporting import conformal_metrics, rolling_residual_intervals, validate_formal_reporting_inputs
 
 
 def _oos() -> pd.DataFrame:
@@ -31,44 +30,29 @@ def test_conformal_metrics_report_required_model_risk_fields():
     assert result["target_coverage"].eq(0.9).all()
 
 
-def test_final_delivery_audit_enforces_table_figure_and_report_semantics():
+def test_limited_r4_delivery_has_current_gate_and_null_reason_semantics():
     root = Path(__file__).resolve().parents[1]
-    intervals = pd.read_parquet(root / "outputs" / "model_risk" / "rolling_residual_intervals.parquet")
-    tables = pd.read_csv(root / "outputs" / "reporting" / "final_tables_manifest.csv").to_dict("records")
-    figures = pd.read_csv(root / "outputs" / "reporting" / "final_figures_manifest.csv").to_dict("records")
+    validate_formal_reporting_inputs(root)
+    t4 = pd.read_csv(root / "outputs/reporting/tables/fed_stress_results.csv")
+    assert t4.capital_depletion.isna().all()
+    assert t4.capital_depletion_reason.str.contains("Unavailable").all()
+    assert not ((t4.model == "dynamic_fe") & (t4.segment_scope == "CRE")).any()
 
-    audit = _audit(root, tables, figures, intervals)
 
-    repair_status = json.loads((root / "outputs" / "repair" / "artifact_status.json").read_text(encoding="utf-8"))
-    if repair_status["status"] == "INVALID_PENDING_REBUILD":
-        # R1 changed the upstream panel. Retained Batch 5 outputs are audit-only
-        # and must not masquerade as a passing current reproducibility audit.
-        assert audit["status"] == "FAIL"
-        return
+def test_formal_reporting_entry_rejects_stale_residual_calibration():
+    root = Path(__file__).resolve().parents[1]
+    with pytest.raises(ValueError, match="does not authorize residual/extra formal inputs"):
+        validate_formal_reporting_inputs(
+            root,
+            additional_formal_artifacts=[root / "outputs/model_risk/rolling_residual_intervals.parquet"],
+        )
+
+
+def test_reproducibility_evidence_does_not_claim_full_end_to_end_rerun():
+    root = Path(__file__).resolve().parents[1]
+    audit = __import__("json").loads((root / "outputs/reporting/reproducibility_audit.json").read_text(encoding="utf-8"))
     assert audit["status"] == "PASS"
-    assert audit["checks"]["required_final_table_schemas_and_semantics"]
-    assert audit["checks"]["required_final_figure_semantics"]
-    assert audit["checks"]["final_report_has_ten_pages_and_required_positioning"]
-    assert audit["checks"]["readme_states_final_delivery_and_model_positioning"]
-
-
-def test_final_report_metric_semantics_reject_dynamic_fe_attribution_of_ar_best_metric():
-    root = Path(__file__).resolve().parents[1]
-    model_comparison = pd.read_csv(root / "outputs" / "reporting" / "tables" / "model_comparison.csv")
-    resume = __import__("json").loads((root / "outputs" / "reporting" / "resume_metrics.json").read_text(encoding="utf-8"))
-    best_improvement = _mean_model_rmse_improvement_vs_ar(model_comparison, "AR")
-    dynamic_fe_improvement = _mean_model_rmse_improvement_vs_ar(model_comparison, "Dynamic FE")
-
-    correct = (
-        f"best-model improvement versus AR: {best_improvement:.2%}. "
-        "Because AR itself is the best pooled OOS RMSE model. "
-        f"The T3-derived Dynamic FE versus AR RMSE change is {dynamic_fe_improvement:.2%}."
-    )
-    prior_misattribution = (
-        f"best-model improvement versus AR: {best_improvement:.2%}. "
-        "Because AR itself is the best pooled OOS RMSE model. "
-        f"The generated resume metric records the Dynamic-FE versus AR RMSE change of {best_improvement:.2%}."
-    )
-
-    assert _final_report_metric_semantics(correct, model_comparison, resume)
-    assert not _final_report_metric_semantics(prior_misattribution, model_comparison, resume)
+    assert audit["evidence_classes"]["unit"]["status"] == "PASS"
+    assert audit["evidence_classes"]["integration"]["status"] == "PASS"
+    assert audit["evidence_classes"]["artifact_consistency"]["status"] == "PASS"
+    assert audit["evidence_classes"]["end_to_end"]["status"] == "NOT_RUN"

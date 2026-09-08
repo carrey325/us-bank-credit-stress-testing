@@ -1,39 +1,5 @@
 bank_id,bank_name,segment,reason
-12311,HUNTINGTON NATIONAL BANK,CI,recent merger flag
-12311,HUNTINGTON NATIONAL BANK,CRE,recent merger flag
-197478,EAST WEST BANK,CI,incomplete 2025Q4 jump-off state
-208244,OLD NATIONAL BANK,CI,incomplete 2025Q4 jump-off state
-229801,VALLEY NATIONAL BANK,CI,incomplete 2025Q4 jump-off state
-233031,REGIONS BANK,CI,incomplete 2025Q4 jump-off state
-280110,KEYBANK NATIONAL ASSN,CI,incomplete 2025Q4 jump-off state
-3212149,UBS BANK USA,CI,incomplete 2025Q4 jump-off state
-3303298,CITIZENS BANK NATIONAL ASSN,CI,incomplete 2025Q4 jump-off state
-413208,HSBC BANK USA NATIONAL ASSN,CI,incomplete 2025Q4 jump-off state
-491224,FIRST-CITIZENS BANK&TRUST CO,CI,incomplete 2025Q4 jump-off state
-501105,MANUFACTURERS&TRADERS TR CO,CI,incomplete 2025Q4 jump-off state
-60143,COMERICA BANK,CI,incomplete 2025Q4 jump-off state
-619877,USAA FEDERAL SAVINGS BANK,CI,not eligible for approved model
-619877,USAA FEDERAL SAVINGS BANK,CRE,not eligible for approved model
-63069,CITY NATIONAL BANK,CI,incomplete 2025Q4 jump-off state
-694904,FLAGSTAR BANK NATIONAL ASSN,CI,incomplete 2025Q4 jump-off state
-722777,SANTANDER BANK N A,CI,incomplete 2025Q4 jump-off state
-723112,FIFTH THIRD BANK NA,CI,incomplete 2025Q4 jump-off state
-936855,UMB BANK NATIONAL ASSN,CI,incomplete 2025Q4 jump-off state
-940311,BANCO POPULAR DE PUERTO RICO,CI,incomplete 2025Q4 jump-off state
-197478,EAST WEST BANK,CRE,incomplete approved primary-segment portfolio at 2025Q4
-208244,OLD NATIONAL BANK,CRE,incomplete approved primary-segment portfolio at 2025Q4
-229801,VALLEY NATIONAL BANK,CRE,incomplete approved primary-segment portfolio at 2025Q4
-233031,REGIONS BANK,CRE,incomplete approved primary-segment portfolio at 2025Q4
-280110,KEYBANK NATIONAL ASSN,CRE,incomplete approved primary-segment portfolio at 2025Q4
-3212149,UBS BANK USA,CRE,incomplete approved primary-segment portfolio at 2025Q4
-3303298,CITIZENS BANK NATIONAL ASSN,CRE,incomplete approved primary-segment portfolio at 2025Q4
-413208,HSBC BANK USA NATIONAL ASSN,CRE,incomplete approved primary-segment portfolio at 2025Q4
-491224,FIRST-CITIZENS BANK&TRUST CO,CRE,incomplete approved primary-segment portfolio at 2025Q4
-501105,MANUFACTURERS&TRADERS TR CO,CRE,incomplete approved primary-segment portfolio at 2025Q4
-60143,COMERICA BANK,CRE,incomplete approved primary-segment portfolio at 2025Q4
-63069,CITY NATIONAL BANK,CRE,incomplete approved primary-segment portfolio at 2025Q4
-694904,FLAGSTAR BANK NATIONAL ASSN,CRE,incomplete approved primary-segment portfolio at 2025Q4
-722777,SANTANDER BANK N A,CRE,incomplete approved primary-segment portfolio at 2025Q4
-723112,FIFTH THIRD BANK NA,CRE,incomplete approved primary-segment portfolio at 2025Q4
-936855,UMB BANK NATIONAL ASSN,CRE,incomplete approved primary-segment portfolio at 2025Q4
-940311,BANCO POPULAR DE PUERTO RICO,CRE,incomplete approved primary-segment portfolio at 2025Q4
+12311,HUNTINGTON NATIONAL BANK,CI,segment lacks eligible complete 2025Q4 state
+12311,HUNTINGTON NATIONAL BANK,CRE,segment lacks eligible complete 2025Q4 state
+619877,USAA FEDERAL SAVINGS BANK,CI,segment lacks eligible complete 2025Q4 state
+619877,USAA FEDERAL SAVINGS BANK,CRE,segment lacks eligible complete 2025Q4 state

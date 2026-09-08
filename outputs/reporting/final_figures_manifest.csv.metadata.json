@@ -1,0 +1,20 @@
+{
+  "run_id": "r4-20260908-limited-delivery",
+  "stage": "R4",
+  "code_commit": "c5b1b1989fc39c0bcd7ff462f3543cadc616470e",
+  "code_tree_hash_or_dirty_diff_hash": "094080b1b03d012f9fa9700958dfb3d379545b5482f03c18b8308c7ed265cada",
+  "artifact": "outputs/reporting/final_figures_manifest.csv",
+  "artifact_hash": "e31f57bcc6a217def0ecb6a38ac0a39a876d556368129cd71e548f02d151ac62",
+  "input_artifact_hashes": {
+    "outputs/stress/stress_paths.parquet": "4f20d837b320047d96b63bf56afb6912340dc74d553ee5f2016a47637b117195",
+    "outputs/stress/t4_fed_stress_results.csv": "fc79395365b291bb70016f54e6576968c415f4e067aae00223d387053e4240f6",
+    "outputs/validation/model_use_registry.json": "b347089eb3ab0a98dcef52a13654305953f2f55a7689818b8a9530e72e854afb",
+    "outputs/repair/r3/validation_summary.json": "4b048a119fe2644f296fd3d3385ea1d24843e59682a5ea9d40f244db5cb3d9ad"
+  },
+  "raw_manifest_hash": "b4fa86c0bbe24b24fae8d2c754849b58183eef7c9f626b4e09c92a3dcb2e7296",
+  "field_mapping_hash": "378e645d4d9086edb1a620d842de09e0a504c3f688e42688291107283719c2c6",
+  "data_definition_version": "mf772-r1-definitions-v2",
+  "model_spec_hash": "49ff9113ca4815ae99d51ba13deb740f82f65a114da771926cbae28d5015490d",
+  "created_at": "2026-09-08T02:54:25.243198+00:00",
+  "validation_status": "PASS"
+}

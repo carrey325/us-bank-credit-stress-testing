@@ -13,6 +13,7 @@ if __name__ == "__main__":
     result = run_batch4(ROOT)
     summary = result["summary"]
     for scenario in ("baseline", "severely_adverse"):
-        value = summary[(summary.scenario == scenario) & (summary.model == "dynamic_fe")].cumulative_loss.sum()
-        print(f"{scenario}_aggregate_loss={value:.2f}")
-    print(f"stress_universe_banks={result['metrics']['n_banks']}")
+        value = summary[(summary.scenario == scenario) & (summary.model == "ar_mean")].cumulative_loss_thousands.sum()
+        print(f"{scenario}_ar_aggregate_loss_thousands={value:.2f}")
+    print(f"stress_universe_banks={result['metrics']['stress_universe_banks']}")
+    print(f"formal_path_pairs={','.join(result['metrics']['formal_path_pairs'])}")
