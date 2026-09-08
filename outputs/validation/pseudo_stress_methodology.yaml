@@ -1,10 +1,12 @@
 validation_scope: MINIMAL_R3
 macro_path: supplied realized historical macro path; unavailable features are not
   imputed
-lagged_nco: recursive modeled state after a valid jump-off
+lagged_nco: recursive modeled state after a valid jump-off; source period and type
+  carry unchanged across unavailable predictions
 bank_controls: current train-end NPL rate, allowance coverage, Tier 1 ratio, and adjacent-quarter
   loan growth held fixed; incomplete current states are excluded and counted
-bank_control_source_lineage: one source-period column per frozen control in pseudo_stress.parquet
+bank_control_source_lineage: one source-period column per frozen control in pseudo_stress.parquet;
+  loan growth also records its adjacent-prior-quarter denominator component
 generation_scoring_separation: true
 conditional_mean_path_label: plug-in conditional-mean recursive path; not asserted
   exact expectation
