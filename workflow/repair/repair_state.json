@@ -2,11 +2,11 @@
   "cycle_id": "mf772-repair-v1",
   "base_commit": "09e036b827463d915990f423941b6bff5c3349b0",
   "current_stage": "R4",
-  "status": "WAITING_REVIEW",
+  "status": "COMPLETE",
   "active_worker_id": null,
   "input_run_id": "r4-20260908-limited-delivery",
   "checkpoint_commit": "17d6cad4586555f956d5d4bc9563c1effa594dd2",
-  "review_status": "PENDING_SUBMISSION",
+  "review_status": "APPROVED",
   "blocker": null,
-  "next_action": "SUBMIT_FINAL_LIMITED_R4_REVIEW_FROM_STATE_CHECKPOINT; close the Repair Cycle to COMPLETE only after Astra Extra High returns APPROVED."
+  "next_action": "NONE; MF772 Repair Cycle is complete. Deferred research requires separate user authorization."
 }
