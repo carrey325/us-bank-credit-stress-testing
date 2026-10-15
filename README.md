@@ -119,6 +119,12 @@ Other limitations include a selected regional-bank sample, unsupported historica
 
 ## 6. Reproduce and inspect
 
+The additive [model-risk extension](docs/model_risk.md) provides frozen-object
+independent scoring, persistence/Ridge/gradient-boosting challengers, a formal
+crossing retest, and fixed-parameter C&I stochastic losses around separate Fed
+scenarios. These are conditional research diagnostics with explicit calibration
+limits; the historical findings above and their evidence remain unchanged.
+
 Python 3.11 or newer:
 
 ```bash
