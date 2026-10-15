@@ -75,3 +75,6 @@ aggregation and empirical ES with ties and fractional tail probability.
   files; all hashes verified, alongside all 10 original evidence files.
 - Final review disposition: centering P2 fixed and tested; no unresolved critical
   or important findings. Retain the isolated branch and local full artifacts.
+- Packaging check detected four JSON evidence blobs normalized by Git rather
+  than preserving their hashed CRLF bytes. Added a model-risk evidence -text
+  attribute and verified committed blobs plus a clean Git-archive checkout.
