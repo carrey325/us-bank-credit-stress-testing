@@ -8,7 +8,7 @@ import pandas as pd
 
 from bankstress.modeling import _eligible_frame
 from bankstress.tail_validation import _prepare_jump_off_state
-from .scenarios import MACROS, contiguous_blocks, sample_blocks, fit_credit_factor, fit_var
+from .scenarios import MACROS, centered_blocks, sample_blocks, fit_credit_factor, fit_var
 from .simulation import CONTROL_MAP, propagate
 from .states import LinearState, assert_training_cutoff
 
@@ -81,10 +81,10 @@ def historical_diagnostics(panel: pd.DataFrame, spec: dict, run: Path, output: P
                 fitted, factor, idio, _ = fit_credit_factor(residuals, settings['factor_min_bank_fraction'], settings['minimum_bank_residual_quarters'])
                 rng = np.random.default_rng(settings['seed'] + window_id)
                 n = 2000
-                common = sample_blocks(contiguous_blocks(factor.to_frame(), 4), n, 9, rng)[:, :, 0]
+                common = sample_blocks(centered_blocks(factor.to_frame(), 4), n, 9, rng)[:, :, 0]
                 shocks = np.empty((n, 9, len(banks)))
                 for j, bank in enumerate(banks):
-                    specific = sample_blocks(contiguous_blocks(idio[[bank]], 4), n, 9, rng)[:, :, 0]
+                    specific = sample_blocks(centered_blocks(idio[[bank]], 4), n, 9, rng)[:, :, 0]
                     shocks[:, :, j] = (common * fitted['loadings'][j] + specific) * fitted['scale'][j]
                 center = pd.DataFrame({'quarter': dates})
                 for term in state.predictors:

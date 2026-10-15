@@ -57,3 +57,13 @@ aggregation and empirical ES with ties and fractional tail probability.
   LIMITED_NOT_VALIDATED_FOR_PREDICTIVE_USE status, distinct from integrity PASS.
 - Test evidence so far: 126 passed, 8 legacy integration skips; evidence export
   verification and fresh-context code review are the remaining delivery gates.
+- Fresh-context review found one P2: historical residual blocks lacked the
+  production population-centering step. Fixed with a shared centered_blocks
+  function and endpoint-weighting regression (RED -> GREEN); regenerate evidence.
+- Added reconstructed design rank/condition diagnostics to the finding record;
+  these are explicitly labeled reconstructed rather than historical fit objects.
+- Review rulings: regulatory suitability is not asserted; excluded Bayesian,
+  mortgage and parameter work stays excluded; hash manifests are integrity checks,
+  not adversarial signatures; poor coverage and inadmissible macro draws remain
+  disclosed limitations. Eight legacy integration tests still need their exact
+  original locations/artifacts and remain skipped; new real-run verification is separate.

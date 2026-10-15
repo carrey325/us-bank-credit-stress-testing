@@ -28,6 +28,12 @@ def sample_blocks(blocks: np.ndarray, paths: int, horizon: int, rng: np.random.G
     return blocks[indices].reshape(paths, count * blocks.shape[1], blocks.shape[2])[:, :horizon]
 
 
+def centered_blocks(frame: pd.DataFrame, length: int = 4) -> np.ndarray:
+    """Center the overlapping block population, including endpoint multiplicity."""
+    blocks = contiguous_blocks(frame, length)
+    return blocks - blocks.mean(axis=(0, 1))
+
+
 def fit_var(history: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
     history = history.sort_index()
     if history.index.has_duplicates or history.isna().any().any() or not np.isfinite(history.to_numpy()).all():
@@ -100,10 +106,7 @@ def draw_innovations(var: dict, innovations: pd.DataFrame, factor_fit: dict,
                      seed: int, block_length: int = 4) -> tuple[np.ndarray, np.ndarray, dict]:
     rng = np.random.default_rng(seed)
     joint = innovations.join(factor, how='inner').dropna()
-    blocks = contiguous_blocks(joint, block_length)
-    # Endpoint multiplicity and incomplete-quarter selection can shift the
-    # bootstrap population mean. Recenter that population, not sampled paths.
-    blocks = blocks - blocks.mean(axis=(0, 1))
+    blocks = centered_blocks(joint, block_length)
     draw = sample_blocks(blocks, paths, horizon, rng)
     transition, scale = np.asarray(var['transition']), np.asarray(var['scale'])
     state = np.zeros((paths, len(scale)))
@@ -114,8 +117,7 @@ def draw_innovations(var: dict, innovations: pd.DataFrame, factor_fit: dict,
     credit = np.empty((paths, horizon, len(factor_fit['banks'])))
     block_counts = {}
     for j, bank in enumerate(factor_fit['banks']):
-        specific_blocks = contiguous_blocks(idio[[bank]], block_length)
-        specific_blocks = specific_blocks - specific_blocks.mean(axis=(0, 1))
+        specific_blocks = centered_blocks(idio[[bank]], block_length)
         block_counts[bank] = len(specific_blocks)
         specific = sample_blocks(specific_blocks, paths, horizon, rng)[:, :, 0]
         credit[:, :, j] = (draw[:, :, -1] * factor_fit['loadings'][j] + specific) * factor_fit['scale'][j]

@@ -53,3 +53,12 @@ def test_reconstructed_fe_state_matches_existing_estimator():
     fitted = _fit_entity_fe(data, 'nco_rate', ['x'])
     state = from_fe(fitted, 'CI')
     np.testing.assert_allclose(state.predict(data), _predict_entity_fe(fitted, data, 'nco_rate').prediction, atol=1e-14)
+
+
+def test_rank_deficient_design_is_explicit_diagnostic_not_finite_condition_claim():
+    from bankstress.modelrisk.states import design_diagnostics
+    matrix = np.column_stack([np.ones(4), np.arange(4), 2*np.arange(4)])
+    info = design_diagnostics(matrix)
+    assert info['design_rank'] == 2
+    assert info['design_columns'] == 3
+    assert info['design_condition_number'] is None

@@ -61,3 +61,13 @@ def from_quantile(fit, segment: str) -> LinearState:
 def assert_training_cutoff(data: pd.DataFrame, cutoff: str | pd.Timestamp) -> None:
     if data.empty or data.target_period.isna().any() or (pd.to_datetime(data.target_period) > pd.Timestamp(cutoff)).any():
         raise ValueError('empty training data or training cutoff violation')
+
+
+def design_diagnostics(matrix: np.ndarray) -> dict:
+    values = np.asarray(matrix, dtype=float)
+    if values.ndim != 2 or not np.isfinite(values).all() or not values.size:
+        raise ValueError('nonempty finite design matrix required')
+    rank = int(np.linalg.matrix_rank(values))
+    singular = np.linalg.svd(values, compute_uv=False)
+    return {'design_rank': rank, 'design_columns': values.shape[1],
+            'design_condition_number': float(singular.max() / singular.min()) if rank == values.shape[1] else None}

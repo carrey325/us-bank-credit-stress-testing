@@ -86,3 +86,14 @@ def test_portfolio_risk_aggregates_paths_before_quantiles():
     losses = np.array([[0., 100.], [100., 0.]])
     result = summarize_losses(losses, ['a', 'b'], [.95], seed=772)
     assert result.query("bank_id == 'PORTFOLIO'")['var'].iloc[0] == 100.
+
+
+def test_bootstrap_population_centering_accounts_for_overlapping_endpoints():
+    from bankstress.modelrisk.scenarios import centered_blocks
+    # Original series mean is zero, but repeated middle observations bias blocks.
+    frame = pd.DataFrame({'x': [-8., 1., 1., 1., 5.]},
+                         index=pd.date_range('2020-03-31', periods=5, freq='QE'))
+    blocks = centered_blocks(frame, 4)
+    assert blocks.shape == (2, 4, 1)
+    assert blocks.mean() == pytest.approx(0., abs=1e-15)
+    assert blocks[0, 1, 0] - blocks[0, 0, 0] == 9.

@@ -123,6 +123,12 @@ def remediation_run(run: Path, expected: int = 507) -> Path:
         diagnostics = pd.read_csv(run / 'inputs/quantile_diagnostics.csv')
         diagnostics = diagnostics.rename(columns={'model_family': 'model'})
         root_cause = diagnostics.merge(grouped, on=['window', 'segment', 'model'], how='left', validate='many_to_one')
+        reconstructed_designs = pd.DataFrame(json.loads((run / 'fitted/catalog.json').read_text()))
+        reconstructed_designs = reconstructed_designs[reconstructed_designs.model.isin(['ar_quantile', 'dynamic_quantile'])]
+        root_cause = root_cause.merge(reconstructed_designs[
+            ['window', 'segment', 'model', 'tau', 'design_rank', 'design_columns', 'design_condition_number']],
+            on=['window', 'segment', 'model', 'tau'], how='left', validate='one_to_one')
+        root_cause['design_diagnostic_provenance'] = 'RECONSTRUCTED_FIT_NOT_ORIGINAL_OBJECT'
         root_cause.to_csv(output / 'root_cause_diagnostics.csv', index=False)
         finding = {'finding_id': 'MRM-QC-001', 'finding': 'Crossed one-step conditional quantiles',
                    'source_sha256': sha256_file(run / 'inputs/quantile_predictions.parquet'),

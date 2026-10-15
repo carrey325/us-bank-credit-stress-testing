@@ -11,7 +11,7 @@ from bankstress.tail_validation import fit_quantile
 from .bundle import write_json
 from .challengers import fit_challenger, load_challenger
 from .scoring import IDENTITY, KEYS
-from .states import LinearState, assert_training_cutoff, from_fe, from_quantile
+from .states import LinearState, assert_training_cutoff, from_fe, from_quantile, design_diagnostics
 
 
 def _rows(test, prediction, model, tau, window, version='ORIGINAL'):
@@ -61,7 +61,8 @@ def fit_oos(panel: pd.DataFrame, spec: dict, output: Path, seed: int) -> tuple[p
                     catalog.append({'file': name, 'model': family, 'tau': tau, 'window': window_id, 'segment': segment,
                                     'train_start': window['train_start'], 'train_end': window['train_end'],
                                     'predictors': predictors, 'banks': sorted(state.intercepts), 'status': 'RECONSTRUCTED',
-                                    'iterations': fitted.iterations, 'converged': fitted.converged})
+                                    'iterations': fitted.iterations, 'converged': fitted.converged,
+                                    **design_diagnostics(fitted.result.model.exog)})
                     reconstructed.append(_rows(test, prediction, family, tau, window_id, 'PRE_REARRANGEMENT'))
                 repaired = np.sort(np.column_stack(matrix), axis=1)
                 for j, tau in enumerate(spec['quantiles']):
