@@ -5,6 +5,9 @@ R2/R3/R4 replay gates and published research snapshot. It adds process-separated
 validation, a formal quantile-crossing retest and fixed-parameter C&I simulations.
 It does not establish organizationally independent validation or regulatory approval.
 
+The retained [results and open findings](model_risk_results.md) summarize the
+real-archive run and link its compact evidence.
+
 ## Run the three stages
 
 Install Python 3.11+ and `python -m pip install -e ".[test,modelrisk]"`.

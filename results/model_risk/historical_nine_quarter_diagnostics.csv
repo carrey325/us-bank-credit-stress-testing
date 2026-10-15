@@ -1,0 +1,9 @@
+window,model,scope,status,calibration_end,paths,generated_banks,scored_banks,jump_off_exclusions,residual_support_exclusions,missing_actual_path_exclusions,bank_90_interval_coverage,bank_upper95_exceedance,actual_loss_thousands,simulated_mean_scored_universe_thousands,reason
+1,ar,nine_quarter_credit_conditional_on_realized_macro,EVALUATED_DIAGNOSTIC,2011-12-31,2000.0,16.0,11.0,1.0,14.0,5.0,0.36363636363636365,0.0,711620.0463963659,2375674.940354414,
+1,dynamic_fe,nine_quarter_credit_conditional_on_realized_macro,EVALUATED_DIAGNOSTIC,2011-12-31,2000.0,16.0,11.0,1.0,14.0,5.0,0.0,0.0,711620.0463963659,2551520.2585296747,
+2,ar,nine_quarter_credit_conditional_on_realized_macro,EVALUATED_DIAGNOSTIC,2016-12-31,2000.0,30.0,16.0,2.0,1.0,14.0,0.8125,0.0625,1320552.2078464166,2571026.0300685107,
+2,dynamic_fe,nine_quarter_credit_conditional_on_realized_macro,EVALUATED_DIAGNOSTIC,2016-12-31,2000.0,30.0,16.0,2.0,1.0,14.0,0.4375,0.5625,1320552.2078464166,609675.1118333056,
+3,ar,nine_quarter_credit_conditional_on_realized_macro,NOT_EVALUATED,,,,,,,,,,,,heldout window shorter than nine quarters
+3,dynamic_fe,nine_quarter_credit_conditional_on_realized_macro,NOT_EVALUATED,,,,,,,,,,,,heldout window shorter than nine quarters
+4,ar,nine_quarter_credit_conditional_on_realized_macro,EVALUATED_DIAGNOSTIC,2021-12-31,2000.0,29.0,19.0,4.0,0.0,10.0,0.6842105263157895,0.0,1774402.5846231126,4509417.637522692,
+4,dynamic_fe,nine_quarter_credit_conditional_on_realized_macro,EVALUATED_DIAGNOSTIC,2021-12-31,2000.0,29.0,19.0,4.0,0.0,10.0,0.7894736842105263,0.05263157894736842,1774402.5846231126,3268279.819971078,

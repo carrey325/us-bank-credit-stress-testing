@@ -1,0 +1,25 @@
+{
+  "integrity_status": "PASS",
+  "calibration_status": "LIMITED_NOT_VALIDATED_FOR_PREDICTIVE_USE",
+  "risk_use": "CONDITIONAL_RESEARCH_DISTRIBUTION",
+  "segment": "CI",
+  "banks": 31,
+  "paths_per_model_scenario": 20000,
+  "horizon": 9,
+  "seed": 772,
+  "macro_spectral_radius": 0.9665628224929758,
+  "parameter_uncertainty": false,
+  "scenario_probabilities": null,
+  "units": "USD thousands",
+  "residual_dependence": "common factor plus bank-specific contiguous blocks",
+  "limitations": [
+    "final-vintage macro calibration",
+    "in-sample residual calibration",
+    "remaining idiosyncratic cross-bank correlation not modeled",
+    "static exposure and bank controls",
+    "dynamic FE limited challenger",
+    "unbounded macro generator can produce inadmissible levels; frequencies in path_qa.csv",
+    "historical cumulative interval coverage is inadequate in some holdout windows",
+    "no regulatory approval or capital forecast"
+  ]
+}

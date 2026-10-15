@@ -1,0 +1,18 @@
+{
+  "finding_id": "MRM-QC-001",
+  "finding": "Crossed one-step conditional quantiles",
+  "source_sha256": "dbfbb34af680212d2aea83eb541bc747251107f19de0beca9fadb035487ab8ad",
+  "remediation_owner": "model-development workflow",
+  "retest_owner": "independent structural verifier",
+  "independence_limit": "Software/process separation, not separate human institutional validation",
+  "observed_actuals_used_for_repair": false,
+  "before_crossing_rows": 507,
+  "after_crossing_rows": 0,
+  "complete_vector_n": 5960,
+  "keys_preserved": true,
+  "raw_values_preserved": true,
+  "structural_status": "CLOSED",
+  "predictive_adequacy": "SEPARATE_OPEN_DIAGNOSTIC",
+  "root_cause_confirmed": "Separately estimated quantiles have no joint monotonicity constraint.",
+  "remediation": "Existing deterministic row-wise increasing rearrangement; no actuals used."
+}

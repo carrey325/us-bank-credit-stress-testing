@@ -67,3 +67,11 @@ aggregation and empirical ES with ties and fractional tail probability.
   not adversarial signatures; poor coverage and inadmissible macro draws remain
   disclosed limitations. Eight legacy integration tests still need their exact
   original locations/artifacts and remain skipped; new real-run verification is separate.
+- Final delivery: restored 202 archive output/derived files (8.8 MB) without
+  overwriting existing files, enabling all historical integration tests.
+  Full suite: 137 passed, no skips. Compact checkout: 129 passed, 8 skips.
+- Final run mrm-20261015-final uses f330c86 source; full-run verification and
+  independent tail recomputation passed. Exported 17 compact extension evidence
+  files; all hashes verified, alongside all 10 original evidence files.
+- Final review disposition: centering P2 fixed and tested; no unresolved critical
+  or important findings. Retain the isolated branch and local full artifacts.

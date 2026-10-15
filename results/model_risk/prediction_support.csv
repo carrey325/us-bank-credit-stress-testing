@@ -1,0 +1,9 @@
+window,segment,train_n,candidate_prediction_n,prediction_n,unknown_bank_exclusions
+1,CRE,263,479,284,195
+1,CI,635,585,567,18
+2,CRE,707,354,354,0
+2,CI,1177,342,342,0
+3,CRE,1031,246,246,0
+3,CI,1489,239,239,0
+4,CRE,1268,466,466,0
+4,CI,1720,482,482,0

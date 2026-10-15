@@ -1,0 +1,5 @@
+model,scenario,max_absolute_rate_difference,zero_shock_replay
+ar,baseline,0.0,PASS
+ar,severely_adverse,0.0,PASS
+dynamic_fe,baseline,3.469446951953614e-18,PASS
+dynamic_fe,severely_adverse,6.938893903907228e-18,PASS
