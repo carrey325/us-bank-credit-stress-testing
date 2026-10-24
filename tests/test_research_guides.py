@@ -64,13 +64,26 @@ def test_audit_parser_rejects_duplicate_or_missing_keys(audit_root):
         audit_flow_inputs(audit_root, "12311", "2007-12-31", "CRE")
 
 
+def test_audit_parser_rejects_missing_zero_quarterly_component(audit_root):
+    from bankstress.research_guides import audit_flow_inputs
+
+    path = audit_root / "metadata/manual_source_audit.csv"
+    audit = pd.read_csv(path, dtype=str)
+    audit["recovery_raw_fields_and_values"] = audit.recovery_raw_fields_and_values.str.replace(
+        "RIAD3583: current_ytd=1; prior_ytd=1; quarterly=0 | ", "", regex=False,
+    )
+    audit.to_csv(path, index=False)
+    with pytest.raises(ValueError, match="12311.*recovery_raw_fields_and_values.*RIAD3583"):
+        audit_flow_inputs(audit_root, "12311", "2007-12-31", "CRE")
+
+
 def test_root_location_accepts_both_launch_directories_and_rejects_unrelated(tmp_path):
     from bankstress.research_guides import repository_root
 
     assert repository_root(ROOT) == ROOT
     assert repository_root(ROOT / "notebooks") == ROOT
     with pytest.raises(FileNotFoundError, match="repository"):
-        repository_root(ROOT.parent)
+        repository_root(Path(ROOT.anchor))
 
 
 def _runner():

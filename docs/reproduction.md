@@ -102,12 +102,35 @@ The guides neither replace the historical replay gates below nor establish a
 complete download-to-model reproduction. Their saved outputs are teaching
 artifacts, separate from the hash-bound research snapshot.
 
+Verification on 2026-10-24 (Python 3.13, pandas 2.3.3):
+
+- All three guides passed from fresh kernels with both working directories;
+  saved outputs have sequential execution counts and no error or stderr outputs.
+- Local checkout with retained historical artifacts: **150 passed**.
+- Public-only checkout: **142 passed, 8 skipped**. The skips require historical
+  reporting/stress artifacts or generated R3 validation inputs, as described above.
+- Both suites emitted 208 dependency warnings (NumPy/pandas deprecations and
+  statsmodels diagnostics); no research algorithm was changed to suppress them.
+- All 58 files in the protected directories retained identical SHA-256 hashes;
+  the historical evidence verifier passed before and after execution.
+- Independent code review found an omitted-zero-component validation gap. The
+  added failing regression passed after the adapter began checking complete raw
+  code sets against the existing component definitions.
+- HTML export succeeded and the three saved charts were visually inspected.
+  Full-page browser inspection remains incomplete: browser policy denied the
+  local file URL. Formula source was checked, but browser math rendering and
+  full-page layout have not been visually verified.
+
 To inspect an HTML rendering without changing evidence, export to an ignored or
 temporary directory, for example:
 
 ```bash
 python -m nbconvert --to html --output-dir=tmp/guides-html notebooks/01_call_reports_to_credit_losses.ipynb notebooks/02_benchmarks_and_forecast_evidence.ipynb notebooks/03_ci_stress_scenario_walkthrough.ipynb
 ```
+
+If an unrelated user-level Jupyter configuration references unavailable plugins,
+set `JUPYTER_NO_CONFIG=1` for this export process. That was necessary in the
+verification environment; no global user configuration was edited.
 
 ### Calculations from the committed snapshot
 

@@ -202,8 +202,8 @@ git diff --check
 
 ## 7. 最后交付
 
-- [ ] 在隔离分支提交本次工作，提交说明强调研究可读性、证据边界和离线导读；不 push/merge。
-- [ ] 交付三篇 notebook 的相对路径、改动文件、实际执行命令/结果、合理 skips、保存输出与 HTML 审阅情况。
+- [x] 在隔离分支提交本次工作，提交说明强调研究可读性、证据边界和离线导读；不 push/merge。
+- [x] 交付三篇 notebook 的相对路径、改动文件、实际执行命令/结果、合理 skips、保存输出与 HTML 审阅情况。
 - [x] 说明历史快照与核心研究结论保持一致；若有阻塞，准确区分未执行、执行失败、数据不存在，不能声称全面复现。
 - [x] 最后再次确认恰好三篇导读；没有新增模型拟合、改变样本、扩大实证结论或触碰其他仓库。
 
@@ -213,11 +213,15 @@ git diff --check
 - 基线 `df3aa00`，已有干净 linked worktree，创建分支 `enhancement/research-walkthroughs`；保留前一轮模型风险扩展，不 reset 到审阅版本。
 - 新增恰好三篇 notebook；依次为 15、16、15 个单元格，英文正文约 650、648、640 词，各一幅图。计算复用现有函数，无新模型拟合或新实证结论。
 - 实际执行：`python scripts/export_results.py --verify` 前后均通过，10 个历史证据文件及 summary 通过；58 个受保护文件起止 SHA-256 完全一致。
-- 实际执行：`python -m pytest -q -p no:cacheprovider`，新虚拟环境中 **149 passed**，208 条依赖相关 warning；本地原历史输入已存在，因此这一运行没有 skip，不等于重新拟合历史研究链。
+- 实际执行：`python -m pytest -q -p no:cacheprovider`，审查修复后新虚拟环境中 **150 passed**，208 条依赖相关 warning；本地原历史输入已存在，因此这一运行没有 skip，不等于重新拟合历史研究链。
 - 实际执行：`python scripts/check_research_guides.py --cwd root`、`--cwd notebooks`、`--write` 全部通过，每篇独立新内核，临时副本不包含 `outputs/`。原 notebook 已保存顺序执行输出，无 error、stderr 或机器路径输出。
-- 解析与运行器 12 项检查覆盖审计原文手算、错误 token、NaN、重复记录、错误季度、工作目录、独立内核、执行失败时保留原 notebook、禁止改动受保护输入。RED→GREEN 过程已执行。
+- 解析与运行器 13 项检查覆盖审计原文手算、错误 token、NaN、重复记录、错误季度、工作目录、独立内核、执行失败时保留原 notebook、禁止改动受保护输入。RED→GREEN 过程已执行。
 - 新 venv 使用 Python 3.13；原始 `pip install -e ".[test,guides]"` 解析到 pandas 3.1.0，导致原有 `test_unsupported_filing_spine_retains_explicit_segment_placeholders` 的空表 object/datetime merge 失败。将本地验收环境固定到 pandas 2.3.3 后通过；未修改核心依赖声明或研究算法。复现文档说明该限制。
 - 三份 HTML 已成功导出到忽略目录 `tmp/guides-html/`；用户全局 nbconvert 配置引用缺失插件，设置 `JUPYTER_NO_CONFIG=1` 后导出成功。浏览器安全策略拒绝本地 file URL，未尝试绕过；完整 HTML 页面视觉验收尚未完成。三幅保存的 PNG 已实际查看，标题、单位、图例与 synthetic 标签可读。
 - 临时目录权限问题通过在本地设置 TEMP/TMP 到忽略目录解决；Git 元数据位于旧仓库路径，分支操作经执行权限审核完成。
 - Ruling: 复用现有 worktree 并新建分支，避免复制历史输入；代价是新分支包含此前尚未推送的模型风险提交。Bash 技能辅助脚本被系统限制，改用 Python/PowerShell 维护等价任务记录。
-- 待完成：整分支独立审查、干净无历史输入副本的全套测试、提交及最终交付；不 push、不 merge。
+- 独立整分支审查完成：发现一项 Important（遗漏季度金额为零的组件仍通过汇总核对），已加失败回归并调用既有 `required_flow_components` 检查完整组件集合；修复后通过。无其他 Critical/Important/Minor。
+- 干净无历史输入副本：最终 **142 passed, 8 skipped**，208 条依赖 warning。8 项 skip 分别为报告（1）、压力产物（5）、R3 tail validation（2）；不是完整历史链重跑。
+- 全部三种导读执行命令在修复后再次通过；原有测试与历史快照均未改变。
+- 首次提交 `ad130a4`；审查修复和收尾记录另行提交，分支 `enhancement/research-walkthroughs`；不 push、不 merge。
+- 审查边界决策：审查员未重复会产生文件的测试，由执行者实跑并保留结果；无原始 FFIEC 档案/逐观测预测的新验证；整页 HTML 视觉验收因浏览器策略未完成，保留上方未勾选项。三项边界不扩展研究结论。

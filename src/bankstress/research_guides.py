@@ -6,6 +6,8 @@ import re
 
 import pandas as pd
 
+from bankstress.transform.panel import required_flow_components
+
 
 def repository_root(start: Path | None = None) -> Path:
     """Locate this repository from its root, notebooks, or a nested directory."""
@@ -78,6 +80,10 @@ def audit_flow_inputs(root: Path, bank_id: str, report_date: str, segment: str) 
 
     number = r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)"
     pattern = re.compile(rf"([A-Z0-9]+): current_ytd=({number}); prior_ytd=({number}); quarterly=({number})")
+    groups = {"CRE": ["cre_nco"], "CI": ["ci_nco_041", "ci_nco_031"],
+              "Mortgage": ["mortgage_closed_end_nco"]}
+    if segment not in groups:
+        fail("segment", "no supported component definition")
     rows = []
     for metric in ("charge_off", "recovery"):
         field = f"{metric}_raw_fields_and_values"
@@ -92,6 +98,12 @@ def audit_flow_inputs(root: Path, bank_id: str, report_date: str, segment: str) 
                 rows.append({"bank_id": str(bank_id), "report_date": when, "segment": segment,
                              "standard_metric": metric, "raw_code": code, "numeric_value": float(value),
                              "source_file": by_date[when], "evidence_label": "Recorded source-audit excerpt"})
+        # Validate complete code sets using the existing definitions. For C&I,
+        # accepting either complete set does not infer or supply a filing form.
+        candidates = [required_flow_components(segment, metric, date, {group}) for group in groups[segment]]
+        if seen not in candidates:
+            closest = min(candidates, key=lambda required: len(required.symmetric_difference(seen)))
+            fail(field, f"incomplete component set; missing={sorted(closest - seen)}, unexpected={sorted(seen - closest)}")
     return pd.DataFrame(rows)
 
 
