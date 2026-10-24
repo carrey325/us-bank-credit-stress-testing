@@ -1,0 +1,11 @@
+schema_version: 1
+cutoff: '2025-12-31'
+seed: 772
+paths: 20000
+horizon: 9
+block_length: 4
+alphas: [0.95, 0.99]
+output_root: outputs/model_risk
+factor_min_bank_fraction: 0.5
+minimum_bank_residual_quarters: 20
+historical_crossing_expected: 507

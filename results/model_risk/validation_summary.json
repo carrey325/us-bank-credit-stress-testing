@@ -1,0 +1,11 @@
+{
+  "run_id": "mrm-20261015-final",
+  "integrity_status": "PASS",
+  "historical_prediction_rows": 41720,
+  "challenger_prediction_rows": 26820,
+  "reconstruction_compared_rows": 41720,
+  "reconstruction_mismatch_rows": 0,
+  "reconstruction_max_absolute_difference": 1.3877787807814457e-17,
+  "predictive_adequacy": "DIAGNOSTIC_NOT_AUTOMATICALLY_APPROVED",
+  "stress_challenger_authorizations_added": 0
+}

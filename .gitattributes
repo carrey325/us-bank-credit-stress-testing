@@ -3,5 +3,6 @@
 *.csv -text
 configs/*.yaml -text
 results/evidence/*.json -text
+results/model_risk/** -text
 metadata/*.json -text
 *.png binary

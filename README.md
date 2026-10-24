@@ -119,6 +119,30 @@ Other limitations include a selected regional-bank sample, unsupported historica
 
 ## 6. Reproduce and inspect
 
+### Read the research in three executable guides
+
+The guides run offline from public repository inputs, with a fresh kernel for
+each notebook. They distinguish recorded source-audit excerpts, committed research
+evidence, and explicitly synthetic demonstrations; they do not refit the models.
+
+1. [From Call Reports to Annualized Credit Losses](notebooks/01_call_reports_to_credit_losses.ipynb)
+   — how YTD flows, adjacent balances, scope changes, and missing components affect a loss rate.
+2. [What the Benchmarks Say About Predictive Value](notebooks/02_benchmarks_and_forecast_evidence.ipynb)
+   — what all four windows show about mean and Q90 forecasts, including negative results.
+3. [Reading a Nine-Quarter C&I Stress Scenario](notebooks/03_ci_stress_scenario_walkthrough.ipynb)
+   — how recursive rates and static exposure produce conditional losses, and why those losses are not a capital forecast.
+
+Install `.[test,guides]`, then run `python scripts/check_research_guides.py`.
+See the [guide execution instructions](docs/reproduction.md#offline-research-guides)
+for the tested environment, both working-directory checks, and saved outputs.
+These walkthroughs do not remove the input requirements for full historical replay.
+
+The additive [model-risk extension](docs/model_risk.md) provides frozen-object
+independent scoring, persistence/Ridge/gradient-boosting challengers, a formal
+crossing retest, and fixed-parameter C&I stochastic losses around separate Fed
+scenarios. These are conditional research diagnostics with explicit calibration
+limits; the historical findings above and their evidence remain unchanged.
+
 Python 3.11 or newer:
 
 ```bash
