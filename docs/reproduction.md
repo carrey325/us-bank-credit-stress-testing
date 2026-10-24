@@ -46,6 +46,71 @@ part of these verification runs.
 
 ## 2. Recalculate the main findings
 
+### Offline research guides
+
+Read the three notebooks in order:
+
+1. [Call Reports to credit losses](../notebooks/01_call_reports_to_credit_losses.ipynb)
+2. [Benchmarks and forecast evidence](../notebooks/02_benchmarks_and_forecast_evidence.ipynb)
+3. [C&I stress scenario interpretation](../notebooks/03_ci_stress_scenario_walkthrough.ipynb)
+
+Use a fresh Python 3.11+ environment. The guide extra is separate from the core
+research dependencies:
+
+```bash
+python -m venv .venv
+# Activate .venv for your shell, then:
+python -m pip install -e ".[test,guides]"
+python -m pip install "pandas==2.3.3"
+python scripts/export_results.py --verify
+python -m pytest -q -p no:cacheprovider
+python scripts/check_research_guides.py --cwd root
+python scripts/check_research_guides.py --cwd notebooks
+python scripts/check_research_guides.py --write
+python scripts/export_results.py --verify
+```
+
+The pandas pin records the tested environment, not a change to the project's
+core dependency declaration. An unpinned fresh install resolving pandas 3.1.0
+failed the existing
+`test_unsupported_filing_spine_retains_explicit_segment_placeholders` test because
+empty panel construction mixed object and datetime merge keys. That pre-existing
+compatibility issue is outside this documentation-only research scope.
+
+After dependency installation, execution needs no network, API keys, original
+archives, private caches, or historical `outputs/`. The checker copies public
+inputs to a temporary directory and runs exactly the three named notebooks in
+separate fresh kernels using its own Python interpreter. `--cwd` selects the
+kernel's root or `notebooks/` directory. The default leaves notebooks unchanged;
+`--write` saves executed outputs only after all three pass. Each cell has a
+120-second timeout, errors fail the command, and hashes check that `results/`,
+`metadata/`, `data/manifests/`, and `configs/` remain unchanged. Kernel execution
+needs local loopback sockets; dependency installation and notebook execution are
+distinct steps. On restricted Windows hosts, point `TEMP` and `TMP` to a writable
+local scratch directory if the default temporary location is unavailable.
+
+The evidence boundaries are deliberate:
+
+- **Recorded source-audit excerpt:** reconciles saved YTD fields and audit totals;
+  it does not reopen the original FFIEC archives or supply missing loan balances.
+- **Committed research evidence:** recalculates aggregate comparisons and totals;
+  it does not recover observation-level common keys or real quarterly stress paths.
+- **Synthetic demonstration:** explains existing transformations and recursion with
+  clearly fictional inputs; it provides no additional empirical result.
+
+The guides neither replace the historical replay gates below nor establish a
+complete download-to-model reproduction. Their saved outputs are teaching
+artifacts, separate from the hash-bound research snapshot.
+
+To inspect an HTML rendering without changing evidence, export to an ignored or
+temporary directory, for example:
+
+```bash
+python -m nbconvert --to html --output-dir=tmp/guides-html notebooks/01_call_reports_to_credit_losses.ipynb notebooks/02_benchmarks_and_forecast_evidence.ipynb notebooks/03_ci_stress_scenario_walkthrough.ipynb
+```
+
+### Calculations from the committed snapshot
+
 - **Data scale:** `results/evidence/sample.csv`; unique `raw_code` values in
   `metadata/field_mapping.csv` supply the 73-code inventory.
 - **5.38% tail improvement:** filter `tail_metrics.csv` to `window == 0`
